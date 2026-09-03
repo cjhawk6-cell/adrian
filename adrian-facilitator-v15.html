@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Adrian Ingram — Facilitator v15</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#0E765A;--green2:#0C824C;--yellow:#FFF400;
+  --charcoal:#58585A;--mid:#818285;--light:#A8A9AC;
+  --font:'Roboto',Arial,sans-serif;
+  --display-bg:#0d1a13;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--font);}
+#app{display:flex;height:100vh;background:#0d1a13;}
+
+/* ── LEFT PANEL ── */
+#ctrl{width:340px;flex-shrink:0;background:#111a14;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow:hidden;}
+#ctrl-header{background:#0d1a13;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+#ctrl-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+#ctrl-logo{width:28px;height:28px;background:var(--yellow);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--green);}
+#ctrl-title{font-size:13px;font-weight:700;color:white;letter-spacing:.5px;}
+#ctrl-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px;}
+#ctrl-buttons{display:flex;flex-wrap:wrap;gap:6px;}
+.cb{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:5px;}
+#cb-start{background:var(--green);color:white;}
+#cb-start:hover{background:var(--green2);}
+#cb-stop{background:#2a0f0f;color:#ff8080;border:1px solid #4a1a1a;display:none;}
+#cb-stop:hover{background:#3a1a1a;}
+#cb-ask{background:var(--yellow);color:var(--charcoal);}
+#cb-ask:hover{background:#ede900;}
+#cb-save{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1);}
+#cb-save:hover{background:rgba(255,255,255,.12);}
+
+/* ── CLIENT SELECTOR ── */
+#client-row{display:flex;align-items:center;gap:6px;margin-top:8px;}
+#client-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);font-weight:700;white-space:nowrap;}
+#client-select{flex:1;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;font-size:11px;color:white;font-family:var(--font);cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;}
+#client-select option{background:#1a2a20;color:white;}
+#client-select.active{border-color:rgba(100,255,180,.4);background:rgba(100,255,180,.08);}
+#client-context-badge{font-size:9px;padding:2px 7px;border-radius:8px;background:rgba(100,255,180,.15);color:#64ffb4;border:1px solid rgba(100,255,180,.3);display:none;white-space:nowrap;}
+#client-context-badge.visible{display:inline-block;}
+
+/* ── AUDIENCE VISIBILITY CHIPS ── */
+#aud-vis-section{margin-top:10px;}
+#aud-vis-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:6px;}
+#aud-vis-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.aud-chip{padding:4px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.12);cursor:pointer;font-size:10px;font-weight:600;font-family:var(--font);background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);transition:all .2s;user-select:none;}
+.aud-chip.active{color:white;}
+.aud-chip[data-key="rock"].active{background:rgba(100,255,180,.18);border-color:rgba(100,255,180,.4);color:#64ffb4;}
+.aud-chip[data-key="roadblock"].active{background:rgba(252,211,77,.18);border-color:rgba(252,211,77,.4);color:#fcd34d;}
+.aud-chip[data-key="boulder"].active{background:rgba(196,181,253,.18);border-color:rgba(196,181,253,.4);color:#c4b5fd;}
+.aud-chip[data-key="todo"].active{background:rgba(147,197,253,.18);border-color:rgba(147,197,253,.4);color:#93c5fd;}
+.aud-chip[data-key="pebble"].active{background:rgba(253,186,116,.18);border-color:rgba(253,186,116,.4);color:#fdba74;}
+.aud-chip[data-key="parking"].active{background:rgba(148,163,184,.18);border-color:rgba(148,163,184,.4);color:#94a3b8;}
+#aud-vis-hint{font-size:9px;color:rgba(255,255,255,.2);margin-top:5px;line-height:1.4;}
+
+/* API + session */
+#ctrl-api-row,#ctrl-dg-row{display:flex;align-items:center;gap:6px;margin-top:8px;}
+#ctrl-api-label,#ctrl-dg-label{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap;}
+#ctrl-api-input,#ctrl-dg-input{flex:1;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);}
+
+/* Speaker calibration (Tier 1 — session-only) */
+#speaker-calib-wrap{margin-top:8px;padding:8px;background:rgba(196,130,255,.06);border:1px solid rgba(196,130,255,.2);border-radius:6px;}
+#speaker-calib-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(196,130,255,.7);font-weight:700;margin-bottom:6px;}
+.speaker-calib-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.speaker-calib-idx{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap;width:66px;flex-shrink:0;}
+.speaker-calib-input{flex:1;padding:4px 7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:4px;font-size:11px;color:white;font-family:var(--font);}
+.tr-speaker{font-size:9px;font-weight:700;color:#c482ff;text-transform:uppercase;letter-spacing:.3px;margin-right:4px;}
+#ctrl-session{width:100%;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);margin-top:6px;}
+#ctrl-session::placeholder,#ctrl-api-input::placeholder,#ctrl-dg-input::placeholder{color:rgba(255,255,255,.25);}
+
+/* supabase row */
+#ctrl-supa-row{display:flex;align-items:center;gap:6px;margin-top:6px;}
+#ctrl-supa-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;transition:background .3s;}
+#ctrl-supa-dot.connected{background:#64ffb4;}
+#ctrl-supa-dot.error{background:#ff4444;}
+#ctrl-supa-label{font-size:10px;color:rgba(255,255,255,.35);}
+
+/* status row */
+#ctrl-status-row{padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;gap:8px;}
+#ctrl-rec-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;transition:background .3s;}
+#ctrl-rec-dot.live{background:#ff4444;animation:pulse-red 1.2s infinite;}
+@keyframes pulse-red{0%,100%{opacity:1;}50%{opacity:.3;}}
+#ctrl-status-text{font-size:11px;color:rgba(255,255,255,.5);flex:1;}
+#ctrl-timer{font-size:11px;color:rgba(255,255,255,.4);font-variant-numeric:tabular-nums;}
+#ctrl-wordcount{font-size:10px;color:rgba(255,255,255,.3);}
+
+/* tabs */
+#ctrl-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.ctab{flex:1;padding:9px 2px;font-size:10px;font-weight:500;color:rgba(255,255,255,.4);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:var(--font);}
+.ctab.active{color:var(--yellow);border-bottom-color:var(--yellow);}
+.ctab:hover:not(.active){color:rgba(255,255,255,.7);}
+#ctrl-body{flex:1;overflow:hidden;position:relative;}
+.tab-pane{position:absolute;inset:0;overflow-y:auto;padding:10px;display:none;}
+.tab-pane.active{display:block;}
+
+/* transcript */
+.tr-entry{margin-bottom:8px;}
+.tr-time{font-size:9px;color:rgba(255,255,255,.3);margin-bottom:2px;}
+.tr-text{font-size:12px;line-height:1.5;color:rgba(255,255,255,.7);background:rgba(255,255,255,.04);border-left:2px solid rgba(255,255,255,.1);padding:5px 8px;border-radius:0 4px 4px 0;}
+.tr-text.interim{color:rgba(255,255,255,.35);font-style:italic;}
+
+/* thought cards */
+.thought-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;overflow:hidden;animation:cFadeIn .3s ease;}
+@keyframes cFadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.thought-card-head{padding:7px 10px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);}
+.thought-card-hl{font-size:11px;font-weight:700;color:rgba(255,255,255,.8);flex:1;}
+.thought-card-time{font-size:9px;color:rgba(255,255,255,.3);}
+.thought-card-body{padding:8px 10px;}
+.thought-card-text{font-size:12px;line-height:1.55;color:rgba(255,255,255,.65);margin-bottom:7px;}
+.thought-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px;}
+.tc-tag{font-size:9px;padding:1px 7px;border-radius:8px;font-weight:500;}
+.tc-tag-ai{background:rgba(99,179,237,.15);color:#90cdf4;}
+.tc-tag-strategy{background:rgba(104,211,145,.12);color:#9ae6b4;}
+.tc-tag-action{background:rgba(255,244,0,.1);color:#fef08a;}
+.tc-tag-risk{background:rgba(252,129,74,.12);color:#fca57a;}
+.tc-tag-opportunity{background:rgba(183,148,244,.12);color:#c4b5fd;}
+.tc-tag-quip{background:rgba(255,220,100,.12);color:#fde68a;font-style:italic;}
+.thought-card-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.tca{padding:4px 10px;border-radius:5px;border:none;cursor:pointer;font-size:10px;font-weight:600;font-family:var(--font);transition:all .15s;}
+.tca-show{background:var(--yellow);color:var(--charcoal);}
+.tca-show:hover{background:#ede900;}
+.tca-dismiss{background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.08);}
+
+/* keywords tab */
+.kw-section{margin-bottom:14px;}
+.kw-section-title{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.3);font-weight:700;margin-bottom:8px;}
+.kw-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.kw-badge{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid transparent;}
+.kw-badge:hover{filter:brightness(1.2);}
+.kw-badge-fire-btn{padding:2px 6px;border-radius:8px;border:none;cursor:pointer;font-size:9px;background:rgba(255,255,255,.15);color:white;font-family:var(--font);font-weight:700;transition:all .15s;flex-shrink:0;}
+.kw-badge-fire-btn:hover{background:rgba(255,244,0,.4);color:#333;}
+.kw-badge-del-btn{padding:2px 5px;border-radius:8px;border:none;cursor:pointer;font-size:9px;background:rgba(255,60,60,.2);color:#ff8080;font-family:var(--font);font-weight:700;transition:all .15s;flex-shrink:0;}
+.kw-badge-del-btn:hover{background:rgba(255,60,60,.45);}
+.emote-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.emote-btn{padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.1);cursor:pointer;font-size:14px;background:rgba(255,255,255,.05);transition:all .15s;display:flex;align-items:center;gap:5px;font-family:var(--font);}
+.emote-btn:hover{background:rgba(255,255,255,.15);transform:scale(1.1);border-color:rgba(255,255,255,.25);}
+.emote-btn:active{transform:scale(.93);}
+.emote-btn-label{font-size:9px;color:rgba(255,255,255,.4);font-weight:500;}
+.kw-add-row{display:flex;gap:6px;margin-top:6px;}
+.kw-add-input{flex:1;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);}
+.kw-add-input::placeholder{color:rgba(255,255,255,.25);}
+.kw-add-btn{padding:5px 10px;border-radius:5px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);background:var(--green);color:white;transition:all .15s;}
+.kw-add-btn:hover{background:var(--green2);}
+.kw-suggest-btn{width:100%;padding:7px;border-radius:6px;border:1px dashed rgba(255,244,0,.3);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);background:rgba(255,244,0,.05);color:var(--yellow);transition:all .15s;margin-top:4px;}
+.kw-suggest-btn:hover{background:rgba(255,244,0,.1);}
+
+/* saved tab */
+.save-btn-row{display:flex;gap:6px;margin-top:8px;}
+.save-action-btn{flex:1;padding:7px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);transition:all .15s;}
+#btn-save-summary{background:var(--green);color:white;}
+#btn-save-summary:hover{background:var(--green2);}
+#btn-export{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.1);}
+#btn-export:hover{background:rgba(255,255,255,.14);}
+#btn-clear-session{background:rgba(200,0,0,.15);color:#ff8080;border:1px solid rgba(200,0,0,.2);}
+#btn-clear-session:hover{background:rgba(200,0,0,.25);}
+.saved-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:background .15s;}
+.saved-item:hover{background:rgba(255,255,255,.08);}
+.saved-item-title{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);}
+.saved-item-meta{font-size:10px;color:rgba(255,255,255,.3);margin-top:2px;}
+
+/* toast */
+#toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{padding:10px 14px;border-radius:10px;font-family:var(--font);font-size:12px;font-weight:600;border:1px solid transparent;opacity:0;transform:translateX(20px);transition:opacity .3s,transform .3s;pointer-events:none;max-width:240px;line-height:1.4;}
+.toast.visible{opacity:1;transform:translateX(0);}
+.toast-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;opacity:.7;margin-bottom:2px;}
+
+/* Ask Adrian modal */
+#ask-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;}
+#ask-overlay.visible{display:flex;}
+#ask-card{background:#1a2520;border:1px solid rgba(255,244,0,.25);border-radius:14px;padding:24px;width:520px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+#ask-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);margin-bottom:6px;}
+#ask-subtitle{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:16px;line-height:1.5;}
+#ask-input{width:100%;min-height:90px;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:white;font-family:var(--font);font-size:14px;line-height:1.5;resize:vertical;outline:none;transition:border-color .2s;}
+#ask-input:focus{border-color:var(--yellow);}
+#ask-input::placeholder{color:rgba(255,255,255,.25);}
+#ask-hint{font-size:11px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.4;}
+#ask-buttons{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.ask-btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s;}
+#ask-cancel{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);}
+#ask-cancel:hover{background:rgba(255,255,255,.15);}
+#ask-freeform{background:rgba(100,200,255,.15);color:#93c5fd;border:1px solid rgba(100,200,255,.3);}
+#ask-freeform:hover{background:rgba(100,200,255,.25);}
+#ask-submit{background:var(--yellow);color:var(--charcoal);}
+#ask-submit:hover{background:#ede900;}
+#ask-submit:disabled{opacity:.5;cursor:not-allowed;}
+
+#error-banner{display:none;background:#2a0f0f;border-top:1px solid #4a1a1a;color:#ff8080;padding:7px 14px;font-size:11px;flex-shrink:0;}
+
+/* ── RIGHT PANEL: BOARD ── */
+#board{flex:1;display:flex;flex-direction:column;background:var(--display-bg);overflow:hidden;position:relative;}
+#board-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(14,118,90,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(14,118,90,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+
+/* board header */
+#board-header{position:relative;z-index:10;display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(13,26,19,.9);backdrop-filter:blur(8px);flex-shrink:0;}
+#board-orb-wrap{position:relative;flex-shrink:0;}
+#board-orb{width:52px;height:52px;border-radius:50%;overflow:hidden;position:relative;flex-shrink:0;}
+#orb-svg{width:52px;height:52px;display:block;}
+#orb-glow{position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(100,255,180,.3);pointer-events:none;transition:border-color .4s,box-shadow .4s;}
+#board-orb-wrap.standby #orb-glow{border-color:rgba(255,244,0,.15);}
+#board-orb-wrap.listening #orb-glow{border-color:rgba(100,255,180,.7);animation:orb-glow-listen 1.4s ease-in-out infinite;}
+#board-orb-wrap.thinking #orb-glow{border-color:rgba(255,220,60,.8);animation:orb-glow-think 1.8s ease-in-out infinite;}
+#board-orb-wrap.speaking #orb-glow{border-color:var(--yellow);animation:orb-glow-speak .3s ease-in-out infinite alternate;}
+@keyframes orb-glow-listen{0%,100%{box-shadow:0 0 0 0 rgba(100,255,180,.3);}50%{box-shadow:0 0 0 8px rgba(100,255,180,0);}}
+@keyframes orb-glow-think{0%,100%{box-shadow:0 0 0 0 rgba(255,220,60,.3);}50%{box-shadow:0 0 0 10px rgba(255,220,60,0);}}
+@keyframes orb-glow-speak{from{box-shadow:0 0 0 0 rgba(255,244,0,.4);}to{box-shadow:0 0 0 6px rgba(255,244,0,0);}}
+#board-orb-wrap.listening #board-orb{animation:orb-bob .9s ease-in-out infinite alternate;}
+#board-orb-wrap.thinking #board-orb{animation:orb-think 2.5s ease-in-out infinite;}
+@keyframes orb-bob{from{transform:translateY(0);}to{transform:translateY(-3px);}}
+@keyframes orb-think{0%,100%{transform:rotate(0);}30%{transform:rotate(-2deg);}70%{transform:rotate(2deg);}}
+
+#board-header-info{flex:1;min-width:0;}
+#board-session-name{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#board-state-label{font-size:10px;color:rgba(255,255,255,.25);margin-top:2px;}
+#board-timer-display{font-size:13px;color:rgba(255,255,255,.4);font-variant-numeric:tabular-nums;font-weight:500;flex-shrink:0;}
+#board-audience-status{display:flex;align-items:center;gap:4px;flex-shrink:0;font-size:10px;color:rgba(255,255,255,.3);}
+#board-aud-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s;}
+#board-aud-dot.active{background:#64ffb4;}
+
+/* ── AGENDA RAIL ── */
+#agenda-rail-wrap{display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;overflow:hidden;}
+#agenda-rail{flex:1;display:flex;align-items:center;gap:6px;overflow-x:auto;padding-bottom:2px;}
+#agenda-rail::-webkit-scrollbar{height:3px;}
+#agenda-rail-empty{font-size:11px;color:rgba(255,255,255,.25);font-style:italic;}
+#agenda-edit-btn{flex-shrink:0;padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);font-size:10px;font-family:var(--font);cursor:pointer;white-space:nowrap;}
+#agenda-edit-btn:hover{background:rgba(255,255,255,.1);}
+.agenda-pill{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);font-size:11px;color:rgba(255,255,255,.35);white-space:nowrap;transition:all .2s;}
+.agenda-pill.done{color:rgba(255,255,255,.3);border-color:rgba(100,255,180,.25);}
+.agenda-pill.done .agenda-pill-check{color:#64ffb4;}
+.agenda-pill.active{background:rgba(255,244,0,.1);border-color:rgba(255,244,0,.5);color:#fff;box-shadow:0 0 0 1px rgba(255,244,0,.15);}
+.agenda-pill-timer{font-variant-numeric:tabular-nums;font-size:10px;color:rgba(255,244,0,.8);}
+.agenda-pill-btn{padding:2px 8px;border-radius:10px;border:none;font-size:9px;font-weight:700;cursor:pointer;font-family:var(--font);text-transform:uppercase;letter-spacing:.5px;}
+.agenda-pill-btn.start{background:var(--green);color:white;}
+.agenda-pill-btn.end{background:#ff4444;color:white;}
+
+/* Agenda tab (left panel) */
+.agenda-row{display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:6px;margin-bottom:6px;}
+.agenda-row-label{flex:1;font-size:12px;color:rgba(255,255,255,.75);}
+.agenda-row-type{font-size:9px;padding:2px 6px;border-radius:8px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);}
+.agenda-row-del{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:12px;padding:2px 4px;}
+.agenda-row-del:hover{color:#ff8080;}
+#agenda-add-row{display:flex;gap:5px;margin-top:8px;}
+#agenda-add-label{flex:2;padding:6px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);}
+#agenda-add-type{flex:1;padding:6px 4px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:10px;color:white;font-family:var(--font);}
+#agenda-add-btn{padding:6px 10px;border-radius:5px;border:none;background:var(--green);color:white;font-size:11px;cursor:pointer;}
+#agenda-default-btn{width:100%;margin-top:10px;padding:7px;border-radius:6px;border:1px dashed rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;font-family:var(--font);}
+#agenda-default-btn:hover{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.3);}
+
+/* Saved agendas (Phase 1: reusable per-client templates) */
+#saved-agenda-section{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);}
+#saved-agenda-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:6px;}
+#saved-agenda-hint{font-size:10px;color:rgba(255,255,255,.25);font-style:italic;margin-bottom:6px;}
+.saved-agenda-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:7px 9px;margin-bottom:5px;}
+.saved-agenda-item-info{flex:1;min-width:0;}
+.saved-agenda-item-title{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);}
+.saved-agenda-item-meta{font-size:9px;color:rgba(255,255,255,.3);margin-top:1px;}
+.saved-agenda-item-btn{padding:4px 9px;border-radius:5px;border:none;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font);flex-shrink:0;}
+.saved-agenda-load{background:var(--green);color:white;}
+.saved-agenda-load:hover{background:var(--green2);}
+.saved-agenda-del{background:rgba(255,60,60,.15);color:#ff8080;}
+.saved-agenda-del:hover{background:rgba(255,60,60,.3);}
+#save-agenda-row{display:flex;gap:5px;margin-top:2px;}
+#save-agenda-name{flex:1;padding:6px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);}
+#save-agenda-name::placeholder{color:rgba(255,255,255,.25);}
+#save-agenda-btn{padding:6px 10px;border-radius:5px;border:none;background:var(--green);color:white;font-size:11px;cursor:pointer;font-family:var(--font);}
+#save-agenda-btn:hover{background:var(--green2);}
+
+/* AI-suggested badge + segment strip on item cards */
+.board-item{position:relative;border-left:3px solid transparent;}
+.board-item.seg-tagged{padding-left:9px;}
+.board-item-ai-badge{font-size:8px;font-weight:700;padding:1px 5px;border-radius:6px;background:rgba(255,244,0,.15);color:#fff400;letter-spacing:.5px;flex-shrink:0;}
+.board-item-mention-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;background:rgba(255,120,50,.18);color:#ff8c42;letter-spacing:.3px;flex-shrink:0;}
+.board-item-mention-badge.corroborated{background:rgba(196,130,255,.2);color:#c482ff;}
+.board-item.drag-over{outline:2px dashed rgba(255,255,255,.4);outline-offset:-2px;}
+.board-item[draggable="true"]{cursor:grab;}
+.board-item.dragging{opacity:.4;}
+.board-col.drop-target{background:rgba(255,255,255,.03);}
+
+/* thought bubble on board */
+#board-bubble{position:absolute;top:76px;left:78px;z-index:50;background:rgba(255,255,255,.97);border-radius:16px;padding:14px 18px;width:380px;max-width:calc(100vw - 400px);opacity:0;transform:translateY(8px) scale(.97);transition:opacity .4s,transform .4s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.4);}
+#board-bubble.visible{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+#board-bubble::before{content:'';position:absolute;top:-10px;left:28px;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.8);}
+#board-bubble::after{content:'';position:absolute;top:-18px;left:22px;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.5);}
+#bb-headline{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:6px;}
+#bb-text{font-size:13px;line-height:1.6;color:#1a2a24;}
+#bb-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.bb-tag{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:500;}
+.bb-tag-ai{background:#e8f4fe;color:#1a5f9e;}
+.bb-tag-strategy{background:#e6f4ef;color:#0E765A;}
+.bb-tag-action{background:#fffce0;color:#7a7200;}
+.bb-tag-risk{background:#fde8e8;color:#a00;}
+.bb-tag-opportunity{background:#f0e8fd;color:#6a1ab5;}
+#bb-close{position:absolute;top:8px;right:10px;border:none;background:none;cursor:pointer;font-size:16px;color:rgba(0,0,0,.3);line-height:1;}
+#bb-close:hover{color:rgba(0,0,0,.6);}
+
+/* board columns */
+#board-cols{flex:1;display:flex;gap:12px;padding:14px 16px;overflow-x:auto;overflow-y:hidden;align-items:stretch;min-height:0;}
+#board-cols::-webkit-scrollbar{height:4px;}
+#board-cols::-webkit-scrollbar-track{background:rgba(255,255,255,.04);}
+#board-cols::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px;}
+.board-col{flex:1;min-width:200px;max-width:320px;display:flex;flex-direction:column;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid rgba(255,255,255,.07);overflow:hidden;}
+.board-col-header{padding:10px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.board-col-icon{font-size:14px;flex-shrink:0;}
+.board-col-label{font-size:11px;font-weight:700;flex:1;text-transform:uppercase;letter-spacing:.8px;}
+.board-col-badge{font-size:9px;padding:1px 7px;border-radius:8px;font-weight:700;min-width:20px;text-align:center;}
+.board-col-add{width:22px;height:22px;border-radius:5px;border:1px dashed rgba(255,255,255,.2);cursor:pointer;background:none;color:rgba(255,255,255,.4);font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
+.board-col-add:hover{background:rgba(255,255,255,.08);color:white;border-color:rgba(255,255,255,.4);}
+.board-col-items{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:5px;}
+.board-col-items::-webkit-scrollbar{width:3px;}
+.board-col-items::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+.board-item{display:flex;align-items:flex-start;gap:6px;padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);animation:cFadeIn .3s ease;cursor:default;}
+.board-item:hover{background:rgba(255,255,255,.08);}
+.board-item-num{font-size:10px;font-weight:700;min-width:18px;flex-shrink:0;padding-top:1px;}
+.board-item-text{font-size:11px;line-height:1.45;color:rgba(255,255,255,.8);flex:1;word-break:break-word;}
+.board-item-del{padding:1px 4px;border-radius:3px;border:none;cursor:pointer;font-size:9px;background:rgba(255,60,60,.12);color:rgba(255,128,128,.6);font-family:var(--font);transition:all .15s;flex-shrink:0;margin-top:1px;opacity:0;}
+.board-item:hover .board-item-del{opacity:1;}
+.board-item-del:hover{background:rgba(255,60,60,.35);color:#ff8080;}
+.board-col-empty{font-size:10px;color:rgba(255,255,255,.15);padding:8px 4px;font-style:italic;text-align:center;}
+
+/* board quick-add inline */
+.board-col-add-row{padding:6px 8px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.06);display:none;}
+.board-col-add-row.open{display:flex;gap:5px;}
+.board-col-add-inp{flex:1;padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;font-size:11px;color:white;font-family:var(--font);outline:none;}
+.board-col-add-inp::placeholder{color:rgba(255,255,255,.25);}
+.board-col-add-inp:focus{border-color:rgba(255,255,255,.3);}
+.board-col-add-ok{padding:5px 9px;border-radius:5px;border:none;cursor:pointer;font-size:11px;font-weight:700;font-family:var(--font);background:var(--green);color:white;transition:all .15s;}
+.board-col-add-ok:hover{background:var(--green2);}
+
+/* board command bar */
+#board-cmd-bar{padding:10px 16px;border-top:1px solid rgba(255,255,255,.07);background:rgba(13,26,19,.9);backdrop-filter:blur(8px);flex-shrink:0;display:flex;gap:8px;align-items:center;}
+#board-cmd-hint{font-size:9px;color:rgba(255,255,255,.25);white-space:nowrap;}
+#board-cmd-input{flex:1;padding:7px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;font-size:12px;color:white;font-family:var(--font);outline:none;transition:border-color .2s;}
+#board-cmd-input:focus{border-color:rgba(255,255,255,.25);}
+#board-cmd-input::placeholder{color:rgba(255,255,255,.2);}
+#board-cmd-btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font);background:var(--green);color:white;transition:all .15s;flex-shrink:0;}
+#board-cmd-btn:hover{background:var(--green2);}
+
+/* ── HARD HAT ── */
+#orb-hat{
+  position:absolute;
+  top:-30px;
+  left:50%;
+  transform:translateX(-50%) translateY(-60px);
+  width:84px;
+  z-index:30;
+  pointer-events:none;
+  opacity:0;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.5));
+}
+#orb-hat.wearing{
+  animation:hat-drop .75s cubic-bezier(.34,1.5,.64,1) forwards;
+}
+#orb-hat.removing{
+  animation:hat-lift .35s ease-in forwards;
+}
+@keyframes hat-drop{
+  0%{opacity:0;transform:translateX(-50%) translateY(-60px);}
+  40%{opacity:1;}
+  68%{transform:translateX(-50%) translateY(6px);}
+  84%{transform:translateX(-50%) translateY(-3px);}
+  100%{opacity:1;transform:translateX(-50%) translateY(0);}
+}
+@keyframes hat-lift{
+  0%{opacity:1;transform:translateX(-50%) translateY(0);}
+  30%{transform:translateX(-50%) translateY(-8px);}
+  100%{opacity:0;transform:translateX(-50%) translateY(-70px);}
+}
+
+/* capture pulse on orb */
+@keyframes orb-capture{0%{box-shadow:0 0 0 0 var(--cap-color);}100%{box-shadow:0 0 0 16px rgba(0,0,0,0);}}
+.orb-capture-flash{animation:orb-capture .6s ease-out 2!important;}
+
+/* auto-show toggle */
+#auto-show-toggle-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding:6px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:6px;}
+#auto-show-label{font-size:11px;color:rgba(255,255,255,.55);flex:1;line-height:1.3;}
+#auto-show-label span{font-size:9px;display:block;color:rgba(255,255,255,.3);margin-top:2px;}
+.toggle-switch{position:relative;width:36px;height:20px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:10px;cursor:pointer;transition:background .2s;}
+.toggle-slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:rgba(255,255,255,.7);border-radius:50%;transition:transform .2s;}
+.toggle-switch input:checked+.toggle-slider{background:var(--green);}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(16px);background:white;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- LEFT PANEL -->
+  <div id="ctrl">
+    <div id="ctrl-header">
+      <div id="ctrl-logo-row">
+        <div id="ctrl-logo">AI</div>
+        <div>
+          <div id="ctrl-title">ADRIAN INGRAM</div>
+          <div id="ctrl-sub">Facilitator — v15</div>
+        </div>
+      </div>
+      <div id="ctrl-buttons">
+        <button class="cb" id="cb-start">▶ Start Listening</button>
+        <button class="cb" id="cb-stop">■ Stop</button>
+        <button class="cb" id="cb-ask">✦ Ask Adrian</button>
+        <button class="cb" id="cb-save">⬇ Save</button>
+      </div>
+
+      <!-- Client selector -->
+      <div id="client-row">
+        <span id="client-label">Client</span>
+        <select id="client-select">
+          <option value="">— No client selected —</option>
+        </select>
+        <span id="client-context-badge">✦ Context loaded</span>
+      </div>
+
+      <!-- Audience visibility chips -->
+      <div id="aud-vis-section">
+        <div id="aud-vis-label">Show on Audience Display</div>
+        <div id="aud-vis-chips">
+          <div class="aud-chip active" data-key="rock">🪨 Rocks</div>
+          <div class="aud-chip active" data-key="roadblock">⚠️ Roadblocks</div>
+          <div class="aud-chip" data-key="boulder">⛰️ Boulders</div>
+          <div class="aud-chip" data-key="todo">✅ To-Dos</div>
+          <div class="aud-chip" data-key="pebble">🔸 Pebbles</div>
+          <div class="aud-chip" data-key="parking">🅿️ Long Term</div>
+        </div>
+        <div id="aud-vis-hint">Tap chips to toggle what the audience sees</div>
+      </div>
+
+      <div id="ctrl-api-row">
+        <span id="ctrl-api-label">API Key</span>
+        <input id="ctrl-api-input" type="password" placeholder="sk-ant-..."/>
+      </div>
+      <div id="ctrl-dg-row">
+        <span id="ctrl-dg-label">Deepgram</span>
+        <input id="ctrl-dg-input" type="password" placeholder="Optional — enables speaker detection"/>
+      </div>
+      <div id="speaker-calib-wrap" style="display:none;">
+        <div id="speaker-calib-label">Speakers detected — assign names:</div>
+        <div id="speaker-calib-list"></div>
+      </div>
+      <input id="ctrl-session" type="text" placeholder="Session name (e.g. Q3 Planning — Acme)"/>
+      <div id="ctrl-supa-row">
+        <div id="ctrl-supa-dot"></div>
+        <span id="ctrl-supa-label">Supabase: connecting…</span>
+      </div>
+    </div>
+
+    <div id="ctrl-status-row">
+      <div id="ctrl-rec-dot"></div>
+      <span id="ctrl-status-text">Ready — press Start to begin</span>
+      <span id="ctrl-timer">0:00</span>
+      <span id="ctrl-wordcount"></span>
+    </div>
+
+    <div id="ctrl-tabs">
+      <button class="ctab active" data-tab="thoughts">Thoughts</button>
+      <button class="ctab" data-tab="transcript">Transcript</button>
+      <button class="ctab" data-tab="keywords">Keywords</button>
+      <button class="ctab" data-tab="saved">Saved</button>
+      <button class="ctab" data-tab="agenda">Agenda</button>
+    </div>
+
+    <div id="ctrl-body">
+      <!-- Thoughts tab -->
+      <div class="tab-pane active" id="tab-thoughts">
+        <div id="auto-show-toggle-row">
+          <div id="auto-show-label">Auto-show thoughts on board
+            <span>Adrian's insights appear as overlays automatically</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="auto-show-toggle" checked/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div id="thoughts-list" style="margin-top:8px;"></div>
+        <div id="thoughts-empty" style="font-size:11px;color:rgba(255,255,255,.2);padding:10px 4px;font-style:italic;">
+          Thoughts appear as Adrian listens…
+        </div>
+      </div>
+
+      <!-- Transcript tab -->
+      <div class="tab-pane" id="tab-transcript">
+        <div id="transcript-list"></div>
+        <div id="transcript-empty" style="font-size:11px;color:rgba(255,255,255,.2);padding:10px 4px;font-style:italic;">Transcript will appear here…</div>
+      </div>
+
+      <!-- Keywords tab -->
+      <div class="tab-pane" id="tab-keywords">
+        <div class="kw-section">
+          <div class="kw-section-title">Active Keywords</div>
+          <div id="kw-grid" class="kw-grid"></div>
+          <div class="kw-add-row">
+            <input class="kw-add-input" id="kw-add-input" placeholder="Add keyword…"/>
+            <button class="kw-add-btn" id="kw-add-btn">+ Add</button>
+          </div>
+          <button class="kw-suggest-btn" id="kw-suggest-btn">✦ Suggest keywords from transcript</button>
+        </div>
+        <div class="kw-section">
+          <div class="kw-section-title">Quick Reactions</div>
+          <div class="emote-grid" id="emote-grid"></div>
+        </div>
+      </div>
+
+      <!-- Saved tab -->
+      <div class="tab-pane" id="tab-saved">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Session insights &amp; exports</div>
+        <div class="save-btn-row">
+          <button class="save-action-btn" id="btn-save-summary">✦ AI Summary</button>
+          <button class="save-action-btn" id="btn-export">⬇ Export Board</button>
+        </div>
+        <button class="save-action-btn" id="btn-clear-session" style="width:100%;margin-top:6px;">✕ Clear Session</button>
+        <div id="saved-list" style="margin-top:10px;"></div>
+        <div id="saved-empty" style="font-size:11px;color:rgba(255,255,255,.2);padding:8px 4px;font-style:italic;margin-top:8px;">Nothing saved yet.</div>
+      </div>
+
+      <!-- Agenda tab -->
+      <div class="tab-pane" id="tab-agenda">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Segments mirror this session's actual agenda. Start/End each one from the rail above the board — items and transcript get tagged with whichever segment is active.</div>
+        <div id="saved-agenda-section">
+          <div id="saved-agenda-label">Saved Agendas</div>
+          <div id="saved-agenda-hint">Select a client above to save or load an agenda template.</div>
+          <div id="saved-agenda-list"></div>
+          <div id="save-agenda-row" style="display:none;">
+            <input id="save-agenda-name" placeholder="Name this agenda, e.g. Quarterly Planning"/>
+            <button id="save-agenda-btn">Save Current</button>
+          </div>
+        </div>
+        <div id="agenda-list"></div>
+        <div id="agenda-list-empty" style="font-size:11px;color:rgba(255,255,255,.2);padding:8px 4px;font-style:italic;">No segments yet.</div>
+        <div id="agenda-add-row">
+          <input id="agenda-add-label" placeholder="Segment name, e.g. Scorecard Review"/>
+          <select id="agenda-add-type"></select>
+          <button id="agenda-add-btn">+</button>
+        </div>
+        <button id="agenda-default-btn">Use default agenda (one segment per category)</button>
+      </div>
+    </div>
+
+    <div id="error-banner"></div>
+  </div>
+
+  <!-- RIGHT PANEL: BOARD -->
+  <div id="board">
+    <div id="board-bg-grid"></div>
+
+    <!-- Board header with Adrian orb -->
+    <div id="board-header">
+      <div id="board-orb-wrap" class="standby">
+        <div id="board-orb">
+          <svg id="orb-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="orb-clip"><circle cx="50" cy="50" r="48"/></clipPath>
+              <radialGradient id="orb-shade" cx="35%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#1ca47d"/>
+                <stop offset="60%" stop-color="#0E765A"/>
+                <stop offset="100%" stop-color="#075039"/>
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="48" fill="url(#orb-shade)"/>
+            <g clip-path="url(#orb-clip)">
+              <line x1="95" y1="5" x2="5" y2="95" stroke="#0a3a2e" stroke-width="3.6" stroke-linecap="round" opacity=".85"/>
+              <line x1="100" y1="10" x2="10" y2="100" stroke="#0a3a2e" stroke-width="3.6" stroke-linecap="round" opacity=".85"/>
+              <line x1="105" y1="15" x2="15" y2="105" stroke="#0a3a2e" stroke-width="3.6" stroke-linecap="round" opacity=".85"/>
+              <line x1="110" y1="20" x2="20" y2="110" stroke="#0a3a2e" stroke-width="3.6" stroke-linecap="round" opacity=".85"/>
+            </g>
+            <circle cx="50" cy="50" r="48" fill="none" stroke="#0a2920" stroke-width="2"/>
+            <g class="face-default">
+              <path d="M33 38 Q40 34 47 38" stroke="#0a1a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <path d="M53 38 Q60 34 67 38" stroke="#0a1a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <g class="eye-l">
+                <ellipse cx="40" cy="50" rx="7" ry="9" fill="white" stroke="#0a1a10" stroke-width=".8"/>
+                <ellipse cx="41" cy="52" rx="3" ry="4" fill="#0a0a0a"/>
+                <circle cx="42" cy="50" r="1.3" fill="white"/>
+              </g>
+              <g class="eye-r">
+                <ellipse cx="60" cy="50" rx="7" ry="9" fill="white" stroke="#0a1a10" stroke-width=".8"/>
+                <ellipse cx="61" cy="52" rx="3" ry="4" fill="#0a0a0a"/>
+                <circle cx="62" cy="50" r="1.3" fill="white"/>
+              </g>
+              <g class="mouth-closed">
+                <path d="M42 70 Q50 74 58 70" stroke="#0a1a10" stroke-width="2" fill="none" stroke-linecap="round"/>
+              </g>
+              <g class="mouth-open" style="display:none">
+                <ellipse cx="50" cy="71" rx="7" ry="2" fill="#0a0505">
+                  <animate attributeName="ry" values="2;5;2;6;2;4;2" dur="0.45s" repeatCount="indefinite"/>
+                  <animate attributeName="rx" values="7;6;7;5.5;7;6;7" dur="0.45s" repeatCount="indefinite"/>
+                </ellipse>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div id="orb-glow"></div>
+        <!-- Hard hat — drops on client select -->
+        <div id="orb-hat">
+          <svg viewBox="0 0 84 50" xmlns="http://www.w3.org/2000/svg">
+            <!-- shadow -->
+            <ellipse cx="42" cy="48" rx="28" ry="2.5" fill="rgba(0,0,0,.25)"/>
+            <!-- dome -->
+            <path d="M14 36 C12 22 20 8 42 6 C64 8 72 22 70 36 Z" fill="#FFD700"/>
+            <!-- dome highlight -->
+            <path d="M20 30 C20 20 26 10 42 8 C32 12 26 20 26 30 Z" fill="rgba(255,255,255,.22)"/>
+            <!-- vent ridge -->
+            <path d="M30 19 Q42 16 54 19" fill="none" stroke="#e0a800" stroke-width="1.8" stroke-linecap="round"/>
+            <!-- brim -->
+            <path d="M6 36 Q42 44 78 36 L76 38 Q42 46 8 38 Z" fill="#e6b800"/>
+            <!-- brim top edge -->
+            <path d="M14 36 Q42 41 70 36" fill="none" stroke="#e0a800" stroke-width="1.2"/>
+            <!-- CE Floyd badge — blue rect + actual logo paths scaled inside -->
+            <rect x="28" y="19" width="28" height="18" rx="2.5" fill="#1172ba"/>
+            <!-- Logo: white version of the 3 CEF paths, nested svg scales them -->
+            <svg x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
+              <path fill="white" d="m172.18,592.41H0V0c.82,0,1.92,0,3.02,0C200.14,0,397.26,0,594.38,0c3.7,0,3.71.01,3.71,3.67,0,35.5,0,71.01,0,106.51q0,4.02-3.96,4.07c-1.6.02-3.2.02-4.8.02-137.79,0-275.57,0-413.36,0q-4.36,0-4.36,4.37c.03,19.31.07,38.61.09,57.92.16,137.21.32,274.42.48,411.63,0,1.3,0,2.61,0,4.23Z"/>
+              <path fill="white" d="m240.13,357.5v-4.08c0-36.16.03-72.32-.06-108.49,0-2.81.65-3.65,3.58-3.65,75.25.09,150.5.08,225.74.03,2.44,0,3.44.45,3.43,3.22-.09,36.54-.09,73.08,0,109.62,0,2.71-.74,3.46-3.47,3.46-74.68-.09-149.36-.09-224.05-.11-1.59,0-3.18,0-5.17,0Z"/>
+              <path fill="white" d="m239.88,478.23h113.5v114.05h-113.5v-114.05Z"/>
+            </svg>
+          </svg>
+        </div>
+      </div>
+
+      <div id="board-header-info">
+        <div id="board-session-name">New Session</div>
+        <div id="board-state-label">Standby — press Start to begin</div>
+      </div>
+      <div id="board-timer-display">0:00</div>
+      <div id="board-audience-status">
+        <div id="board-aud-dot"></div>
+        <span id="board-aud-text">Audience: off</span>
+      </div>
+    </div>
+
+    <!-- Agenda rail -->
+    <div id="agenda-rail-wrap">
+      <div id="agenda-rail"><span id="agenda-rail-empty">No agenda set — add segments in the Agenda tab</span></div>
+      <button id="agenda-edit-btn">✎ Agenda</button>
+    </div>
+
+    <!-- Thought bubble overlay -->
+    <div id="board-bubble">
+      <button id="bb-close">×</button>
+      <div id="bb-headline">INSIGHT</div>
+      <div id="bb-text"></div>
+      <div id="bb-tags"></div>
+    </div>
+
+    <!-- 6 capture columns -->
+    <div id="board-cols">
+      <!-- Columns injected by JS via CATS -->
+    </div>
+
+    <!-- Command bar -->
+    <div id="board-cmd-bar">
+      <span id="board-cmd-hint">Manual add →</span>
+      <input id="board-cmd-input" type="text" placeholder='e.g. "rock: Hire VP of Sales" or "todo: Send follow-up by Friday"'/>
+      <button id="board-cmd-btn">Add</button>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="ask-overlay">
+    <div id="ask-card">
+      <div id="ask-title">ASK ADRIAN</div>
+      <div id="ask-subtitle">Type a direct question or prompt for Adrian to respond to on the board display.</div>
+      <textarea id="ask-input" placeholder="What's the biggest theme we haven't addressed yet?"></textarea>
+      <div id="ask-hint">Adrian will respond with a thought displayed as an overlay on the board.</div>
+      <div id="ask-buttons">
+        <button class="ask-btn" id="ask-cancel">Cancel</button>
+        <button class="ask-btn" id="ask-freeform">Freestyle</button>
+        <button class="ask-btn" id="ask-submit">Ask ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+</div>
+
+<!-- Local Supabase credentials — see config.example.js. Never commit config.js. -->
+<script src="config.js"></script>
+<!-- Local client context — see clients.example.js. Never commit clients.js. -->
+<script src="clients.js"></script>
+<script>
+/* ── CLIENT CONFIG ── */
+const CLIENT_PROFILES=window.CLIENT_PROFILES||{};
+if(!Object.keys(CLIENT_PROFILES).length){console.error('Adrian: clients.js not found or empty. Copy clients.example.js to clients.js and add client profiles.');}
+
+/* ── CATEGORY CONFIG ── */
+const CATS=[
+  {key:'rock',     label:'Rocks',         icon:'🪨',color:'#64ffb4',toastBg:'#0d2e1e',badgeBg:'rgba(100,255,180,.15)'},
+  {key:'roadblock',label:'Roadblocks',    icon:'⚠️',color:'#fcd34d',toastBg:'#2e1e08',badgeBg:'rgba(252,211,77,.15)'},
+  {key:'boulder',  label:'1-Yr Boulders', icon:'⛰️',color:'#c4b5fd',toastBg:'#1a0d2e',badgeBg:'rgba(196,181,253,.15)'},
+  {key:'todo',     label:'To-Dos',        icon:'✅',color:'#93c5fd',toastBg:'#0d1a2e',badgeBg:'rgba(147,197,253,.15)'},
+  {key:'pebble',   label:'Pebbles',       icon:'🔸',color:'#fdba74',toastBg:'#2e1a0d',badgeBg:'rgba(253,186,116,.15)'},
+  {key:'parking',  label:'Long Term',     icon:'🅿️',color:'#94a3b8',toastBg:'#1a1a1a',badgeBg:'rgba(148,163,184,.15)'},
+];
+
+/* ── STATE ── */
+let activeClient=null; // key into CLIENT_PROFILES
+let items={rock:[],roadblock:[],boulder:[],todo:[],pebble:[],parking:[]};
+let counters={rock:0,roadblock:0,boulder:0,todo:0,pebble:0,parking:0};
+let audienceVisible=new Set(['rock','roadblock']);
+let isListening=false;
+let elapsedSec=0;
+let timerInterval=null;
+let recognition=null;
+let aiActive=false;
+let transcriptBuffer='';
+let wordCount=0;
+let transcriptEntries=[];
+let thoughts=[];
+let savedItems=[];
+let keywords=[];
+let lastAiCallTime=0;
+const AI_INTERVAL_MS=18000;
+let supabaseOk=false;
+let dbSessionId=null; // Phase 0: real sessions.id once a session row is created
+
+/* ── VOICE-AWARE (Deepgram) ── */
+let dgSocket=null;
+let dgMediaRecorder=null;
+let dgMicStream=null;
+let dgActive=false; // true while the Deepgram path (vs Web Speech API) is running
+let dgLastSpeaker=null; // raw speaker index (0,1,2...) of the most recent final utterance
+let dgSpeakerNames={}; // {0:'Chris Floyd', ...} — session-only calibration, never persisted
+let dgSeenSpeakers=new Set();
+
+/* ── PHASE 1: AGENDA / SEGMENTS ── */
+let agenda=[]; // [{label, segment_type, dbId, started_at, ended_at}]
+let activeSegmentIndex=-1;
+let dragState=null; // {key, idx} of the item card currently being dragged
+const CFG=window.ADRIAN_CONFIG||{};
+const SUPABASE_URL=CFG.SUPABASE_URL||'';
+const SUPABASE_KEY=CFG.SUPABASE_KEY||'';
+const SUPABASE_TABLE=CFG.SUPABASE_TABLE||'ai_sessions';
+const SESSION_ID=CFG.SESSION_ID||'main-session';
+if(!SUPABASE_URL||!SUPABASE_KEY){console.error('Adrian: config.js not found or incomplete. Copy config.example.js to config.js and add your Supabase URL/key.');}
+const tagMap={AI:'tc-tag-ai',Strategy:'tc-tag-strategy',Action:'tc-tag-action',Risk:'tc-tag-risk',Opportunity:'tc-tag-opportunity',Automation:'tc-tag-ai',People:'tc-tag-strategy',Process:'tc-tag-action',Technology:'tc-tag-ai',Data:'tc-tag-ai',Quip:'tc-tag-quip',Finance:'tc-tag-action',Operations:'tc-tag-strategy',Culture:'tc-tag-opportunity',Sales:'tc-tag-opportunity'};
+const bbTagMap={AI:'bb-tag-ai',Strategy:'bb-tag-strategy',Action:'bb-tag-action',Risk:'bb-tag-risk',Opportunity:'bb-tag-opportunity',Automation:'bb-tag-ai',People:'bb-tag-strategy',Process:'bb-tag-action',Technology:'bb-tag-ai',Data:'bb-tag-ai',Finance:'bb-tag-action',Operations:'bb-tag-strategy',Culture:'bb-tag-opportunity',Sales:'bb-tag-opportunity'};
+const EMOTES=[{e:'👏',l:'Applause'},{e:'💡',l:'Idea'},{e:'🔥',l:'Hot'},{e:'⚠️',l:'Flag'},{e:'✅',l:'Agree'},{e:'❓',l:'Question'}];
+
+/* ── DOM REFS ── */
+const cbStart=document.getElementById('cb-start');
+const cbStop=document.getElementById('cb-stop');
+const cbAsk=document.getElementById('cb-ask');
+const cbSave=document.getElementById('cb-save');
+const recDot=document.getElementById('ctrl-rec-dot');
+const statusText=document.getElementById('ctrl-status-text');
+const ctrlTimer=document.getElementById('ctrl-timer');
+const boardTimer=document.getElementById('board-timer-display');
+const wordcountEl=document.getElementById('ctrl-wordcount');
+const apiInput=document.getElementById('ctrl-api-input');
+const dgInput=document.getElementById('ctrl-dg-input'); // Deepgram key — session-only, never persisted, same pattern as apiInput
+const sessionInput=document.getElementById('ctrl-session');
+const supaLabel=document.getElementById('ctrl-supa-label');
+const supaDot=document.getElementById('ctrl-supa-dot');
+const boardSessionName=document.getElementById('board-session-name');
+const boardStateLabel=document.getElementById('board-state-label');
+const boardAudDot=document.getElementById('board-aud-dot');
+const boardAudText=document.getElementById('board-aud-text');
+const boardBubble=document.getElementById('board-bubble');
+const bbHeadline=document.getElementById('bb-headline');
+const bbText=document.getElementById('bb-text');
+const bbTags=document.getElementById('bb-tags');
+const bbClose=document.getElementById('bb-close');
+const boardCols=document.getElementById('board-cols');
+const boardCmdInput=document.getElementById('board-cmd-input');
+const boardCmdBtn=document.getElementById('board-cmd-btn');
+const orbWrap=document.getElementById('board-orb-wrap');
+const thoughtsList=document.getElementById('thoughts-list');
+const transcriptList=document.getElementById('transcript-list');
+const errorBanner=document.getElementById('error-banner');
+const askOverlay=document.getElementById('ask-overlay');
+const askInput=document.getElementById('ask-input');
+const askSubmit=document.getElementById('ask-submit');
+const askCancel=document.getElementById('ask-cancel');
+const askFreeform=document.getElementById('ask-freeform');
+
+/* ── BUILD BOARD COLUMNS ── */
+function buildColumns(){
+  boardCols.innerHTML='';
+  CATS.forEach(cat=>{
+    const col=document.createElement('div');
+    col.className='board-col';
+    col.id=`col-${cat.key}`;
+    col.innerHTML=`
+      <div class="board-col-header">
+        <span class="board-col-icon">${cat.icon}</span>
+        <span class="board-col-label" style="color:${cat.color}">${cat.label}</span>
+        <span class="board-col-badge" id="badge-${cat.key}" style="background:${cat.badgeBg};color:${cat.color}">0</span>
+        <button class="board-col-add" data-key="${cat.key}" title="Quick add">+</button>
+      </div>
+      <div class="board-col-items" id="items-${cat.key}">
+        <div class="board-col-empty" id="empty-${cat.key}">No ${cat.label.toLowerCase()} yet</div>
+      </div>
+      <div class="board-col-add-row" id="addrow-${cat.key}">
+        <input class="board-col-add-inp" id="addinp-${cat.key}" placeholder="Add ${cat.label.toLowerCase().replace(/1-yr /,'')}…"/>
+        <button class="board-col-add-ok" data-key="${cat.key}">↵</button>
+      </div>`;
+    boardCols.appendChild(col);
+
+    // quick-add button
+    col.querySelector('.board-col-add').addEventListener('click',()=>openQuickAdd(cat.key));
+    // ok button
+    col.querySelector('.board-col-add-ok').addEventListener('click',()=>commitQuickAdd(cat.key));
+    // enter key in input
+    col.querySelector('.board-col-add-inp').addEventListener('keydown',e=>{if(e.key==='Enter')commitQuickAdd(cat.key);if(e.key==='Escape')closeQuickAdd(cat.key);});
+
+    // drag-and-drop reclassification target
+    col.addEventListener('dragover',e=>{
+      if(!dragState)return;
+      e.preventDefault();
+      col.classList.add('drop-target');
+    });
+    col.addEventListener('dragleave',()=>col.classList.remove('drop-target'));
+    col.addEventListener('drop',e=>{
+      e.preventDefault();
+      col.classList.remove('drop-target');
+      if(!dragState||dragState.key===cat.key)return;
+      const {key:fromKey,idx:fromIdx}=dragState;
+      const [moved]=items[fromKey].splice(fromIdx,1);
+      if(!moved)return;
+      counters[cat.key]++;
+      moved.num=counters[cat.key];
+      items[cat.key].push(moved);
+      renderColItems(fromKey);
+      renderColItems(cat.key);
+      syncSupabase();
+      dbInsertItem(cat.key,moved.text,moved.num,moved.speaker).then(id=>{moved.dbId=id;}); // durable record under its new category
+      dragState=null;
+    });
+  });
+}
+
+function openQuickAdd(key){
+  CATS.forEach(c=>closeQuickAdd(c.key));
+  const row=document.getElementById(`addrow-${key}`);
+  row.classList.add('open');
+  setTimeout(()=>document.getElementById(`addinp-${key}`).focus(),50);
+}
+function closeQuickAdd(key){
+  const row=document.getElementById(`addrow-${key}`);
+  if(row){row.classList.remove('open');document.getElementById(`addinp-${key}`).value='';}
+}
+function commitQuickAdd(key){
+  const inp=document.getElementById(`addinp-${key}`);
+  const text=inp.value.trim();
+  if(!text)return;
+  addItem(key,text,false);
+  closeQuickAdd(key);
+}
+
+/* ── ITEM MANAGEMENT ── */
+function addItem(key,text,fromAI=false){
+  counters[key]++;
+  const activeSeg=agenda[activeSegmentIndex]||null;
+  const speaker=dgActive?resolveSpeakerName(dgLastSpeaker):null;
+  const item={num:counters[key],text,fromAI,segType:activeSeg?activeSeg.segment_type:null,segLabel:activeSeg?activeSeg.label:null,dbId:null,mentionCount:0,speaker,mentionSpeakers:speaker?[speaker]:[]};
+  items[key].push(item);
+  renderColItems(key);
+  showToast(key,text);
+  if(!fromAI)pulseOrb(key);
+  syncSupabase();
+  dbInsertItem(key,text,item.num,speaker).then(id=>{item.dbId=id;});
+}
+
+function logItemMention(key,num,text){
+  const item=items[key].find(it=>it.num===num);
+  if(!item){addItem(key,text,true);return;} // referenced item not found — fall back to adding fresh rather than losing it
+  item.mentionCount=(item.mentionCount||0)+1;
+  const mentionSpeaker=dgActive?resolveSpeakerName(dgLastSpeaker):null;
+  if(!item.mentionSpeakers)item.mentionSpeakers=item.speaker?[item.speaker]:[];
+  if(mentionSpeaker&&!item.mentionSpeakers.includes(mentionSpeaker))item.mentionSpeakers.push(mentionSpeaker);
+  renderColItems(key);
+  showToast(key,`Echoed again: ${text}`);
+  syncSupabase();
+  dbInsertItemMention(item.dbId,text,mentionSpeaker);
+}
+
+function segmentColor(segType){
+  if(!segType)return 'transparent';
+  const c=CATS.find(x=>x.key===segType);
+  return c?c.color:'#94a3b8'; // 'custom' or unmatched segment types get a neutral strip
+}
+
+function mentionBadgeHtml(it){
+  if(!it.mentionCount)return '';
+  const distinctSpeakers=(it.mentionSpeakers||[]).length;
+  if(distinctSpeakers>=2){
+    // Multiple different people independently raised this — corroboration, not redundancy
+    const names=it.mentionSpeakers.join(', ');
+    return `<span class="board-item-mention-badge corroborated" title="Raised independently by ${distinctSpeakers} people: ${escHtml(names)}">👥 ×${distinctSpeakers}</span>`;
+  }
+  // No speaker data yet, or it's genuinely the same person repeating themselves
+  return `<span class="board-item-mention-badge" title="Mentioned again ${it.mentionCount} time${it.mentionCount>1?'s':''} this session">🔁 ×${it.mentionCount+1}</span>`;
+}
+
+function renderColItems(key){
+  const cat=CATS.find(c=>c.key===key);
+  const container=document.getElementById(`items-${key}`);
+  const emptyEl=document.getElementById(`empty-${key}`);
+  const badge=document.getElementById(`badge-${key}`);
+  const arr=items[key];
+  badge.textContent=arr.length;
+  if(!arr.length){
+    container.innerHTML=`<div class="board-col-empty" id="empty-${key}">No ${cat.label.toLowerCase()} yet</div>`;
+    return;
+  }
+  container.innerHTML=arr.map((it,idx)=>`
+    <div class="board-item${it.segType?' seg-tagged':''}" draggable="true" data-key="${key}" data-idx="${idx}" style="border-left-color:${segmentColor(it.segType)}" title="${it.segLabel?escHtml(it.segLabel):''}">
+      <span class="board-item-num" style="color:${cat.color}">#${it.num}</span>
+      <span class="board-item-text">${escHtml(it.text)}</span>
+      ${it.fromAI?'<span class="board-item-ai-badge">AI</span>':''}
+      ${mentionBadgeHtml(it)}
+      <button class="board-item-del" data-key="${key}" data-idx="${idx}">✕</button>
+    </div>`).join('');
+  container.querySelectorAll('.board-item-del').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const k=btn.dataset.key;const i=parseInt(btn.dataset.idx);
+      items[k].splice(i,1);
+      renderColItems(k);
+      syncSupabase();
+    });
+  });
+  container.querySelectorAll('.board-item').forEach(card=>{
+    card.addEventListener('dragstart',e=>{
+      dragState={key:card.dataset.key,idx:parseInt(card.dataset.idx)};
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    card.addEventListener('dragend',()=>{
+      card.classList.remove('dragging');
+      document.querySelectorAll('.board-col.drop-target').forEach(c=>c.classList.remove('drop-target'));
+    });
+  });
+}
+
+function showToast(key,text){
+  const cat=CATS.find(c=>c.key===key);
+  const t=document.createElement('div');
+  t.className='toast';
+  t.style.background=cat.toastBg;
+  t.style.color=cat.color;
+  t.style.borderColor=`${cat.color}44`;
+  t.innerHTML=`<div class="toast-label">${cat.icon} ${cat.label}</div>${escHtml(text.length>60?text.slice(0,60)+'…':text)}`;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(()=>t.classList.add('visible'),10);
+  setTimeout(()=>{t.classList.remove('visible');setTimeout(()=>t.remove(),400);},4000);
+}
+
+function showToastPlain(text){
+  const t=document.createElement('div');
+  t.className='toast';
+  t.style.background='#111a14';
+  t.style.color='rgba(255,255,255,.85)';
+  t.style.borderColor='rgba(255,255,255,.15)';
+  t.textContent=text;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(()=>t.classList.add('visible'),10);
+  setTimeout(()=>{t.classList.remove('visible');setTimeout(()=>t.remove(),400);},3000);
+}
+
+function pulseOrb(key){
+  const cat=CATS.find(c=>c.key===key);
+  orbWrap.style.setProperty('--cap-color',`${cat.color}44`);
+  const glow=document.getElementById('orb-glow');
+  glow.classList.remove('orb-capture-flash');
+  void glow.offsetWidth;
+  glow.style.borderColor=cat.color;
+  glow.classList.add('orb-capture-flash');
+  setTimeout(()=>{glow.classList.remove('orb-capture-flash');glow.style.borderColor='';},1400);
+}
+
+/* ── AUDIENCE CHIPS ── */
+function initAudChips(){
+  document.querySelectorAll('.aud-chip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      const key=chip.dataset.key;
+      if(audienceVisible.has(key)){audienceVisible.delete(key);chip.classList.remove('active');}
+      else{audienceVisible.add(key);chip.classList.add('active');}
+      updateAudStatus();
+      syncSupabase();
+    });
+  });
+}
+
+function updateAudStatus(){
+  const count=audienceVisible.size;
+  if(count===0){boardAudDot.classList.remove('active');boardAudText.textContent='Audience: off';}
+  else{boardAudDot.classList.add('active');boardAudText.textContent=`Audience: ${count} categor${count===1?'y':'ies'}`;}
+}
+
+/* ── TABS ── */
+document.querySelectorAll('.ctab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── TIMER ── */
+function startTimer(){
+  if(timerInterval)return;
+  timerInterval=setInterval(()=>{
+    elapsedSec++;
+    const m=Math.floor(elapsedSec/60);const s=elapsedSec%60;
+    const t=`${m}:${String(s).padStart(2,'0')}`;
+    ctrlTimer.textContent=t;boardTimer.textContent=t;
+    if(activeSegmentIndex!==-1){
+      const seg=agenda[activeSegmentIndex];
+      const el=document.getElementById(`agenda-pill-timer-${activeSegmentIndex}`);
+      if(seg&&seg.started_at&&el)el.textContent=formatElapsed(Date.now()-new Date(seg.started_at).getTime());
+    }
+  },1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
+
+/* ── ORB STATE ── */
+function setOrbState(state){
+  orbWrap.className='';orbWrap.classList.add(state);
+  const mo=document.querySelector('#orb-svg .mouth-open');
+  const mc=document.querySelector('#orb-svg .mouth-closed');
+  if(state==='speaking'){mo.style.display='';mc.style.display='none';}
+  else{mo.style.display='none';mc.style.display='';}
+  boardStateLabel.textContent={standby:'Standby — press Start to begin',listening:'Listening…',thinking:'Thinking…',speaking:'Speaking / showing thought'}[state]||state;
+}
+
+/* ── SPEECH RECOGNITION (dispatcher — Deepgram if a key is entered, Web Speech API otherwise) ── */
+function startListening(){
+  if(dgInput.value.trim()){
+    startListeningDeepgram();
+  }else{
+    startListeningWebSpeech();
+  }
+}
+
+function stopListening(){
+  if(dgActive){
+    stopListeningDeepgram();
+  }else{
+    stopListeningWebSpeech();
+  }
+}
+
+function startListeningWebSpeech(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){showError('Speech recognition not available in this browser.');return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();
+  recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
+  recognition.onstart=()=>{isListening=true;recDot.classList.add('live');statusText.textContent='Listening…';setOrbState('listening');startTimer();};
+  recognition.onend=()=>{if(isListening)recognition.start();};
+  recognition.onerror=e=>{if(e.error!=='no-speech')showError('Speech error: '+e.error);};
+  recognition.onresult=e=>{
+    let interim='';let final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    if(final){
+      transcriptBuffer+=final;
+      wordCount+=final.trim().split(/\s+/).length;
+      wordcountEl.textContent=wordCount+' words';
+      addTranscriptEntry(final.trim(),false);
+      maybeCallAI();
+    }
+    if(interim){
+      const last=transcriptList.querySelector('.tr-text.interim');
+      if(last)last.textContent=interim;
+      else{const el=document.createElement('div');el.className='tr-text interim';el.textContent=interim;transcriptList.appendChild(el);}
+    }
+    document.getElementById('transcript-empty').style.display='none';
+  };
+  recognition.start();
+}
+
+function stopListeningWebSpeech(){
+  isListening=false;
+  if(recognition){try{recognition.stop();}catch(e){}}
+  recognition=null;
+  recDot.classList.remove('live');
+  statusText.textContent='Stopped';
+  setOrbState('standby');
+  stopTimer();
+}
+
+/* ── SPEECH RECOGNITION (Deepgram streaming — adds speaker diarization) ──
+   Uses the Sec-WebSocket-Protocol auth pattern Deepgram documents for
+   browser clients (no custom headers possible on a WebSocket handshake):
+   new WebSocket(url, ['token', apiKey]). The key is typed in each session
+   and held only in memory, same pattern as the Claude key. */
+async function startListeningDeepgram(){
+  const dgKey=dgInput.value.trim();
+  if(!dgKey){showError('Enter a Deepgram API key, or clear that field to use browser speech recognition instead.');return;}
+  try{
+    dgMicStream=await navigator.mediaDevices.getUserMedia({audio:true});
+  }catch(e){showError('Microphone access denied: '+e.message);return;}
+
+  const params=new URLSearchParams({
+    model:'nova-3',diarize:'true',punctuate:'true',smart_format:'true',
+    interim_results:'true',endpointing:'300'
+  });
+
+  try{
+    dgSocket=new WebSocket(`wss://api.deepgram.com/v1/listen?${params.toString()}`,['token',dgKey]);
+  }catch(e){showError('Could not open Deepgram connection: '+e.message);return;}
+
+  dgSocket.onopen=()=>{
+    dgActive=true;isListening=true;
+    recDot.classList.add('live');statusText.textContent='Listening (speaker detection on)…';
+    setOrbState('listening');startTimer();
+    try{
+      dgMediaRecorder=new MediaRecorder(dgMicStream,{mimeType:'audio/webm;codecs=opus'});
+    }catch(e){showError('MediaRecorder error: '+e.message);return;}
+    dgMediaRecorder.ondataavailable=e=>{
+      if(e.data.size>0&&dgSocket&&dgSocket.readyState===WebSocket.OPEN)dgSocket.send(e.data);
+    };
+    dgMediaRecorder.start(250);
+  };
+
+  dgSocket.onmessage=e=>{
+    let data;
+    try{data=JSON.parse(e.data);}catch(err){return;}
+    const alt=data?.channel?.alternatives?.[0];
+    if(!alt)return;
+    if(!data.is_final){
+      if(alt.transcript){
+        const last=transcriptList.querySelector('.tr-text.interim');
+        if(last)last.textContent=alt.transcript;
+        else{const el=document.createElement('div');el.className='tr-text interim';el.textContent=alt.transcript;transcriptList.appendChild(el);}
+        document.getElementById('transcript-empty').style.display='none';
+      }
+      return;
+    }
+    const words=alt.words||[];
+    if(!words.length){
+      if(alt.transcript&&alt.transcript.trim())commitDiarizedFinal(dgLastSpeaker,alt.transcript.trim());
+      return;
+    }
+    // Group consecutive same-speaker words into one entry per speaker turn
+    let curSpeaker=words[0].speaker;
+    let curWords=[];
+    words.forEach(w=>{
+      if(w.speaker!==curSpeaker){
+        commitDiarizedFinal(curSpeaker,curWords.join(' '));
+        curWords=[];curSpeaker=w.speaker;
+      }
+      curWords.push(w.punctuated_word||w.word);
+    });
+    if(curWords.length)commitDiarizedFinal(curSpeaker,curWords.join(' '));
+  };
+
+  dgSocket.onerror=()=>{showError('Deepgram connection error.');};
+  dgSocket.onclose=()=>{
+    if(isListening&&dgActive)showError('Deepgram connection closed unexpectedly — press Stop and Start again to reconnect.');
+  };
+}
+
+function commitDiarizedFinal(speakerIdx,text){
+  if(!text||!text.trim())return;
+  noteSpeakerSeen(speakerIdx);
+  dgLastSpeaker=speakerIdx;
+  const speakerName=resolveSpeakerName(speakerIdx);
+  transcriptBuffer+=text+' ';
+  wordCount+=text.trim().split(/\s+/).length;
+  wordcountEl.textContent=wordCount+' words';
+  addTranscriptEntry(text.trim(),false,speakerName);
+  maybeCallAI();
+}
+
+function stopListeningDeepgram(){
+  isListening=false;dgActive=false;
+  if(dgMediaRecorder){try{dgMediaRecorder.stop();}catch(e){}}
+  dgMediaRecorder=null;
+  if(dgMicStream){dgMicStream.getTracks().forEach(t=>t.stop());}
+  dgMicStream=null;
+  if(dgSocket){try{dgSocket.close();}catch(e){}}
+  dgSocket=null;
+  recDot.classList.remove('live');
+  statusText.textContent='Stopped';
+  setOrbState('standby');
+  stopTimer();
+}
+
+/* ── SPEAKER CALIBRATION (Tier 1 — session-only, unsupervised) ── */
+function resolveSpeakerName(idx){
+  if(idx===null||idx===undefined)return null;
+  return dgSpeakerNames[idx]||`Speaker ${idx}`;
+}
+
+function noteSpeakerSeen(idx){
+  if(idx===null||idx===undefined||dgSeenSpeakers.has(idx))return;
+  dgSeenSpeakers.add(idx);
+  renderSpeakerCalibration();
+}
+
+function renderSpeakerCalibration(){
+  const wrap=document.getElementById('speaker-calib-wrap');
+  const list=document.getElementById('speaker-calib-list');
+  if(!wrap||!list)return;
+  if(!dgSeenSpeakers.size){wrap.style.display='none';return;}
+  wrap.style.display='';
+  list.innerHTML=[...dgSeenSpeakers].sort((a,b)=>a-b).map(idx=>`
+    <div class="speaker-calib-row">
+      <span class="speaker-calib-idx">Speaker ${idx}</span>
+      <input class="speaker-calib-input" data-idx="${idx}" placeholder="Assign name…" value="${dgSpeakerNames[idx]?escHtml(dgSpeakerNames[idx]):''}"/>
+    </div>`).join('');
+  list.querySelectorAll('.speaker-calib-input').forEach(inp=>{
+    inp.addEventListener('change',()=>{
+      const idx=parseInt(inp.dataset.idx);
+      const v=inp.value.trim();
+      if(v)dgSpeakerNames[idx]=v;else delete dgSpeakerNames[idx];
+    });
+  });
+}
+
+function addTranscriptEntry(text,isInterim,speaker=null){
+  const d=document.createElement('div');d.className='tr-entry';
+  const now=new Date();const ts=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const speakerTag=speaker?`<span class="tr-speaker">${escHtml(speaker)}</span> `:'';
+  d.innerHTML=`<div class="tr-time">${ts}</div><div class="tr-text${isInterim?' interim':''}">${speakerTag}${escHtml(text)}</div>`;
+  transcriptList.appendChild(d);
+  transcriptList.scrollTop=transcriptList.scrollHeight;
+  transcriptEntries.push({ts,text,isInterim,speaker});
+  dbInsertTranscriptChunk(text,speaker);
+}
+
+/* ── AI PROCESSING ── */
+async function maybeCallAI(){
+  if(aiActive)return;
+  const now=Date.now();
+  if(now-lastAiCallTime<AI_INTERVAL_MS)return;
+  if(!transcriptBuffer.trim()||transcriptBuffer.trim().split(/\s+/).length<20)return;
+  lastAiCallTime=now;
+  const bufferSnapshot=transcriptBuffer;
+  transcriptBuffer='';
+  await callAI(bufferSnapshot,false);
+}
+
+async function callAI(text,isFreeform,userQuestion=''){
+  const apiKey=apiInput.value.trim();
+  if(!apiKey){showError('Enter your Claude API key above.');return;}
+  aiActive=true;setOrbState('thinking');
+  const catDescriptions=CATS.map(c=>`- ${c.key}: ${c.label}`).join('\n');
+  const existingItemsBlock=CATS.map(c=>{
+    if(!items[c.key].length)return null;
+    return `${c.key.toUpperCase()}:\n${items[c.key].map(it=>`  #${it.num}: ${it.text}`).join('\n')}`;
+  }).filter(Boolean).join('\n');
+  const client=activeClient?CLIENT_PROFILES[activeClient]:null;
+  const clientBlock=client?`
+== CLIENT CONTEXT ==
+Client: ${client.name}
+Industry: ${client.industry}
+Location: ${client.location}
+Team size: ${client.size}
+Leadership team: ${client.leadership}
+Ideal client profiles (ICPs): ${client.icps}
+Company flywheel: ${client.flywheel}
+Active strategic themes:
+${client.activeThemes.map(t=>`  - ${t}`).join('\n')}
+Key terminology: ${client.terminology}
+Tone guidance: ${client.toneGuidance}
+== END CLIENT CONTEXT ==
+`:'';
+  const sysPrompt=`You are Adrian Ingram, an intelligent AI facilitator embedded in a strategic planning session using EOS/Traction methodology.
+
+You listen to conversation and extract insights in JSON format. You must return ONLY valid JSON — no text before or after.
+${clientBlock}
+You identify items across these 6 capture categories:
+${catDescriptions}
+
+Category definitions:
+- rock: Quarterly priorities/goals (SMART, 90-day horizon)
+- roadblock: Issues, obstacles, or blockers to progress
+- boulder: Annual priorities or goals (12-month horizon)
+- todo: Specific action items, tasks, or follow-ups
+- pebble: Small quick tasks or minor items worth tracking
+- parking: Good ideas that aren't relevant this quarter — long-term consideration
+${existingItemsBlock?`
+Items already captured this session (numbered per category):
+${existingItemsBlock}
+`:''}
+Required JSON format:
+{
+  "headline": "2-5 word insight title",
+  "insight": "1-3 sentence observation or synthesis${client?` — tailor language and analogies to ${client.name}'s context and industry`:''}",
+  "tags": ["tag1","tag2"],
+  "captures": [
+    {"type": "rock|roadblock|boulder|todo|pebble|parking", "text": "item text, concise and actionable", "matches_item_num": null}
+  ]
+}
+
+Rules:
+- captures array may be empty if nothing clear was identified
+- Only capture items clearly stated or strongly implied — do NOT hallucinate
+- tags choose from: AI, Strategy, Action, Risk, Opportunity, People, Process, Technology, Finance, Operations, Culture, Sales, Quip
+- insight should be a genuine synthesis, not a summary${client?`\n- Use client-specific terminology naturally when relevant (${client.terminology})`:''}
+- captures text should be concise (max 10 words)
+- matches_item_num: if this transcript segment is restating or echoing an item already captured this session (same underlying point, even if worded differently or said by someone else), set this to that item's number within its category instead of treating it as new. Leave it null if the point is genuinely new. This matters even if it sounds like a different person saying it — same underlying issue/rock/etc still counts as a match.
+${userQuestion?`\nUser question: ${userQuestion}`:''}`;
+
+  const userMsg=isFreeform
+    ?`The facilitator asks: "${text}"\n\nRecent transcript context:\n${transcriptEntries.slice(-8).map(e=>e.text).join(' ')}`
+    :`Recent meeting transcript segment:\n"${text}"`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,system:sysPrompt,messages:[{role:'user',content:userMsg}]})
+    });
+    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||res.status);}
+    const data=await res.json();
+    const raw=data.content[0].text.trim();
+    let parsed;
+    try{parsed=JSON.parse(raw);}
+    catch(e){const m=raw.match(/\{[\s\S]*\}/);if(m)parsed=JSON.parse(m[0]);else throw new Error('JSON parse failed');}
+    handleAIResult(parsed);
+  }catch(e){showError('AI error: '+e.message);}
+  finally{aiActive=false;if(isListening)setOrbState('listening');else setOrbState('standby');}
+}
+
+function handleAIResult(parsed){
+  // Add captures (or log a mention if this echoes an existing item)
+  if(parsed.captures&&parsed.captures.length){
+    parsed.captures.forEach(cap=>{
+      const cat=CATS.find(c=>c.key===cap.type);
+      if(!cat||!cap.text||!cap.text.trim())return;
+      if(cap.matches_item_num){
+        logItemMention(cap.type,cap.matches_item_num,cap.text.trim());
+      }else{
+        addItem(cap.type,cap.text.trim(),true);
+      }
+    });
+  }
+  // Show thought
+  const autoShow=document.getElementById('auto-show-toggle').checked;
+  if(parsed.insight){
+    const thought={id:Date.now(),headline:parsed.headline||'INSIGHT',text:parsed.insight,tags:parsed.tags||[],time:new Date().toLocaleTimeString()};
+    thoughts.unshift(thought);
+    renderThoughts();
+    if(autoShow)showBubble(thought);
+    else setOrbState(isListening?'listening':'standby');
+  }
+}
+
+function showBubble(thought){
+  setOrbState('speaking');
+  bbHeadline.textContent=thought.headline;
+  bbText.textContent=thought.text;
+  bbTags.innerHTML=(thought.tags||[]).map(t=>`<span class="bb-tag ${bbTagMap[t]||'bb-tag-ai'}">${t}</span>`).join('');
+  boardBubble.classList.add('visible');
+  setTimeout(()=>{boardBubble.classList.remove('visible');if(isListening)setOrbState('listening');else setOrbState('standby');},12000);
+}
+
+bbClose.addEventListener('click',()=>{boardBubble.classList.remove('visible');if(isListening)setOrbState('listening');else setOrbState('standby');});
+
+function renderThoughts(){
+  const empty=document.getElementById('thoughts-empty');
+  if(!thoughts.length){empty.style.display='';thoughtsList.innerHTML='';return;}
+  empty.style.display='none';
+  thoughtsList.innerHTML=thoughts.map((th,idx)=>`
+    <div class="thought-card">
+      <div class="thought-card-head">
+        <span class="thought-card-hl">${escHtml(th.headline)}</span>
+        <span class="thought-card-time">${th.time}</span>
+      </div>
+      <div class="thought-card-body">
+        <div class="thought-card-text">${escHtml(th.text)}</div>
+        <div class="thought-card-tags">${(th.tags||[]).map(t=>`<span class="tc-tag ${tagMap[t]||'tc-tag-ai'}">${t}</span>`).join('')}</div>
+        <div class="thought-card-actions">
+          <button class="tca tca-show" data-idx="${idx}">Show on Board</button>
+          <button class="tca tca-dismiss" data-idx="${idx}">Dismiss</button>
+        </div>
+      </div>
+    </div>`).join('');
+  thoughtsList.querySelectorAll('.tca-show').forEach(btn=>{
+    btn.addEventListener('click',()=>showBubble(thoughts[parseInt(btn.dataset.idx)]));
+  });
+  thoughtsList.querySelectorAll('.tca-dismiss').forEach(btn=>{
+    btn.addEventListener('click',()=>{thoughts.splice(parseInt(btn.dataset.idx),1);renderThoughts();});
+  });
+}
+
+/* ── COMMAND BAR ── */
+function parseCommand(text){
+  text=text.trim();
+  if(!text)return;
+  // Try "key: text" or "key text" patterns
+  for(const cat of CATS){
+    const aliases={
+      rock:['rock','rocks'],
+      roadblock:['roadblock','roadblocks','block','blocker'],
+      boulder:['boulder','boulders','1yr','1-yr','annual'],
+      todo:['todo','todos','task','action','follow-up','followup'],
+      pebble:['pebble','pebbles','small','minor'],
+      parking:['parking','park','long term','longterm','ltpv'],
+    };
+    const keys=aliases[cat.key]||[cat.key];
+    for(const k of keys){
+      const re=new RegExp(`^${k}[:\\s]+(.+)$`,'i');
+      const m=text.match(re);
+      if(m){addItem(cat.key,m[1].trim(),false);return;}
+    }
+  }
+  // fallback: ask AI to classify
+  const cat=CATS[0];// default rock
+  addItem('rock',text,false);
+}
+
+boardCmdBtn.addEventListener('click',()=>{const v=boardCmdInput.value.trim();if(v){parseCommand(v);boardCmdInput.value='';}});
+boardCmdInput.addEventListener('keydown',e=>{if(e.key==='Enter'){const v=boardCmdInput.value.trim();if(v){parseCommand(v);boardCmdInput.value='';}}} );
+
+/* ── SUPABASE ── */
+async function syncSupabase(){
+  try{
+    const payload={
+      _reaction_trigger:{
+        type:'list_state',
+        items,
+        audienceVisible:[...audienceVisible],
+        clientKey:activeClient||null,
+        agenda:agenda.map(seg=>({label:seg.label,segment_type:seg.segment_type,started_at:seg.started_at,ended_at:seg.ended_at})),
+        activeSegmentIndex,
+        at:Date.now()
+      },
+      updated_at:new Date().toISOString()
+    };
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${SESSION_ID}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok&&res.status!==404){
+      // try insert
+      await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+        body:JSON.stringify({id:SESSION_ID,...payload})
+      });
+    }
+    if(!supabaseOk){supabaseOk=true;supaDot.classList.add('connected');supaLabel.textContent='Supabase: connected';}
+  }catch(e){supaDot.classList.remove('connected');supaDot.classList.add('error');supaLabel.textContent='Supabase: error';}
+}
+
+async function initSupabase(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${SESSION_ID}&select=id`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
+    });
+    if(res.ok){supabaseOk=true;supaDot.classList.add('connected');supaLabel.textContent='Supabase: connected';}
+  }catch(e){supaDot.classList.add('error');supaLabel.textContent='Supabase: error';}
+}
+
+/* ── PHASE 0: DURABLE HISTORY (real tables — separate from the live board-sync above) ──
+   These calls are additive and best-effort: if the migration in supabase-schema.sql
+   hasn't been run yet, or a request fails, the live app keeps working exactly as
+   before. Nothing here blocks the existing _reaction_trigger sync.
+
+   This is a permanent split by design (decided 2026-09-03), not a migration step
+   to eventually collapse: the ai_sessions JSONB blob stays the live-sync feed the
+   audience view polls (proven, low-latency, already tested in front of clients),
+   while these tables are the durable record history/replay/carryover read from
+   later. Don't remove the dual-write expecting the audience view to cut over —
+   it isn't going to. */
+
+function currentQuarter(d=new Date()){
+  return `${d.getFullYear()}-Q${Math.floor(d.getMonth()/3)+1}`;
+}
+
+async function dbCreateSession(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/sessions`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=representation'},
+      body:JSON.stringify({
+        client_key:activeClient||null,
+        name:sessionInput.value||'New Session',
+        quarter:currentQuarter(),
+        started_at:new Date().toISOString()
+      })
+    });
+    if(res.ok){
+      const rows=await res.json();
+      if(rows&&rows[0])dbSessionId=rows[0].id;
+    }
+  }catch(e){/* durable history is best-effort; live sync is unaffected */}
+}
+
+async function dbUpdateSessionClient(){
+  if(!dbSessionId)return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/sessions?id=eq.${dbSessionId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({client_key:activeClient||null})
+    });
+  }catch(e){}
+}
+
+async function dbEndSession(){
+  if(!dbSessionId)return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/sessions?id=eq.${dbSessionId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({ended_at:new Date().toISOString()})
+    });
+  }catch(e){}
+}
+
+async function dbInsertItem(category,text,num,speaker=null){
+  if(!dbSessionId)return null; // no durable session yet (e.g. migration not run) — live board still works
+  const activeSeg=agenda[activeSegmentIndex]||null;
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/items`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=representation'},
+      body:JSON.stringify({
+        session_id:dbSessionId,
+        segment_id:activeSeg?activeSeg.dbId||null:null,
+        client_key:activeClient||null,
+        category,text,num,speaker,
+        quarter:currentQuarter(),
+        status:'open'
+      })
+    });
+    if(res.ok){
+      const rows=await res.json();
+      return rows&&rows[0]?rows[0].id:null;
+    }
+  }catch(e){}
+  return null;
+}
+
+async function dbInsertItemMention(itemDbId,text,speaker=null){
+  if(!itemDbId||!dbSessionId)return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/item_mentions`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({item_id:itemDbId,session_id:dbSessionId,speaker,text})
+    });
+  }catch(e){}
+}
+
+async function dbInsertTranscriptChunk(text,speaker=null){
+  if(!dbSessionId)return;
+  const activeSeg=agenda[activeSegmentIndex]||null;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/transcript_chunks`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({session_id:dbSessionId,segment_id:activeSeg?activeSeg.dbId||null:null,speaker,text})
+    });
+  }catch(e){}
+}
+
+/* ── PHASE 1: AGENDA / SEGMENTS ── */
+const agendaRail=document.getElementById('agenda-rail');
+const agendaList=document.getElementById('agenda-list');
+const agendaListEmpty=document.getElementById('agenda-list-empty');
+const agendaAddLabel=document.getElementById('agenda-add-label');
+const agendaAddType=document.getElementById('agenda-add-type');
+const savedAgendaList=document.getElementById('saved-agenda-list');
+const savedAgendaHint=document.getElementById('saved-agenda-hint');
+const saveAgendaRow=document.getElementById('save-agenda-row');
+const saveAgendaName=document.getElementById('save-agenda-name');
+let savedAgendas=[]; // Phase 1: reusable per-client agenda templates, loaded from the `agendas` table
+
+function populateAgendaTypeSelect(){
+  agendaAddType.innerHTML='<option value="custom">Custom</option>'+
+    CATS.map(c=>`<option value="${c.key}">${c.label}</option>`).join('');
+}
+populateAgendaTypeSelect();
+
+function addAgendaItem(label,segment_type){
+  agenda.push({label,segment_type,dbId:null,started_at:null,ended_at:null});
+  renderAgendaTab();
+  renderAgendaRail();
+}
+
+function removeAgendaItem(idx){
+  if(idx===activeSegmentIndex){showError('End the active segment before removing it.');return;}
+  agenda.splice(idx,1);
+  if(activeSegmentIndex>idx)activeSegmentIndex--;
+  renderAgendaTab();
+  renderAgendaRail();
+}
+
+function loadDefaultAgenda(){
+  agenda=CATS.map(c=>({label:c.label,segment_type:c.key,dbId:null,started_at:null,ended_at:null}));
+  activeSegmentIndex=-1;
+  renderAgendaTab();
+  renderAgendaRail();
+}
+
+/* ── SAVED AGENDAS (reusable per-client templates, `agendas` table) ── */
+async function loadSavedAgendas(){
+  if(!activeClient){savedAgendas=[];renderSavedAgendas();return;}
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/agendas?client_key=eq.${encodeURIComponent(activeClient)}&order=created_at.desc&select=*`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
+    });
+    savedAgendas=res.ok?await res.json():[];
+  }catch(e){savedAgendas=[];}
+  renderSavedAgendas();
+}
+
+function renderSavedAgendas(){
+  if(!activeClient){
+    savedAgendaHint.style.display='';
+    savedAgendaHint.textContent='Select a client above to save or load an agenda template.';
+    savedAgendaList.innerHTML='';
+    saveAgendaRow.style.display='none';
+    return;
+  }
+  saveAgendaRow.style.display='flex';
+  if(!savedAgendas.length){
+    savedAgendaHint.style.display='';
+    savedAgendaHint.textContent=`No saved agendas for ${CLIENT_PROFILES[activeClient]?.name||activeClient} yet.`;
+    savedAgendaList.innerHTML='';
+    return;
+  }
+  savedAgendaHint.style.display='none';
+  savedAgendaList.innerHTML=savedAgendas.map(tmpl=>{
+    const tItems=tmpl.items||[];
+    return `<div class="saved-agenda-item">
+      <div class="saved-agenda-item-info">
+        <div class="saved-agenda-item-title">${escHtml(tmpl.name)}</div>
+        <div class="saved-agenda-item-meta">${tItems.length} segment${tItems.length===1?'':'s'}</div>
+      </div>
+      <button class="saved-agenda-item-btn saved-agenda-load" data-id="${tmpl.id}">Load</button>
+      <button class="saved-agenda-item-btn saved-agenda-del" data-id="${tmpl.id}">✕</button>
+    </div>`;
+  }).join('');
+  savedAgendaList.querySelectorAll('.saved-agenda-load').forEach(btn=>{
+    btn.addEventListener('click',()=>loadAgendaTemplate(btn.dataset.id));
+  });
+  savedAgendaList.querySelectorAll('.saved-agenda-del').forEach(btn=>{
+    btn.addEventListener('click',()=>deleteSavedAgendaTemplate(btn.dataset.id));
+  });
+}
+
+function loadAgendaTemplate(id){
+  const tmpl=savedAgendas.find(a=>String(a.id)===String(id));
+  if(!tmpl)return;
+  if(activeSegmentIndex!==-1){showError('End the active segment before loading a different agenda.');return;}
+  agenda=(tmpl.items||[]).map(it=>({label:it.label,segment_type:it.segment_type,dbId:null,started_at:null,ended_at:null}));
+  activeSegmentIndex=-1;
+  renderAgendaTab();
+  renderAgendaRail();
+  syncSupabase();
+  showToastPlain(`Loaded agenda: ${tmpl.name}`);
+}
+
+async function saveCurrentAgenda(){
+  const name=saveAgendaName.value.trim();
+  if(!name){showError('Name the agenda before saving.');return;}
+  if(!agenda.length){showError('Add at least one segment before saving.');return;}
+  if(!activeClient){showError('Select a client before saving an agenda.');return;}
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/agendas`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=representation'},
+      body:JSON.stringify({
+        client_key:activeClient,
+        name,
+        items:agenda.map(seg=>({label:seg.label,segment_type:seg.segment_type}))
+      })
+    });
+    if(res.ok){
+      saveAgendaName.value='';
+      showToastPlain(`Saved agenda: ${name}`);
+      loadSavedAgendas();
+    }else{
+      showError('Could not save agenda — check that the agendas table exists (see supabase-schema.sql).');
+    }
+  }catch(e){showError('Could not save agenda: '+e.message);}
+}
+
+async function deleteSavedAgendaTemplate(id){
+  if(!confirm('Delete this saved agenda?'))return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/agendas?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
+    });
+  }catch(e){}
+  loadSavedAgendas();
+}
+
+function renderAgendaTab(){
+  if(!agenda.length){
+    agendaList.innerHTML='';
+    agendaListEmpty.style.display='';
+    return;
+  }
+  agendaListEmpty.style.display='none';
+  agendaList.innerHTML=agenda.map((seg,idx)=>{
+    const typeLabel=seg.segment_type==='custom'?'Custom':(CATS.find(c=>c.key===seg.segment_type)?.label||seg.segment_type);
+    return `<div class="agenda-row">
+      <span class="agenda-row-label">${idx+1}. ${escHtml(seg.label)}</span>
+      <span class="agenda-row-type">${typeLabel}</span>
+      <button class="agenda-row-del" data-idx="${idx}">✕</button>
+    </div>`;
+  }).join('');
+  agendaList.querySelectorAll('.agenda-row-del').forEach(btn=>{
+    btn.addEventListener('click',()=>removeAgendaItem(parseInt(btn.dataset.idx)));
+  });
+}
+
+function renderAgendaRail(){
+  if(!agenda.length){
+    agendaRail.innerHTML='<span id="agenda-rail-empty">No agenda set — add segments in the Agenda tab</span>';
+    return;
+  }
+  agendaRail.innerHTML=agenda.map((seg,idx)=>{
+    const isActive=idx===activeSegmentIndex;
+    const isDone=!!seg.ended_at;
+    const cls=isActive?'active':(isDone?'done':'');
+    const elapsed=isActive&&seg.started_at?formatElapsed(Date.now()-new Date(seg.started_at).getTime()):'';
+    return `<div class="agenda-pill ${cls}" data-idx="${idx}">
+      ${isDone?'<span class="agenda-pill-check">✓</span>':''}
+      <span class="agenda-pill-label">${escHtml(seg.label)}</span>
+      ${isActive?`<span class="agenda-pill-timer" id="agenda-pill-timer-${idx}">${elapsed}</span><button class="agenda-pill-btn end" data-idx="${idx}">End</button>`:
+        (isDone?'':`<button class="agenda-pill-btn start" data-idx="${idx}">Start</button>`)}
+    </div>`;
+  }).join('');
+  agendaRail.querySelectorAll('.agenda-pill-btn.start').forEach(btn=>{
+    btn.addEventListener('click',()=>startSegment(parseInt(btn.dataset.idx)));
+  });
+  agendaRail.querySelectorAll('.agenda-pill-btn.end').forEach(btn=>{
+    btn.addEventListener('click',()=>endSegment(parseInt(btn.dataset.idx)));
+  });
+}
+
+function formatElapsed(ms){
+  const s=Math.floor(ms/1000);
+  const m=Math.floor(s/60);
+  return `${m}:${String(s%60).padStart(2,'0')}`;
+}
+
+async function startSegment(idx){
+  if(activeSegmentIndex!==-1&&activeSegmentIndex!==idx)await endSegment(activeSegmentIndex);
+  const seg=agenda[idx];
+  seg.started_at=new Date().toISOString();
+  activeSegmentIndex=idx;
+  renderAgendaRail();
+  syncSupabase();
+  if(!dbSessionId){return;} // durable segment row needs a session to attach to
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/segments`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=representation'},
+      body:JSON.stringify({
+        session_id:dbSessionId,
+        agenda_item_label:seg.label,
+        segment_type:seg.segment_type,
+        sort_order:idx,
+        started_at:seg.started_at
+      })
+    });
+    if(res.ok){
+      const rows=await res.json();
+      if(rows&&rows[0])seg.dbId=rows[0].id;
+    }
+  }catch(e){}
+}
+
+async function endSegment(idx){
+  const seg=agenda[idx];
+  if(!seg)return;
+  seg.ended_at=new Date().toISOString();
+  if(activeSegmentIndex===idx)activeSegmentIndex=-1;
+  renderAgendaRail();
+  syncSupabase();
+  if(!seg.dbId)return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/segments?id=eq.${seg.dbId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({ended_at:seg.ended_at})
+    });
+  }catch(e){}
+}
+
+document.getElementById('agenda-add-btn').addEventListener('click',()=>{
+  const label=agendaAddLabel.value.trim();
+  if(!label)return;
+  addAgendaItem(label,agendaAddType.value);
+  agendaAddLabel.value='';
+});
+agendaAddLabel.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('agenda-add-btn').click();});
+document.getElementById('agenda-default-btn').addEventListener('click',loadDefaultAgenda);
+document.getElementById('save-agenda-btn').addEventListener('click',saveCurrentAgenda);
+saveAgendaName.addEventListener('keydown',e=>{if(e.key==='Enter')saveCurrentAgenda();});
+document.getElementById('agenda-edit-btn').addEventListener('click',()=>{
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelector('.ctab[data-tab="agenda"]').classList.add('active');
+  document.getElementById('tab-agenda').classList.add('active');
+});
+
+/* ── START/STOP ── */
+cbStart.addEventListener('click',()=>{
+  cbStart.style.display='none';cbStop.style.display='flex';
+  dgSeenSpeakers=new Set();dgSpeakerNames={};dgLastSpeaker=null; // fresh calibration per session
+  renderSpeakerCalibration();
+  startListening();
+  boardSessionName.textContent=sessionInput.value||'New Session';
+  dbCreateSession();
+});
+cbStop.addEventListener('click',()=>{
+  cbStart.style.display='';cbStop.style.display='none';
+  stopListening();
+  dbEndSession();
+});
+
+/* ── ASK ADRIAN ── */
+cbAsk.addEventListener('click',()=>{askOverlay.classList.add('visible');askInput.focus();});
+askCancel.addEventListener('click',()=>{askOverlay.classList.remove('visible');});
+askSubmit.addEventListener('click',async()=>{
+  const q=askInput.value.trim();if(!q)return;
+  askOverlay.classList.remove('visible');
+  await callAI(q,false,q);
+  askInput.value='';
+});
+askFreeform.addEventListener('click',async()=>{
+  const q=askInput.value.trim();if(!q)return;
+  askOverlay.classList.remove('visible');
+  await callAI(q,true);
+  askInput.value='';
+});
+
+/* ── SAVE / EXPORT ── */
+cbSave.addEventListener('click',()=>exportBoard());
+document.getElementById('btn-export').addEventListener('click',()=>exportBoard());
+document.getElementById('btn-clear-session').addEventListener('click',()=>{
+  if(!confirm('Clear all items and transcript?'))return;
+  CATS.forEach(c=>{items[c.key]=[];counters[c.key]=0;renderColItems(c.key);});
+  thoughts=[];transcriptEntries=[];transcriptBuffer='';wordCount=0;
+  wordcountEl.textContent='';transcriptList.innerHTML='';
+  renderThoughts();syncSupabase();
+});
+document.getElementById('btn-save-summary').addEventListener('click',async()=>{
+  const apiKey=apiInput.value.trim();if(!apiKey){showError('Enter API key.');return;}
+  const context=CATS.map(c=>`${c.label}:\n${items[c.key].map(i=>`- ${i.text}`).join('\n')||'(none)'}`).join('\n\n');
+  const prompt=`Provide a concise executive summary (3-5 sentences) of this strategic planning session:\n\n${context}`;
+  await callAI(prompt,true);
+});
+
+function exportBoard(){
+  const lines=[`Session: ${sessionInput.value||'Untitled'}`,`Date: ${new Date().toLocaleDateString()}`,``];
+  CATS.forEach(c=>{
+    lines.push(`== ${c.label.toUpperCase()} ==`);
+    items[c.key].forEach(i=>lines.push(`${i.num}. ${i.text}`));
+    if(!items[c.key].length)lines.push('(none)');
+    lines.push('');
+  });
+  const blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`session-board-${Date.now()}.txt`;a.click();
+  const item={id:Date.now(),title:`Board Export — ${new Date().toLocaleTimeString()}`,meta:CATS.map(c=>`${c.label}: ${items[c.key].length}`).join(' · ')};
+  savedItems.unshift(item);renderSaved();
+}
+
+function renderSaved(){
+  const el=document.getElementById('saved-list');
+  const empty=document.getElementById('saved-empty');
+  if(!savedItems.length){empty.style.display='';el.innerHTML='';return;}
+  empty.style.display='none';
+  el.innerHTML=savedItems.map(s=>`<div class="saved-item"><div class="saved-item-title">${escHtml(s.title)}</div><div class="saved-item-meta">${escHtml(s.meta||'')}</div></div>`).join('');
+}
+
+/* ── KEYWORDS ── */
+const defaultKeywords=['Strategy','Revenue','Hiring','Culture','Technology','Process','Q3 Rock','Q4 Rock'];
+function initKeywords(){
+  keywords=defaultKeywords.map(k=>({text:k,color:'#90cdf4',bgColor:'rgba(99,179,237,.15)'}));
+  renderKeywords();
+  initEmotes();
+}
+
+function renderKeywords(){
+  const grid=document.getElementById('kw-grid');
+  if(!keywords.length){grid.innerHTML='<span style="font-size:10px;color:rgba(255,255,255,.2)">No keywords yet.</span>';return;}
+  grid.innerHTML=keywords.map((kw,i)=>`
+    <div class="kw-badge" style="background:${kw.bgColor};color:${kw.color};border-color:${kw.color}33">
+      <span>${escHtml(kw.text)}</span>
+      <button class="kw-badge-fire-btn" data-i="${i}">📡</button>
+      <button class="kw-badge-del-btn" data-i="${i}">✕</button>
+    </div>`).join('');
+  grid.querySelectorAll('.kw-badge-fire-btn').forEach(b=>b.addEventListener('click',()=>fireKeyword(keywords[parseInt(b.dataset.i)].text)));
+  grid.querySelectorAll('.kw-badge-del-btn').forEach(b=>b.addEventListener('click',()=>{keywords.splice(parseInt(b.dataset.i),1);renderKeywords();}));
+}
+
+function fireKeyword(kw){showToast('rock',`Keyword fired: ${kw}`);}
+
+function initEmotes(){
+  const grid=document.getElementById('emote-grid');
+  grid.innerHTML=EMOTES.map(em=>`<button class="emote-btn" data-e="${em.e}"><span>${em.e}</span><span class="emote-btn-label">${em.l}</span></button>`).join('');
+  grid.querySelectorAll('.emote-btn').forEach(b=>b.addEventListener('click',()=>fireEmote(b.dataset.e)));
+}
+
+async function fireEmote(emoji){
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${SESSION_ID}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({_reaction_trigger:{type:'reaction',emoji,at:Date.now()},updated_at:new Date().toISOString()})
+    });
+  }catch(e){}
+}
+
+document.getElementById('kw-add-btn').addEventListener('click',()=>{
+  const inp=document.getElementById('kw-add-input');const v=inp.value.trim();
+  if(!v)return;
+  keywords.push({text:v,color:'#c4b5fd',bgColor:'rgba(196,181,253,.12)'});
+  renderKeywords();inp.value='';
+});
+document.getElementById('kw-add-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){document.getElementById('kw-add-btn').click();}
+});
+document.getElementById('kw-suggest-btn').addEventListener('click',async()=>{
+  const apiKey=apiInput.value.trim();if(!apiKey)return;
+  const context=transcriptEntries.slice(-10).map(e=>e.text).join(' ');
+  if(!context.trim())return;
+  await callAI(`Extract 5 important keyword topics from: "${context}"`,true);
+});
+
+/* ── CLIENT SELECTOR ── */
+const clientSelect=document.getElementById('client-select');
+const clientBadge=document.getElementById('client-context-badge');
+const orbHat=document.getElementById('orb-hat');
+
+function populateClientSelect(){
+  Object.keys(CLIENT_PROFILES).forEach(key=>{
+    const opt=document.createElement('option');
+    opt.value=key;opt.textContent=CLIENT_PROFILES[key].name||key;
+    clientSelect.appendChild(opt);
+  });
+}
+populateClientSelect();
+
+function wearHat(clientKey){
+  const hatConfigs={
+    cef:{show:true},
+  };
+  // remove any existing hat
+  orbHat.classList.remove('wearing','removing');
+  if(clientKey&&hatConfigs[clientKey]){
+    void orbHat.offsetWidth; // reflow
+    orbHat.classList.add('wearing');
+  } else {
+    // lift hat off if one was on
+    if(getComputedStyle(orbHat).opacity!=='0'){
+      orbHat.classList.add('removing');
+      setTimeout(()=>orbHat.classList.remove('removing'),400);
+    }
+  }
+}
+
+clientSelect.addEventListener('change',()=>{
+  const key=clientSelect.value;
+  activeClient=key||null;
+  const client=key?CLIENT_PROFILES[key]:null;
+  if(client){
+    clientSelect.classList.add('active');
+    clientBadge.classList.add('visible');
+    wearHat(key);
+    // pre-fill session name if empty
+    if(!sessionInput.value.trim()){
+      sessionInput.value=client.name+' — ';
+      sessionInput.dispatchEvent(new Event('input'));
+      sessionInput.focus();
+      sessionInput.setSelectionRange(sessionInput.value.length,sessionInput.value.length);
+    }
+    boardStateLabel.textContent=`Client: ${client.name} · ${client.industry}`;
+    setTimeout(()=>{if(!isListening)boardStateLabel.textContent='Standby — press Start to begin';},4000);
+  } else {
+    clientSelect.classList.remove('active');
+    clientBadge.classList.remove('visible');
+    wearHat(null);
+  }
+  syncSupabase(); // push clientKey to audience immediately
+  dbUpdateSessionClient(); // keep the durable session row's client_key in sync too
+  loadSavedAgendas(); // refresh the saved-agenda list for whichever client is now active
+});
+
+/* ── SESSION NAME SYNC ── */
+sessionInput.addEventListener('input',()=>{boardSessionName.textContent=sessionInput.value||'New Session';});
+
+/* ── UTILS ── */
+function escHtml(str){const d=document.createElement('div');d.appendChild(document.createTextNode(str));return d.innerHTML;}
+function showError(msg){errorBanner.textContent=msg;errorBanner.style.display='block';setTimeout(()=>errorBanner.style.display='none',6000);}
+
+/* ── INIT ── */
+buildColumns();
+initAudChips();
+initKeywords();
+initSupabase();
+updateAudStatus();
+setOrbState('standby');
+renderAgendaTab();
+renderAgendaRail();
+renderSavedAgendas();
+</script>
+</body>
+</html>

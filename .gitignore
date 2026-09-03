@@ -1,0 +1,30 @@
+# Local secrets — never commit
+config.js
+
+# Local client context — never commit (client names, leadership, strategy)
+clients.js
+
+# Local Deepgram test credentials/audio — never commit
+deepgram.local.json
+voice-test/
+
+# Superseded versions — still contain the Supabase key hardcoded inline
+adrian-audience-v12.html
+adrian-audience-v13.html
+adrian-facilitator-v13.html
+adrian-facilitator-v14.html
+
+# Claude Code local settings (machine-specific, not project config)
+.claude/settings.local.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+
+# Old scratch files
+New Text Document.txt
+
+# Archive of pre-v12 versions — also contain the Supabase key hardcoded inline,
+# and includes cloud-only OneDrive placeholder files that break git indexing
+Archived/

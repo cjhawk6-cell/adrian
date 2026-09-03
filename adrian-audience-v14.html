@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Adrian Ingram — Audience</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#0E765A;--green2:#0C824C;--yellow:#FFF400;
+  --font:'Roboto',Arial,sans-serif;
+  --display-bg:#0d1a13;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--display-bg);}
+
+/* ── STAGE ── */
+#stage{width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--display-bg);}
+#stage.shake{animation:stage-shake .5s cubic-bezier(.36,.07,.19,.97);}
+#stage.shake-hard{animation:stage-shake-hard .8s cubic-bezier(.36,.07,.19,.97);}
+@keyframes stage-shake{10%,90%{transform:translate3d(-2px,0,0);}20%,80%{transform:translate3d(4px,0,0);}30%,50%,70%{transform:translate3d(-6px,0,0);}40%,60%{transform:translate3d(6px,0,0);}}
+@keyframes stage-shake-hard{0%,100%{transform:translate3d(0,0,0);}10%{transform:translate3d(-10px,-4px,0) rotate(-.5deg);}20%{transform:translate3d(8px,6px,0) rotate(.5deg);}30%{transform:translate3d(-12px,2px,0) rotate(-.5deg);}40%{transform:translate3d(10px,-6px,0) rotate(.5deg);}50%{transform:translate3d(-8px,4px,0);}60%{transform:translate3d(6px,-4px,0);}70%{transform:translate3d(-4px,2px,0);}}
+
+/* ── AMBIENT ── */
+#bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(14,118,90,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(14,118,90,.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;animation:grid-drift 20s ease-in-out infinite alternate;}
+@keyframes grid-drift{from{background-position:0 0;}to{background-position:25px 25px;}}
+#bg-orb1{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(14,118,90,.08) 0%,transparent 70%);top:-100px;left:-100px;animation:orb-float1 12s ease-in-out infinite alternate;pointer-events:none;}
+#bg-orb2{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(255,244,0,.04) 0%,transparent 70%);bottom:-80px;right:-80px;animation:orb-float2 15s ease-in-out infinite alternate;pointer-events:none;}
+@keyframes orb-float1{from{transform:translate(0,0) scale(1);}to{transform:translate(40px,60px) scale(1.1);}}
+@keyframes orb-float2{from{transform:translate(0,0) scale(1);}to{transform:translate(-50px,-30px) scale(1.15);}}
+#particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:particle-rise linear infinite;}
+@keyframes particle-rise{0%{opacity:0;transform:translateY(0) scale(0);}10%{opacity:.6;}90%{opacity:.1;}100%{opacity:0;transform:translateY(-100vh) scale(.3);}}
+#vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.75) 100%);pointer-events:none;}
+
+/* ── SESSION BAR ── */
+#session-bar{position:absolute;top:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:30px;padding:6px 18px;z-index:40;}
+#session-name{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);}
+#session-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;}
+#session-dot.live{background:#64ffb4;animation:live-pulse 1.4s infinite;}
+@keyframes live-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+#session-timer{font-size:11px;color:rgba(255,255,255,.25);font-variant-numeric:tabular-nums;}
+
+/* ── REACTION EMOJIS ── */
+.emote-pop{position:fixed;font-size:clamp(2rem,4vw,5rem);pointer-events:none;z-index:9999;animation:emote-fly 2.5s forwards cubic-bezier(.2,.6,.3,1);}
+@keyframes emote-fly{0%{opacity:1;transform:translateY(0) scale(.5);}30%{transform:translateY(-80px) scale(1.4);}100%{opacity:0;transform:translateY(-220px) scale(1);}}
+.confetti-piece{position:fixed;pointer-events:none;z-index:9998;animation:conf-fall linear forwards;}
+@keyframes conf-fall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(120vh) rotate(720deg);}}
+
+/* ── ADRIAN FACE (standby / no-board mode) ── */
+#face-stage{display:flex;flex-direction:column;align-items:center;position:relative;z-index:10;transition:opacity .6s;}
+#face-stage.hidden{opacity:0;pointer-events:none;}
+#thought-bubble-wrap{position:relative;min-height:180px;width:clamp(300px,32vw,520px);display:flex;align-items:flex-end;justify-content:center;margin-bottom:0;}
+#thought-bubble{background:rgba(255,255,255,.97);border-radius:20px;padding:18px 22px;width:100%;position:relative;opacity:0;transform:translateY(10px) scale(.97);transition:opacity .5s,transform .5s;pointer-events:none;}
+#thought-bubble.visible{opacity:1;transform:translateY(0) scale(1);}
+#thought-bubble::after{content:'';position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.7);box-shadow:0 14px 0 rgba(255,255,255,.4),0 24px 0 rgba(255,255,255,.2);}
+#bubble-headline{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:8px;}
+#bubble-text{font-size:clamp(14px,1.4vw,22px);line-height:1.65;color:#1a2a24;}
+#bubble-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+.b-tag{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:500;}
+.b-tag-ai{background:#e8f4fe;color:#1a5f9e;}
+.b-tag-strategy{background:#e6f4ef;color:#0E765A;}
+.b-tag-action{background:#fffce0;color:#7a7200;}
+.b-tag-risk{background:#fde8e8;color:#a00;}
+.b-tag-opportunity{background:#f0e8fd;color:#6a1ab5;}
+
+#face-wrap{position:relative;width:clamp(120px,12vw,200px);height:clamp(120px,12vw,200px);flex-shrink:0;}
+#face-glow{position:absolute;inset:-10px;border-radius:50%;border:3px solid transparent;pointer-events:none;transition:border-color .4s;}
+#face-wrap-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;}
+#face-svg{width:100%;height:100%;display:block;}
+#face-wrap.standby #face-glow{border-color:rgba(255,244,0,.15);}
+#face-wrap.listening #face-wrap-inner{animation:face-listen-bob .9s ease-in-out infinite alternate;}
+#face-wrap.listening #face-glow{border-color:rgba(100,255,180,.7);animation:glow-pulse 1.4s ease-in-out infinite;}
+#face-wrap.thinking #face-wrap-inner{animation:face-think-rock 2.5s ease-in-out infinite;}
+#face-wrap.thinking #face-glow{border-color:rgba(255,220,60,.8);animation:glow-think 1.8s ease-in-out infinite;}
+#face-wrap.speaking #face-wrap-inner{animation:face-speak-bounce .3s ease-in-out infinite alternate;}
+#face-wrap.speaking #face-glow{border-color:var(--yellow);animation:glow-speak .3s ease-in-out infinite alternate;}
+@keyframes face-listen-bob{from{transform:translateY(0) scale(1);}to{transform:translateY(-5px) scale(1.04);}}
+@keyframes glow-pulse{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.12);opacity:1;}}
+@keyframes face-think-rock{0%,100%{transform:rotate(0);}30%{transform:rotate(-2deg);}70%{transform:rotate(2deg);}}
+@keyframes glow-think{0%,100%{transform:scale(1);opacity:.4;}50%{transform:scale(1.18);opacity:1;}}
+@keyframes face-speak-bounce{from{transform:scaleY(1);}to{transform:scaleY(1.06) scaleX(.97);}}
+@keyframes glow-speak{from{transform:scale(1);}to{transform:scale(1.1);}}
+#face-caption{font-size:clamp(9px,1vw,13px);color:rgba(255,255,255,.2);letter-spacing:3px;text-transform:uppercase;margin-top:16px;text-align:center;}
+
+/* ── BOARD VIEW (multi-column) ── */
+#board-view{position:absolute;inset:0;display:none;flex-direction:column;z-index:10;padding:112px 24px 16px;}
+#board-view.visible{display:flex;}
+#board-columns{flex:1;display:flex;gap:16px;min-height:0;align-items:stretch;}
+.aud-col{flex:1;min-width:0;display:flex;flex-direction:column;background:rgba(255,255,255,.03);border-radius:16px;border:1px solid rgba(255,255,255,.08);overflow:hidden;animation:col-slide-in .5s ease;}
+@keyframes col-slide-in{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.aud-col-header{padding:14px 18px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.aud-col-icon{font-size:18px;}
+.aud-col-label{font-size:clamp(10px,1.2vw,14px);font-weight:700;text-transform:uppercase;letter-spacing:1.2px;flex:1;}
+.aud-col-badge{font-size:clamp(9px,1vw,12px);padding:2px 9px;border-radius:10px;font-weight:700;}
+.aud-col-items{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:6px;}
+.aud-col-items::-webkit-scrollbar{width:3px;}
+.aud-col-items::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+.aud-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);animation:item-pop .35s ease;}
+.aud-item:last-child{border-bottom:none;}
+@keyframes item-pop{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
+.aud-item-num{font-size:clamp(11px,1.2vw,16px);font-weight:700;min-width:24px;flex-shrink:0;padding-top:2px;}
+.aud-item-text{font-size:clamp(13px,1.4vw,20px);line-height:1.4;color:rgba(255,255,255,.9);font-weight:500;}
+.aud-col-empty{font-size:clamp(11px,1vw,14px);color:rgba(255,255,255,.15);padding:8px;font-style:italic;text-align:center;}
+
+/* single-column large text mode */
+#board-columns.single .aud-col{max-width:680px;margin:0 auto;}
+#board-columns.single .aud-item-text{font-size:clamp(18px,2.2vw,30px);}
+#board-columns.single .aud-col-label{font-size:clamp(12px,1.5vw,18px);}
+
+/* ── CAPTURE FLASH ── */
+#capture-flash{position:fixed;inset:0;pointer-events:none;z-index:999;opacity:0;transition:opacity .08s;}
+#capture-flash.pop{opacity:1;}
+
+/* ── HARD HAT (audience) ── */
+#aud-hat{
+  position:absolute;
+  top:-38%;
+  left:50%;
+  transform:translateX(-50%) translateY(-120px);
+  width:140%;
+  z-index:30;
+  pointer-events:none;
+  opacity:0;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));
+}
+#aud-hat.wearing{animation:aud-hat-drop .85s cubic-bezier(.34,1.5,.64,1) forwards;}
+#aud-hat.removing{animation:aud-hat-lift .4s ease-in forwards;}
+@keyframes aud-hat-drop{
+  0%{opacity:0;transform:translateX(-50%) translateY(-120px);}
+  45%{opacity:1;}
+  70%{transform:translateX(-50%) translateY(10px);}
+  86%{transform:translateX(-50%) translateY(-5px);}
+  100%{opacity:1;transform:translateX(-50%) translateY(0);}
+}
+@keyframes aud-hat-lift{
+  0%{opacity:1;transform:translateX(-50%) translateY(0);}
+  30%{transform:translateX(-50%) translateY(-12px);}
+  100%{opacity:0;transform:translateX(-50%) translateY(-130px);}
+}
+
+/* ── AGENDA RAIL (read-only mirror of the facilitator's) ── */
+#aud-agenda-rail{position:absolute;top:66px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:39;max-width:82vw;overflow-x:auto;padding:2px;}
+#aud-agenda-rail::-webkit-scrollbar{display:none;}
+.aud-agenda-pill{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);font-size:12px;color:rgba(255,255,255,.35);white-space:nowrap;}
+.aud-agenda-pill.done{color:rgba(255,255,255,.35);border-color:rgba(100,255,180,.25);}
+.aud-agenda-pill.done .aud-agenda-check{color:#64ffb4;}
+.aud-agenda-pill.active{background:rgba(255,244,0,.12);border-color:rgba(255,244,0,.55);color:#fff;box-shadow:0 0 0 1px rgba(255,244,0,.15);}
+.aud-agenda-timer{font-variant-numeric:tabular-nums;font-size:11px;color:rgba(255,244,0,.85);}
+
+/* ── SESSION BAR ORBLETTE ── */
+#sb-orb-wrap{position:relative;width:34px;height:34px;flex-shrink:0;}
+#sb-orb{width:34px;height:34px;border-radius:50%;overflow:hidden;display:block;}
+#sb-hat{
+  position:absolute;top:-22px;left:50%;
+  transform:translateX(-50%) translateY(-40px);
+  width:52px;z-index:50;pointer-events:none;opacity:0;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));
+}
+#sb-hat.wearing{animation:sb-hat-drop .75s cubic-bezier(.34,1.5,.64,1) forwards;}
+#sb-hat.removing{animation:sb-hat-lift .35s ease-in forwards;}
+@keyframes sb-hat-drop{
+  0%{opacity:0;transform:translateX(-50%) translateY(-40px);}
+  40%{opacity:1;}
+  68%{transform:translateX(-50%) translateY(4px);}
+  84%{transform:translateX(-50%) translateY(-2px);}
+  100%{opacity:1;transform:translateX(-50%) translateY(0);}
+}
+@keyframes sb-hat-lift{
+  0%{opacity:1;transform:translateX(-50%) translateY(0);}
+  30%{transform:translateX(-50%) translateY(-6px);}
+  100%{opacity:0;transform:translateX(-50%) translateY(-50px);}
+}
+
+/* ── WATERMARK ── */
+#watermark{position:absolute;bottom:16px;right:22px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.08);z-index:5;}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg-grid"></div>
+  <div id="bg-orb1"></div>
+  <div id="bg-orb2"></div>
+  <div id="particles"></div>
+  <div id="vignette"></div>
+
+  <!-- Session bar (always visible) -->
+  <div id="session-bar">
+    <div id="sb-orb-wrap">
+      <svg id="sb-orb" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="sb-clip"><circle cx="50" cy="50" r="50"/></clipPath>
+          <radialGradient id="sb-bg" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#1ca47d"/><stop offset="100%" stop-color="#0a5c42"/>
+          </radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="50" fill="url(#sb-bg)"/>
+        <g clip-path="url(#sb-clip)">
+          <ellipse cx="50" cy="110" rx="38" ry="28" fill="#0a4a35"/>
+          <circle cx="50" cy="42" r="20" fill="#fde68a"/>
+          <circle cx="43" cy="40" r="3.5" fill="#1a1a2e"/>
+          <circle cx="57" cy="40" r="3.5" fill="#1a1a2e"/>
+          <path d="M44 49 Q50 54 56 49" fill="none" stroke="#c2410c" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <div id="sb-hat">
+        <svg viewBox="0 0 84 50" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="42" cy="48" rx="28" ry="2.5" fill="rgba(0,0,0,.25)"/>
+          <path d="M14 36 C12 22 20 8 42 6 C64 8 72 22 70 36 Z" fill="#FFD700"/>
+          <path d="M20 30 C20 20 26 10 42 8 C32 12 26 20 26 30 Z" fill="rgba(255,255,255,.22)"/>
+          <path d="M30 19 Q42 16 54 19" fill="none" stroke="#e0a800" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M6 36 Q42 44 78 36 L76 38 Q42 46 8 38 Z" fill="#e6b800"/>
+          <path d="M14 36 Q42 41 70 36" fill="none" stroke="#e0a800" stroke-width="1.2"/>
+          <rect x="28" y="19" width="28" height="18" rx="2.5" fill="#1172ba"/>
+          <svg x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
+            <path fill="white" d="m172.18,592.41H0V0c.82,0,1.92,0,3.02,0C200.14,0,397.26,0,594.38,0c3.7,0,3.71.01,3.71,3.67,0,35.5,0,71.01,0,106.51q0,4.02-3.96,4.07c-1.6.02-3.2.02-4.8.02-137.79,0-275.57,0-413.36,0q-4.36,0-4.36,4.37c.03,19.31.07,38.61.09,57.92.16,137.21.32,274.42.48,411.63,0,1.3,0,2.61,0,4.23Z"/>
+            <path fill="white" d="m240.13,357.5v-4.08c0-36.16.03-72.32-.06-108.49,0-2.81.65-3.65,3.58-3.65,75.25.09,150.5.08,225.74.03,2.44,0,3.44.45,3.43,3.22-.09,36.54-.09,73.08,0,109.62,0,2.71-.74,3.46-3.47,3.46-74.68-.09-149.36-.09-224.05-.11-1.59,0-3.18,0-5.17,0Z"/>
+            <path fill="white" d="m239.88,478.23h113.5v114.05h-113.5v-114.05Z"/>
+          </svg>
+        </svg>
+      </div>
+    </div>
+    <div id="session-dot"></div>
+    <span id="session-name">Autobahn Consultants</span>
+    <span id="session-timer">—</span>
+  </div>
+
+  <!-- Agenda rail (read-only mirror of the facilitator's) -->
+  <div id="aud-agenda-rail"></div>
+
+  <!-- Adrian face (shown when no board categories are active) -->
+  <div id="face-stage">
+    <div id="thought-bubble-wrap">
+      <div id="thought-bubble">
+        <div id="bubble-headline">INSIGHT</div>
+        <div id="bubble-text"></div>
+        <div id="bubble-tags"></div>
+      </div>
+    </div>
+    <div id="face-wrap" class="standby">
+      <div id="face-glow"></div>
+      <!-- Client hat overlay -->
+      <div id="aud-hat">
+        <svg viewBox="0 0 84 50" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="42" cy="48" rx="28" ry="2.5" fill="rgba(0,0,0,.2)"/>
+          <path d="M14 36 C12 22 20 8 42 6 C64 8 72 22 70 36 Z" fill="#FFD700"/>
+          <path d="M20 30 C20 20 26 10 42 8 C32 12 26 20 26 30 Z" fill="rgba(255,255,255,.22)"/>
+          <path d="M30 19 Q42 16 54 19" fill="none" stroke="#e0a800" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M6 36 Q42 44 78 36 L76 38 Q42 46 8 38 Z" fill="#e6b800"/>
+          <path d="M14 36 Q42 41 70 36" fill="none" stroke="#e0a800" stroke-width="1.2"/>
+          <rect x="28" y="19" width="28" height="18" rx="2.5" fill="#1172ba"/>
+          <svg x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
+            <path fill="white" d="m172.18,592.41H0V0c.82,0,1.92,0,3.02,0C200.14,0,397.26,0,594.38,0c3.7,0,3.71.01,3.71,3.67,0,35.5,0,71.01,0,106.51q0,4.02-3.96,4.07c-1.6.02-3.2.02-4.8.02-137.79,0-275.57,0-413.36,0q-4.36,0-4.36,4.37c.03,19.31.07,38.61.09,57.92.16,137.21.32,274.42.48,411.63,0,1.3,0,2.61,0,4.23Z"/>
+            <path fill="white" d="m240.13,357.5v-4.08c0-36.16.03-72.32-.06-108.49,0-2.81.65-3.65,3.58-3.65,75.25.09,150.5.08,225.74.03,2.44,0,3.44.45,3.43,3.22-.09,36.54-.09,73.08,0,109.62,0,2.71-.74,3.46-3.47,3.46-74.68-.09-149.36-.09-224.05-.11-1.59,0-3.18,0-5.17,0Z"/>
+            <path fill="white" d="m239.88,478.23h113.5v114.05h-113.5v-114.05Z"/>
+          </svg>
+        </svg>
+      </div>
+      <div id="face-wrap-inner">
+        <svg id="face-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="body-clip-f"><circle cx="50" cy="50" r="48"/></clipPath>
+            <radialGradient id="body-shade-f" cx="35%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#1ca47d"/>
+              <stop offset="60%" stop-color="#0E765A"/>
+              <stop offset="100%" stop-color="#075039"/>
+            </radialGradient>
+          </defs>
+          <circle cx="50" cy="50" r="48" fill="url(#body-shade-f)"/>
+          <g clip-path="url(#body-clip-f)">
+            <line x1="95" y1="5" x2="5" y2="95" stroke="#0a3a2e" stroke-width="3.6" stroke-linecap="round" opacity=".85"/>
+            <line x1="100" y1="10" x2="10" y2="100" stroke="#0a3a2e" stroke-width="3.6" stroke-linecap="round" opacity=".85"/>
+            <line x1="105" y1="15" x2="15" y2="105" stroke="#0a3a2e" stroke-width="3.6" stroke-linecap="round" opacity=".85"/>
+            <line x1="110" y1="20" x2="20" y2="110" stroke="#0a3a2e" stroke-width="3.6" stroke-linecap="round" opacity=".85"/>
+          </g>
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#0a2920" stroke-width="2"/>
+          <g class="face-default">
+            <path d="M33 38 Q40 34 47 38" stroke="#0a1a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <path d="M53 38 Q60 34 67 38" stroke="#0a1a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <g class="eye-l">
+              <ellipse cx="40" cy="50" rx="7" ry="9" fill="white" stroke="#0a1a10" stroke-width=".8"/>
+              <ellipse cx="41" cy="52" rx="3" ry="4" fill="#0a0a0a"/>
+              <circle cx="42" cy="50" r="1.3" fill="white"/>
+            </g>
+            <g class="eye-r">
+              <ellipse cx="60" cy="50" rx="7" ry="9" fill="white" stroke="#0a1a10" stroke-width=".8"/>
+              <ellipse cx="61" cy="52" rx="3" ry="4" fill="#0a0a0a"/>
+              <circle cx="62" cy="50" r="1.3" fill="white"/>
+            </g>
+            <g id="mouth-closed-f">
+              <path d="M42 70 Q50 74 58 70" stroke="#0a1a10" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </g>
+            <g id="mouth-open-f" style="display:none">
+              <ellipse cx="50" cy="71" rx="7" ry="2" fill="#0a0505">
+                <animate attributeName="ry" values="2;5;2;6;2;4;2" dur="0.45s" repeatCount="indefinite"/>
+                <animate attributeName="rx" values="7;6;7;5.5;7;6;7" dur="0.45s" repeatCount="indefinite"/>
+              </ellipse>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div id="face-caption">Adrian Ingram · Live Session</div>
+  </div>
+
+  <!-- Board view: multi-column -->
+  <div id="board-view">
+    <div id="board-columns"></div>
+  </div>
+
+  <!-- Capture flash overlay -->
+  <div id="capture-flash"></div>
+  <div id="watermark">Adrian Ingram AI</div>
+</div>
+
+<!-- Local Supabase credentials — see config.example.js. Never commit config.js. -->
+<script src="config.js"></script>
+<script>
+/* ── CATEGORY CONFIG (must match facilitator) ── */
+const CATS=[
+  {key:'rock',     label:'Rocks',         icon:'🪨',color:'#64ffb4',badgeBg:'rgba(100,255,180,.15)'},
+  {key:'roadblock',label:'Roadblocks',    icon:'⚠️',color:'#fcd34d',badgeBg:'rgba(252,211,77,.15)'},
+  {key:'boulder',  label:'1-Yr Boulders', icon:'⛰️',color:'#c4b5fd',badgeBg:'rgba(196,181,253,.15)'},
+  {key:'todo',     label:'To-Dos',        icon:'✅',color:'#93c5fd',badgeBg:'rgba(147,197,253,.15)'},
+  {key:'pebble',   label:'Pebbles',       icon:'🔸',color:'#fdba74',badgeBg:'rgba(253,186,116,.15)'},
+  {key:'parking',  label:'Long Term',     icon:'🅿️',color:'#94a3b8',badgeBg:'rgba(148,163,184,.15)'},
+];
+const bbTagClassMap={AI:'b-tag-ai',Strategy:'b-tag-strategy',Action:'b-tag-action',Risk:'b-tag-risk',Opportunity:'b-tag-opportunity'};
+
+/* ── STATE ── */
+let currentItems={rock:[],roadblock:[],boulder:[],todo:[],pebble:[],parking:[]};
+let audienceVisible=new Set();
+let lastAt=0;
+let elapsedSec=0;
+let timerInterval=null;
+let sessionLive=false;
+
+const CFG=window.ADRIAN_CONFIG||{};
+const SUPABASE_URL=CFG.SUPABASE_URL||'';
+const SUPABASE_KEY=CFG.SUPABASE_KEY||'';
+const SUPABASE_TABLE=CFG.SUPABASE_TABLE||'ai_sessions';
+const SESSION_ID=CFG.SESSION_ID||'main-session';
+if(!SUPABASE_URL||!SUPABASE_KEY){console.error('Adrian: config.js not found or incomplete. Copy config.example.js to config.js and add your Supabase URL/key.');}
+const POLL_MS=1500;
+
+/* ── DOM ── */
+const stage=document.getElementById('stage');
+const faceStage=document.getElementById('face-stage');
+const boardView=document.getElementById('board-view');
+const boardColumns=document.getElementById('board-columns');
+const faceWrap=document.getElementById('face-wrap');
+const thoughtBubble=document.getElementById('thought-bubble');
+const bubbleHeadline=document.getElementById('bubble-headline');
+const bubbleText=document.getElementById('bubble-text');
+const bubbleTags=document.getElementById('bubble-tags');
+const sessionDot=document.getElementById('session-dot');
+const sessionTimer=document.getElementById('session-timer');
+const captureFlash=document.getElementById('capture-flash');
+
+/* ── PARTICLES ── */
+(function initParticles(){
+  const container=document.getElementById('particles');
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');p.className='particle';
+    const size=Math.random()*3+1;
+    p.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;bottom:${Math.random()*20}%;background:rgba(${Math.random()>.5?'14,118,90':'255,244,0'},${Math.random()*.3+.05});animation-duration:${Math.random()*15+10}s;animation-delay:-${Math.random()*15}s;`;
+    container.appendChild(p);
+  }
+})();
+
+/* ── FACE STATE ── */
+function setFaceState(state){
+  faceWrap.className=state;
+  const mo=document.getElementById('mouth-open-f');
+  const mc=document.getElementById('mouth-closed-f');
+  if(state==='speaking'){mo.style.display='';mc.style.display='none';}
+  else{mo.style.display='none';mc.style.display='';}
+}
+
+/* ── BOARD RENDER ── */
+function renderBoard(){
+  const visKeys=[...audienceVisible];
+  if(visKeys.length===0){
+    // show Adrian face, hide board
+    boardView.classList.remove('visible');
+    faceStage.classList.remove('hidden');
+    return;
+  }
+  // show board, hide Adrian face
+  faceStage.classList.add('hidden');
+  boardView.classList.add('visible');
+
+  boardColumns.className='';
+  if(visKeys.length===1)boardColumns.classList.add('single');
+
+  // Build / update columns
+  const existingCols=new Set(Array.from(boardColumns.querySelectorAll('.aud-col')).map(c=>c.dataset.key));
+  const newKeys=new Set(visKeys);
+
+  // Remove columns no longer visible
+  boardColumns.querySelectorAll('.aud-col').forEach(col=>{
+    if(!newKeys.has(col.dataset.key))col.remove();
+  });
+
+  // Add or update columns in order
+  visKeys.forEach(key=>{
+    const cat=CATS.find(c=>c.key===key);
+    if(!cat)return;
+    let col=boardColumns.querySelector(`.aud-col[data-key="${key}"]`);
+    if(!col){
+      col=document.createElement('div');
+      col.className='aud-col';col.dataset.key=key;
+      col.innerHTML=`
+        <div class="aud-col-header">
+          <span class="aud-col-icon">${cat.icon}</span>
+          <span class="aud-col-label" style="color:${cat.color}">${cat.label}</span>
+          <span class="aud-col-badge" style="background:${cat.badgeBg};color:${cat.color}">0</span>
+        </div>
+        <div class="aud-col-items" id="aud-items-${key}"></div>`;
+      boardColumns.appendChild(col);
+    }
+    renderColItems(col,cat,currentItems[key]||[]);
+  });
+}
+
+function renderColItems(col,cat,arr){
+  const badge=col.querySelector('.aud-col-badge');
+  const container=col.querySelector('.aud-col-items');
+  if(badge)badge.textContent=arr.length;
+  if(!arr.length){
+    container.innerHTML=`<div class="aud-col-empty">No ${cat.label.toLowerCase()} yet</div>`;
+    return;
+  }
+  // Only re-render if count changed (avoids animation flicker)
+  const current=container.querySelectorAll('.aud-item').length;
+  if(current!==arr.length){
+    container.innerHTML=arr.map(it=>`
+      <div class="aud-item">
+        <span class="aud-item-num" style="color:${cat.color}">#${it.num}</span>
+        <span class="aud-item-text">${escHtml(it.text)}</span>
+      </div>`).join('');
+  }
+}
+
+/* ── SUPABASE POLL ── */
+async function pollSupabase(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${SESSION_ID}&select=_reaction_trigger,updated_at`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
+    });
+    if(!res.ok)return;
+    const rows=await res.json();
+    if(!rows.length)return;
+    const row=rows[0];
+    const trigger=row._reaction_trigger;
+    if(!trigger||!trigger.at||trigger.at<=lastAt)return;
+    lastAt=trigger.at;
+
+    if(trigger.type==='list_state'){
+      handleListState(trigger);
+    } else if(trigger.type==='reaction'){
+      handleReaction(trigger);
+    }
+  }catch(e){}
+}
+
+function handleListState(trigger){
+  const newVisible=new Set(trigger.audienceVisible||[]);
+  const newItems=trigger.items||{};
+
+  // Update state
+  const prevSize=audienceVisible.size;
+  audienceVisible=newVisible;
+  CATS.forEach(c=>{currentItems[c.key]=newItems[c.key]||[];});
+
+  // Detect new items for flash
+  let hasNew=false;
+  CATS.forEach(c=>{
+    const prev=(currentItems[c.key]||[]).length;// we already updated, so check vs rendered
+    const col=boardColumns.querySelector(`.aud-col[data-key="${c.key}"]`);
+    if(col){const rendered=col.querySelectorAll('.aud-item').length;if((newItems[c.key]||[]).length>rendered)hasNew=true;}
+  });
+
+  wearHat(trigger.clientKey||null);
+  renderBoard();
+  renderAgendaRail(trigger.agenda||[],trigger.activeSegmentIndex??-1);
+  if(!sessionLive){sessionLive=true;sessionDot.classList.add('live');startTimer();}
+  if(hasNew)flashCapture();
+}
+
+/* ── AGENDA RAIL (read-only) ── */
+let audAgenda=[];
+let audActiveSegmentIndex=-1;
+const audAgendaRail=document.getElementById('aud-agenda-rail');
+
+function formatElapsed(ms){
+  const s=Math.floor(ms/1000);
+  const m=Math.floor(s/60);
+  return `${m}:${String(s%60).padStart(2,'0')}`;
+}
+
+function renderAgendaRail(agenda,activeIdx){
+  audAgenda=agenda;
+  audActiveSegmentIndex=activeIdx;
+  if(!agenda.length){audAgendaRail.innerHTML='';return;}
+  audAgendaRail.innerHTML=agenda.map((seg,idx)=>{
+    const isActive=idx===activeIdx;
+    const isDone=!!seg.ended_at;
+    const cls=isActive?'active':(isDone?'done':'');
+    const elapsed=isActive&&seg.started_at?formatElapsed(Date.now()-new Date(seg.started_at).getTime()):'';
+    return `<div class="aud-agenda-pill ${cls}">
+      ${isDone?'<span class="aud-agenda-check">✓</span>':''}
+      <span>${escHtml(seg.label)}</span>
+      ${isActive?`<span class="aud-agenda-timer" id="aud-agenda-timer-${idx}">${elapsed}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function handleReaction(trigger){
+  showEmote(trigger.emoji||'✅');
+  if(trigger.emoji==='🎉')launchConfetti();
+  if(trigger.emoji==='⚠️')stage.classList.add('shake');
+  if(trigger.emoji==='🔥')stage.classList.add('shake-hard');
+  setTimeout(()=>{stage.classList.remove('shake','shake-hard');},1000);
+}
+
+/* ── FLASH ── */
+function flashCapture(){
+  captureFlash.style.background='rgba(100,255,180,.06)';
+  captureFlash.classList.add('pop');
+  setTimeout(()=>captureFlash.classList.remove('pop'),200);
+}
+
+/* ── EMOTE / CONFETTI ── */
+function showEmote(emoji){
+  const el=document.createElement('div');el.className='emote-pop';el.textContent=emoji;
+  el.style.left=`${20+Math.random()*60}vw`;el.style.bottom='10vh';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2600);
+}
+
+function launchConfetti(){
+  const colors=['#FFF400','#64ffb4','#ff69b4','#fca57a','#c4b5fd'];
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    const size=Math.random()*10+6;
+    p.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}vw;top:-20px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${Math.random()*2+1.5}s;animation-delay:${Math.random()*.5}s;`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),3500);
+  }
+}
+
+/* ── TIMER ── */
+function startTimer(){
+  if(timerInterval)return;
+  timerInterval=setInterval(()=>{
+    elapsedSec++;
+    const m=Math.floor(elapsedSec/60);const s=elapsedSec%60;
+    sessionTimer.textContent=`${m}:${String(s).padStart(2,'0')}`;
+    if(audActiveSegmentIndex!==-1){
+      const seg=audAgenda[audActiveSegmentIndex];
+      const el=document.getElementById(`aud-agenda-timer-${audActiveSegmentIndex}`);
+      if(seg&&seg.started_at&&el)el.textContent=formatElapsed(Date.now()-new Date(seg.started_at).getTime());
+    }
+  },1000);
+}
+
+/* ── HAT ── */
+const HAT_CLIENTS=new Set(['cef']);
+let currentHatClient=null;
+const audHat=document.getElementById('aud-hat');
+const sbHat=document.getElementById('sb-hat');
+
+function wearHat(clientKey){
+  if(clientKey===currentHatClient)return;
+  currentHatClient=clientKey;
+  [audHat,sbHat].forEach(hat=>{
+    hat.classList.remove('wearing','removing');
+    void hat.offsetWidth;
+  });
+  if(clientKey&&HAT_CLIENTS.has(clientKey)){
+    audHat.classList.add('wearing');
+    sbHat.classList.add('wearing');
+  } else {
+    audHat.classList.add('removing');
+    sbHat.classList.add('removing');
+    setTimeout(()=>{audHat.classList.remove('removing');sbHat.classList.remove('removing');},450);
+  }
+}
+
+/* ── UTILS ── */
+function escHtml(str){const d=document.createElement('div');d.appendChild(document.createTextNode(str));return d.innerHTML;}
+
+/* ── INIT ── */
+setFaceState('listening');
+setInterval(pollSupabase,POLL_MS);
+pollSupabase();
+</script>
+</body>
+</html>
