@@ -11,6 +11,20 @@
 
 create extension if not exists pgcrypto;
 
+-- The pre-existing live-sync table (predates this schema file and Phase 0 —
+-- both the facilitator and audience view assumed it already existed). Added
+-- here so a fresh Supabase project is fully reproducible from this one file:
+-- a single row (id 'main-session') the facilitator overwrites on every board
+-- change; the audience view polls it on an interval and re-renders.
+create table if not exists ai_sessions (
+  id text primary key,
+  _reaction_trigger jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table ai_sessions enable row level security;
+drop policy if exists "anon full access" on ai_sessions;
+create policy "anon full access" on ai_sessions for all to anon using (true) with check (true);
+
 -- One row per facilitated session (a single client meeting/planning day).
 create table if not exists sessions (
   id uuid primary key default gen_random_uuid(),
@@ -109,6 +123,19 @@ create table if not exists summaries (
   created_at timestamptz not null default now()
 );
 
+-- Sentiment reads + per-speaker talk-time snapshots (Phase 9). Fires on the
+-- same 5-minute cadence as the rolling summary above; speaker_talk_sec is a
+-- {"Display Name": cumulativeSeconds} snapshot at the time of the reading,
+-- not a running total by itself — read the latest row per session for "now".
+create table if not exists sentiment_readings (
+  id uuid primary key default gen_random_uuid(),
+  session_id uuid not null references sessions(id) on delete cascade,
+  segment_id uuid references segments(id) on delete set null,
+  text text not null,
+  speaker_talk_sec jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+
 -- Indexes for the query patterns the app will actually run.
 create index if not exists idx_segments_session on segments(session_id);
 create index if not exists idx_transcript_chunks_session on transcript_chunks(session_id, created_at);
@@ -116,6 +143,7 @@ create index if not exists idx_items_session on items(session_id, created_at);
 create index if not exists idx_items_client_quarter_category on items(client_key, quarter, category);
 create index if not exists idx_quotes_session on quotes(session_id, created_at);
 create index if not exists idx_summaries_session on summaries(session_id, created_at);
+create index if not exists idx_sentiment_readings_session on sentiment_readings(session_id, created_at);
 
 -- Row Level Security: the app talks to Supabase directly from the browser
 -- using only the anon key (same model as the existing ai_sessions table
@@ -134,6 +162,7 @@ alter table items enable row level security;
 alter table item_mentions enable row level security;
 alter table quotes enable row level security;
 alter table summaries enable row level security;
+alter table sentiment_readings enable row level security;
 
 drop policy if exists "anon full access" on sessions;
 create policy "anon full access" on sessions for all to anon using (true) with check (true);
@@ -158,3 +187,6 @@ create policy "anon full access" on quotes for all to anon using (true) with che
 
 drop policy if exists "anon full access" on summaries;
 create policy "anon full access" on summaries for all to anon using (true) with check (true);
+
+drop policy if exists "anon full access" on sentiment_readings;
+create policy "anon full access" on sentiment_readings for all to anon using (true) with check (true);

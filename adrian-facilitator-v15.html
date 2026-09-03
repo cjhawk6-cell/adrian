@@ -29,6 +29,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 #cb-start:hover{background:var(--green2);}
 #cb-stop{background:#2a0f0f;color:#ff8080;border:1px solid #4a1a1a;display:none;}
 #cb-stop:hover{background:#3a1a1a;}
+#cb-pause{background:rgba(255,255,255,.06);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.15);display:none;}
+#cb-pause:hover{background:rgba(255,255,255,.1);}
+#cb-pause.cb-pause-active{background:var(--yellow);color:var(--charcoal);border-color:var(--yellow);}
+#cb-pause.cb-pause-active:hover{background:#ede900;}
 #cb-ask{background:var(--yellow);color:var(--charcoal);}
 #cb-ask:hover{background:#ede900;}
 #cb-save{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1);}
@@ -153,10 +157,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .save-action-btn{flex:1;padding:7px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);transition:all .15s;}
 #btn-save-summary{background:var(--green);color:white;}
 #btn-save-summary:hover{background:var(--green2);}
-#btn-export{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.1);}
+#btn-export{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.1);margin-top:8px;}
 #btn-export:hover{background:rgba(255,255,255,.14);}
 #btn-clear-session{background:rgba(200,0,0,.15);color:#ff8080;border:1px solid rgba(200,0,0,.2);}
 #btn-clear-session:hover{background:rgba(200,0,0,.25);}
+#export-options{margin-top:10px;padding:8px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:6px;}
+#export-options-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:6px;}
+#export-options-subhead{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.2);margin:8px 0 3px;}
+#export-options-subhead:first-of-type{margin-top:0;}
+.export-opt{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,.7);padding:3px 0;cursor:pointer;}
+.export-opt input{accent-color:var(--green);cursor:pointer;}
 .saved-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:background .15s;}
 .saved-item:hover{background:rgba(255,255,255,.08);}
 .saved-item-title{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);}
@@ -267,6 +277,29 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 #save-agenda-name::placeholder{color:rgba(255,255,255,.25);}
 #save-agenda-btn{padding:6px 10px;border-radius:5px;border:none;background:var(--green);color:white;font-size:11px;cursor:pointer;font-family:var(--font);}
 #save-agenda-btn:hover{background:var(--green2);}
+
+/* Agenda-email parsing */
+#email-parse-section{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);}
+#email-parse-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:6px;}
+#email-parse-hint{font-size:10px;color:rgba(255,255,255,.25);font-style:italic;margin-bottom:6px;}
+#email-parse-input{width:100%;min-height:70px;padding:7px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);resize:vertical;box-sizing:border-box;}
+#email-parse-input::placeholder{color:rgba(255,255,255,.25);}
+#email-parse-btn{width:100%;margin-top:6px;padding:7px;border-radius:6px;border:none;background:var(--yellow);color:var(--charcoal);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);}
+#email-parse-btn:hover{background:#ede900;}
+#email-parse-btn:disabled{opacity:.5;cursor:default;}
+#email-parse-status{font-size:10px;color:rgba(255,255,255,.4);margin-top:6px;min-height:12px;}
+
+/* Sentiment / talk-time (Phase 9) */
+#talktime-section{margin-bottom:14px;}
+#talktime-label,#sentiment-card-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:8px;}
+.talktime-row{margin-bottom:8px;}
+.talktime-row-head{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.75);margin-bottom:3px;}
+.talktime-row-pct{color:rgba(255,255,255,.4);font-weight:600;}
+.talktime-bar-track{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;}
+.talktime-bar-fill{height:100%;background:var(--yellow);border-radius:3px;transition:width .3s;}
+#sentiment-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px 12px;}
+#sentiment-card-text{font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;}
+#sentiment-card-time{font-size:9px;color:rgba(255,255,255,.25);margin-top:6px;}
 
 /* AI-suggested badge + segment strip on item cards */
 .board-item{position:relative;border-left:3px solid transparent;}
@@ -400,6 +433,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
       </div>
       <div id="ctrl-buttons">
         <button class="cb" id="cb-start">▶ Start Listening</button>
+        <button class="cb" id="cb-pause">⏸ Pause</button>
         <button class="cb" id="cb-stop">■ Stop</button>
         <button class="cb" id="cb-ask">✦ Ask Adrian</button>
         <button class="cb" id="cb-save">⬇ Save</button>
@@ -424,6 +458,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
           <div class="aud-chip" data-key="todo">✅ To-Dos</div>
           <div class="aud-chip" data-key="pebble">🔸 Pebbles</div>
           <div class="aud-chip" data-key="parking">🅿️ Long Term</div>
+          <div class="aud-chip" data-key="sentiment">💬 Sentiment</div>
         </div>
         <div id="aud-vis-hint">Tap chips to toggle what the audience sees</div>
       </div>
@@ -439,6 +474,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
       <div id="speaker-calib-wrap" style="display:none;">
         <div id="speaker-calib-label">Speakers detected — assign names:</div>
         <div id="speaker-calib-list"></div>
+        <datalist id="speaker-attendee-list"></datalist>
       </div>
       <input id="ctrl-session" type="text" placeholder="Session name (e.g. Q3 Planning — Acme)"/>
       <div id="ctrl-supa-row">
@@ -460,6 +496,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
       <button class="ctab" data-tab="keywords">Keywords</button>
       <button class="ctab" data-tab="saved">Saved</button>
       <button class="ctab" data-tab="agenda">Agenda</button>
+      <button class="ctab" data-tab="sentiment">Sentiment</button>
     </div>
 
     <div id="ctrl-body">
@@ -508,8 +545,21 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
         <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Session insights &amp; exports</div>
         <div class="save-btn-row">
           <button class="save-action-btn" id="btn-save-summary">✦ AI Summary</button>
-          <button class="save-action-btn" id="btn-export">⬇ Export Board</button>
         </div>
+
+        <div id="export-options">
+          <div id="export-options-label">Include in export</div>
+          <div id="export-options-subhead">Board Buckets</div>
+          <div id="export-items-options"></div>
+          <div id="export-options-subhead">Session</div>
+          <label class="export-opt"><input type="checkbox" data-key="agenda" checked/> Agenda / Segments</label>
+          <label class="export-opt"><input type="checkbox" data-key="thoughts" checked/> AI Insights &amp; Summaries</label>
+          <label class="export-opt"><input type="checkbox" data-key="sentiment" checked/> Sentiment Readings</label>
+          <label class="export-opt"><input type="checkbox" data-key="talktime" checked/> Talk-Time Breakdown</label>
+          <label class="export-opt"><input type="checkbox" data-key="transcript"/> Full Transcript</label>
+        </div>
+        <button class="save-action-btn" id="btn-export" style="width:100%;">⬇ Export Session</button>
+
         <button class="save-action-btn" id="btn-clear-session" style="width:100%;margin-top:6px;">✕ Clear Session</button>
         <div id="saved-list" style="margin-top:10px;"></div>
         <div id="saved-empty" style="font-size:11px;color:rgba(255,255,255,.2);padding:8px 4px;font-style:italic;margin-top:8px;">Nothing saved yet.</div>
@@ -518,6 +568,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
       <!-- Agenda tab -->
       <div class="tab-pane" id="tab-agenda">
         <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Segments mirror this session's actual agenda. Start/End each one from the rail above the board — items and transcript get tagged with whichever segment is active.</div>
+
+        <div id="email-parse-section">
+          <div id="email-parse-label">Paste agenda email</div>
+          <div id="email-parse-hint">Paste the meeting invite/agenda email below — Adrian will pull out the attendee list and agenda items.</div>
+          <textarea id="email-parse-input" placeholder="Paste the email text here…"></textarea>
+          <button id="email-parse-btn">✦ Parse with AI</button>
+          <div id="email-parse-status"></div>
+        </div>
+
         <div id="saved-agenda-section">
           <div id="saved-agenda-label">Saved Agendas</div>
           <div id="saved-agenda-hint">Select a client above to save or load an agenda template.</div>
@@ -535,6 +594,21 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
           <button id="agenda-add-btn">+</button>
         </div>
         <button id="agenda-default-btn">Use default agenda (one segment per category)</button>
+      </div>
+
+      <!-- Sentiment tab -->
+      <div class="tab-pane" id="tab-sentiment">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Talk-time needs Deepgram speaker detection running (enter a Deepgram key above). Sentiment refreshes every 5 minutes alongside the rolling summary.</div>
+        <div id="talktime-section">
+          <div id="talktime-label">Talk Time</div>
+          <div id="talktime-list"></div>
+          <div id="talktime-empty" style="font-size:11px;color:rgba(255,255,255,.2);padding:8px 4px;font-style:italic;">No speaker talk-time yet — enable Deepgram and start the session.</div>
+        </div>
+        <div id="sentiment-card">
+          <div id="sentiment-card-label">Current Sentiment</div>
+          <div id="sentiment-card-text">No reading yet — the first one lands ~5 minutes into a live session.</div>
+          <div id="sentiment-card-time"></div>
+        </div>
       </div>
     </div>
 
@@ -700,6 +774,7 @@ let items={rock:[],roadblock:[],boulder:[],todo:[],pebble:[],parking:[]};
 let counters={rock:0,roadblock:0,boulder:0,todo:0,pebble:0,parking:0};
 let audienceVisible=new Set(['rock','roadblock']);
 let isListening=false;
+let isPaused=false; // Phase 2: mic feed suspended, but timer/segment/session stay live
 let elapsedSec=0;
 let timerInterval=null;
 let recognition=null;
@@ -712,6 +787,12 @@ let savedItems=[];
 let keywords=[];
 let lastAiCallTime=0;
 const AI_INTERVAL_MS=18000;
+
+/* ── PHASE 3: SUMMARIZATION ENGINE ── */
+let summaryBuffer=''; // accumulates finalized transcript continuously; drained (and reset) every 5min — independent of transcriptBuffer, which drains every ~18s for live classification
+let summaryTimerInterval=null;
+const SUMMARY_INTERVAL_MS=5*60*1000;
+
 let supabaseOk=false;
 let dbSessionId=null; // Phase 0: real sessions.id once a session row is created
 
@@ -723,6 +804,12 @@ let dgActive=false; // true while the Deepgram path (vs Web Speech API) is runni
 let dgLastSpeaker=null; // raw speaker index (0,1,2...) of the most recent final utterance
 let dgSpeakerNames={}; // {0:'Chris Floyd', ...} — session-only calibration, never persisted
 let dgSeenSpeakers=new Set();
+
+/* ── PHASE 9: SENTIMENT & TALK-TIME + AGENDA-EMAIL INTAKE ── */
+let speakerTalkSec={}; // {rawSpeakerIdx: cumulativeSeconds} — keyed by index like dgSpeakerNames, so a mid-session rename doesn't lose history
+let currentSentiment=null; // {text, at} — latest rolling sentiment read, refreshed alongside the Phase 3 summary timer
+let sentimentHistory=[]; // every {text, at} reading this session, oldest first — what the export's Sentiment section reads from
+let parsedAttendees=[]; // names pulled from a pasted agenda email, offered as Speaker-calibration suggestions
 
 /* ── PHASE 1: AGENDA / SEGMENTS ── */
 let agenda=[]; // [{label, segment_type, dbId, started_at, ended_at}]
@@ -740,6 +827,7 @@ const EMOTES=[{e:'👏',l:'Applause'},{e:'💡',l:'Idea'},{e:'🔥',l:'Hot'},{e:
 
 /* ── DOM REFS ── */
 const cbStart=document.getElementById('cb-start');
+const cbPause=document.getElementById('cb-pause');
 const cbStop=document.getElementById('cb-stop');
 const cbAsk=document.getElementById('cb-ask');
 const cbSave=document.getElementById('cb-save');
@@ -1044,6 +1132,37 @@ function stopListening(){
   }
 }
 
+/* ── PHASE 2: PAUSE / RESUME ── a third state alongside Start/Stop — the
+   session timer keeps running and the active segment stays open, but the
+   mic stops feeding the transcription/AI pipeline. Distinct from Stop,
+   which ends the session entirely (dbEndSession, timer stopped). */
+function pauseListening(){
+  isPaused=true;
+  isListening=false; // set before tearing down so WebSpeech's onend / Deepgram's onclose don't auto-restart or error
+  dgActive=false;
+  if(dgMediaRecorder){try{dgMediaRecorder.stop();}catch(e){}}
+  dgMediaRecorder=null;
+  if(dgMicStream){dgMicStream.getTracks().forEach(t=>t.stop());}
+  dgMicStream=null;
+  if(dgSocket){try{dgSocket.close();}catch(e){}}
+  dgSocket=null;
+  if(recognition){try{recognition.stop();}catch(e){}}
+  recognition=null;
+  recDot.classList.remove('live');
+  statusText.textContent='Paused';
+  setOrbState('standby');
+  boardStateLabel.textContent='Paused — press Resume to continue';
+  cbPause.textContent='▶ Resume';
+  cbPause.classList.add('cb-pause-active');
+}
+
+function resumeListening(){
+  isPaused=false;
+  cbPause.textContent='⏸ Pause';
+  cbPause.classList.remove('cb-pause-active');
+  startListening(); // re-opens the mic/socket; doesn't touch the timer (already running) or dbSessionId
+}
+
 function startListeningWebSpeech(){
   if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){showError('Speech recognition not available in this browser.');return;}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -1060,6 +1179,7 @@ function startListeningWebSpeech(){
     }
     if(final){
       transcriptBuffer+=final;
+      summaryBuffer+=final;
       wordCount+=final.trim().split(/\s+/).length;
       wordcountEl.textContent=wordCount+' words';
       addTranscriptEntry(final.trim(),false);
@@ -1138,17 +1258,22 @@ async function startListeningDeepgram(){
       if(alt.transcript&&alt.transcript.trim())commitDiarizedFinal(dgLastSpeaker,alt.transcript.trim());
       return;
     }
-    // Group consecutive same-speaker words into one entry per speaker turn
+    // Group consecutive same-speaker words into one entry per speaker turn.
+    // Deepgram gives per-word start/end (seconds); summing each turn's span
+    // is what powers the Phase 9 talk-time breakdown.
     let curSpeaker=words[0].speaker;
     let curWords=[];
+    let curStart=words[0].start;
+    let curEnd=words[0].end;
     words.forEach(w=>{
       if(w.speaker!==curSpeaker){
-        commitDiarizedFinal(curSpeaker,curWords.join(' '));
-        curWords=[];curSpeaker=w.speaker;
+        commitDiarizedFinal(curSpeaker,curWords.join(' '),curEnd-curStart);
+        curWords=[];curSpeaker=w.speaker;curStart=w.start;
       }
       curWords.push(w.punctuated_word||w.word);
+      curEnd=w.end;
     });
-    if(curWords.length)commitDiarizedFinal(curSpeaker,curWords.join(' '));
+    if(curWords.length)commitDiarizedFinal(curSpeaker,curWords.join(' '),curEnd-curStart);
   };
 
   dgSocket.onerror=()=>{showError('Deepgram connection error.');};
@@ -1157,12 +1282,14 @@ async function startListeningDeepgram(){
   };
 }
 
-function commitDiarizedFinal(speakerIdx,text){
+function commitDiarizedFinal(speakerIdx,text,durationSec=0){
   if(!text||!text.trim())return;
   noteSpeakerSeen(speakerIdx);
   dgLastSpeaker=speakerIdx;
   const speakerName=resolveSpeakerName(speakerIdx);
+  if(durationSec>0)recordTalkTime(speakerIdx,durationSec);
   transcriptBuffer+=text+' ';
+  summaryBuffer+=text+' ';
   wordCount+=text.trim().split(/\s+/).length;
   wordcountEl.textContent=wordCount+' words';
   addTranscriptEntry(text.trim(),false,speakerName);
@@ -1201,18 +1328,98 @@ function renderSpeakerCalibration(){
   if(!wrap||!list)return;
   if(!dgSeenSpeakers.size){wrap.style.display='none';return;}
   wrap.style.display='';
+  const attendeeList=document.getElementById('speaker-attendee-list');
+  if(attendeeList)attendeeList.innerHTML=parsedAttendees.map(n=>`<option value="${escHtml(n)}"></option>`).join('');
   list.innerHTML=[...dgSeenSpeakers].sort((a,b)=>a-b).map(idx=>`
     <div class="speaker-calib-row">
       <span class="speaker-calib-idx">Speaker ${idx}</span>
-      <input class="speaker-calib-input" data-idx="${idx}" placeholder="Assign name…" value="${dgSpeakerNames[idx]?escHtml(dgSpeakerNames[idx]):''}"/>
+      <input class="speaker-calib-input" list="speaker-attendee-list" data-idx="${idx}" placeholder="${parsedAttendees.length?'Assign name (from agenda email)…':'Assign name…'}" value="${dgSpeakerNames[idx]?escHtml(dgSpeakerNames[idx]):''}"/>
     </div>`).join('');
   list.querySelectorAll('.speaker-calib-input').forEach(inp=>{
     inp.addEventListener('change',()=>{
       const idx=parseInt(inp.dataset.idx);
       const v=inp.value.trim();
       if(v)dgSpeakerNames[idx]=v;else delete dgSpeakerNames[idx];
+      renderTalkTime(); // names shown in the talk-time panel should reflect the rename immediately
     });
   });
+}
+
+/* ── PHASE 9: TALK-TIME ── */
+function recordTalkTime(idx,durationSec){
+  if(idx===null||idx===undefined)return;
+  speakerTalkSec[idx]=(speakerTalkSec[idx]||0)+durationSec;
+  renderTalkTime();
+  syncSupabase();
+}
+
+function renderTalkTime(){
+  const list=document.getElementById('talktime-list');
+  const empty=document.getElementById('talktime-empty');
+  if(!list||!empty)return;
+  const idxs=Object.keys(speakerTalkSec);
+  if(!idxs.length){empty.style.display='';list.innerHTML='';return;}
+  empty.style.display='none';
+  const total=idxs.reduce((sum,idx)=>sum+speakerTalkSec[idx],0)||1;
+  list.innerHTML=idxs
+    .sort((a,b)=>speakerTalkSec[b]-speakerTalkSec[a])
+    .map(idx=>{
+      const pct=Math.round((speakerTalkSec[idx]/total)*100);
+      return `<div class="talktime-row">
+        <div class="talktime-row-head"><span>${escHtml(resolveSpeakerName(parseInt(idx)))}</span><span class="talktime-row-pct">${pct}%</span></div>
+        <div class="talktime-bar-track"><div class="talktime-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+}
+
+function talkTimeSnapshot(){
+  // {displayName: seconds} — what gets synced to the audience view and persisted, since raw speaker indices are meaningless outside this facilitator session
+  const out={};
+  Object.keys(speakerTalkSec).forEach(idx=>{out[resolveSpeakerName(parseInt(idx))]=Math.round(speakerTalkSec[idx]);});
+  return out;
+}
+
+/* ── PHASE 9: SENTIMENT ──
+   Reuses the same 5-minute window as the Phase 3 rolling summary (see
+   runRollingSummary), as a separate Claude call so summarizeText()'s plain
+   summary contract stays reusable for Phase 5/8 without sentiment mixed in. */
+async function analyzeSentiment(text,label='this session'){
+  const apiKey=apiInput.value.trim();
+  if(!apiKey||!text||!text.trim())return null;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:150,
+        system:'You are reading the room during a live EOS/Traction strategic planning session. In 1-2 sentences, plain text, describe the current sentiment/energy/tone based on this transcript excerpt (e.g. engaged, tense, frustrated, energized). No JSON, no markdown, no preamble — just the read.',
+        messages:[{role:'user',content:`Transcript from ${label}:\n"${text.trim()}"`}]
+      })
+    });
+    if(!res.ok)return null;
+    const data=await res.json();
+    return data.content[0].text.trim();
+  }catch(e){return null;}
+}
+
+async function dbInsertSentiment(text,speakerTalk,segmentId=null){
+  if(!dbSessionId||!text)return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/sentiment_readings`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({session_id:dbSessionId,segment_id:segmentId,text,speaker_talk_sec:speakerTalk})
+    });
+  }catch(e){}
+}
+
+function renderSentiment(){
+  const textEl=document.getElementById('sentiment-card-text');
+  const timeEl=document.getElementById('sentiment-card-time');
+  if(!textEl||!timeEl||!currentSentiment)return;
+  textEl.textContent=currentSentiment.text;
+  timeEl.textContent=`Updated ${new Date(currentSentiment.at).toLocaleTimeString()}`;
 }
 
 function addTranscriptEntry(text,isInterim,speaker=null){
@@ -1345,6 +1552,80 @@ function handleAIResult(parsed){
   }
 }
 
+/* ── PHASE 3: SUMMARIZATION ENGINE ──
+   One reusable function — "summarize this chunk of transcript text" — that
+   Phase 5 (segment-end consolidation) and Phase 8 (AI training support) will
+   also call later against different inputs (a full segment's captured
+   items+quotes, a whole past session). Deliberately separate from callAI()
+   above: that one classifies live speech into Rocks/Roadblocks/etc and
+   returns structured JSON; this one just writes a plain-text narrative
+   summary, which is all any of Phase 3/5/8 actually need. */
+async function summarizeText(text,label='this session'){
+  const apiKey=apiInput.value.trim();
+  if(!apiKey||!text||!text.trim())return null;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:300,
+        system:'You are summarizing a chunk of a live EOS/Traction strategic planning session for later review. Write a concise 2-4 sentence plain-text summary of what was discussed. No JSON, no markdown, no preamble or headers — just the summary.',
+        messages:[{role:'user',content:`Transcript from ${label}:\n"${text.trim()}"`}]
+      })
+    });
+    if(!res.ok)return null;
+    const data=await res.json();
+    return data.content[0].text.trim();
+  }catch(e){return null;}
+}
+
+async function dbInsertSummary(type,text,segmentId=null){
+  if(!dbSessionId||!text)return null;
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/summaries`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=representation'},
+      body:JSON.stringify({session_id:dbSessionId,segment_id:segmentId,type,text})
+    });
+    if(res.ok){const rows=await res.json();return rows&&rows[0]?rows[0].id:null;}
+  }catch(e){}
+  return null;
+}
+
+/* Fires every SUMMARY_INTERVAL_MS while a session is live (wired in the
+   Start/Stop handlers below). Best-effort and silent when there's nothing
+   worth summarizing — no new speech since the last window, or no API key
+   entered yet — so it never interrupts the facilitator with an error banner. */
+async function runRollingSummary(){
+  const text=summaryBuffer.trim();
+  if(!text||text.trim().split(/\s+/).length<30)return;
+  summaryBuffer='';
+  const activeSeg=agenda[activeSegmentIndex]||null;
+  const segDbId=activeSeg?activeSeg.dbId||null:null;
+  const label=activeSeg?`the "${activeSeg.label}" segment`:'this session';
+
+  // Summary and sentiment run concurrently against the same window text —
+  // independent Claude calls, so one failing doesn't block the other.
+  const [summary,sentiment]=await Promise.all([summarizeText(text,label),analyzeSentiment(text,label)]);
+
+  if(summary){
+    await dbInsertSummary('rolling_5min',summary,segDbId);
+    const thought={id:Date.now(),headline:'5-MIN SUMMARY',text:summary,tags:[],time:new Date().toLocaleTimeString()};
+    thoughts.unshift(thought);
+    renderThoughts();
+    showToastPlain('✦ 5-minute summary captured');
+  }
+
+  if(sentiment){
+    currentSentiment={text:sentiment,at:Date.now()};
+    sentimentHistory.push(currentSentiment);
+    renderSentiment();
+    dbInsertSentiment(sentiment,talkTimeSnapshot(),segDbId);
+    syncSupabase();
+  }
+}
+
 function showBubble(thought){
   setOrbState('speaking');
   bbHeadline.textContent=thought.headline;
@@ -1423,24 +1704,22 @@ async function syncSupabase(){
         clientKey:activeClient||null,
         agenda:agenda.map(seg=>({label:seg.label,segment_type:seg.segment_type,started_at:seg.started_at,ended_at:seg.ended_at})),
         activeSegmentIndex,
+        speakerTalk:talkTimeSnapshot(),
+        sentiment:currentSentiment,
         at:Date.now()
       },
       updated_at:new Date().toISOString()
     };
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${SESSION_ID}`,{
-      method:'PATCH',
-      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
-      body:JSON.stringify(payload)
+    // Upsert in one request (PATCH's `return=minimal` reports 204 even when zero
+    // rows matched, so a PATCH-then-maybe-insert dance can never actually create
+    // the row the first time — this on_conflict upsert creates or updates it either way).
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=id`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({id:SESSION_ID,...payload})
     });
-    if(!res.ok&&res.status!==404){
-      // try insert
-      await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
-        body:JSON.stringify({id:SESSION_ID,...payload})
-      });
-    }
-    if(!supabaseOk){supabaseOk=true;supaDot.classList.add('connected');supaLabel.textContent='Supabase: connected';}
+    if(res.ok){supabaseOk=true;supaDot.classList.add('connected');supaDot.classList.remove('error');supaLabel.textContent='Supabase: connected';}
+    else{supabaseOk=false;supaDot.classList.remove('connected');supaDot.classList.add('error');supaLabel.textContent='Supabase: error';}
   }catch(e){supaDot.classList.remove('connected');supaDot.classList.add('error');supaLabel.textContent='Supabase: error';}
 }
 
@@ -1595,6 +1874,67 @@ function loadDefaultAgenda(){
   renderAgendaTab();
   renderAgendaRail();
 }
+
+/* ── PHASE 9: AGENDA-EMAIL INTAKE ──
+   Paste-only by design: this app has no backend, so there's no reliable way
+   to parse a real Outlook .msg (or even a MIME .eml) file in-browser. Pasting
+   the email body is simple and gets Claude the same information either way. */
+async function parseAgendaEmail(){
+  const btn=document.getElementById('email-parse-btn');
+  const status=document.getElementById('email-parse-status');
+  const input=document.getElementById('email-parse-input');
+  const raw=input.value.trim();
+  if(!raw){status.textContent='Paste the email text first.';return;}
+  const apiKey=apiInput.value.trim();
+  if(!apiKey){status.textContent='Enter your Claude API key above first.';return;}
+  const validTypes=CATS.map(c=>c.key).concat('custom');
+  btn.disabled=true;status.textContent='Parsing…';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:600,
+        system:`Extract structured data from a meeting/agenda invite email. Return ONLY valid JSON, no text before or after:
+{"attendees": ["Full Name", ...], "agenda": [{"label": "Segment name", "segment_type": "one of: ${validTypes.join('|')}"}]}
+Rules:
+- attendees: names of people attending/invited to the meeting, not sender signature-block boilerplate
+- agenda: the meeting's actual running order/topics, in the order they appear. Pick segment_type by best match to EOS categories (rock=quarterly priorities/rocks review, roadblock=issues list, boulder=annual/1-year goals, todo=action items, pebble=minor items, parking=long-term parking lot); use "custom" if nothing fits (e.g. "Lunch", "Intros")
+- if attendees or agenda can't be found in the text, return an empty array for that field — do not invent data`,
+        messages:[{role:'user',content:raw}]
+      })
+    });
+    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||res.status);}
+    const data=await res.json();
+    const raw2=data.content[0].text.trim();
+    let parsed;
+    try{parsed=JSON.parse(raw2);}
+    catch(e){const m=raw2.match(/\{[\s\S]*\}/);if(m)parsed=JSON.parse(m[0]);else throw new Error('Could not parse AI response');}
+
+    parsedAttendees=(parsed.attendees||[]).filter(n=>n&&n.trim()).map(n=>n.trim());
+    const parsedAgenda=(parsed.agenda||[]).filter(a=>a&&a.label&&a.label.trim()).map(a=>({
+      label:a.label.trim(),
+      segment_type:validTypes.includes(a.segment_type)?a.segment_type:'custom',
+      dbId:null,started_at:null,ended_at:null
+    }));
+
+    if(parsedAgenda.length){
+      agenda=parsedAgenda;
+      activeSegmentIndex=-1;
+      renderAgendaTab();
+      renderAgendaRail();
+    }
+    renderSpeakerCalibration(); // refresh the name-suggestion datalist even if no speakers detected yet
+    status.textContent=`Found ${parsedAttendees.length} attendee${parsedAttendees.length===1?'':'s'} and ${parsedAgenda.length} agenda item${parsedAgenda.length===1?'':'s'}.`;
+    showToastPlain(`✦ Parsed: ${parsedAgenda.length} agenda items, ${parsedAttendees.length} attendees`);
+  }catch(e){
+    status.textContent='Parse failed: '+e.message;
+  }finally{
+    btn.disabled=false;
+  }
+}
+document.getElementById('email-parse-btn').addEventListener('click',parseAgendaEmail);
 
 /* ── SAVED AGENDAS (reusable per-client templates, `agendas` table) ── */
 async function loadSavedAgendas(){
@@ -1803,19 +2143,31 @@ document.getElementById('agenda-edit-btn').addEventListener('click',()=>{
   document.getElementById('tab-agenda').classList.add('active');
 });
 
-/* ── START/STOP ── */
+/* ── START/PAUSE/STOP ── */
 cbStart.addEventListener('click',()=>{
-  cbStart.style.display='none';cbStop.style.display='flex';
+  cbStart.style.display='none';cbPause.style.display='flex';cbStop.style.display='flex';
+  isPaused=false;cbPause.textContent='⏸ Pause';cbPause.classList.remove('cb-pause-active');
   dgSeenSpeakers=new Set();dgSpeakerNames={};dgLastSpeaker=null; // fresh calibration per session
+  speakerTalkSec={};currentSentiment=null;sentimentHistory=[];renderTalkTime();renderSentiment();
+  document.getElementById('sentiment-card-text').textContent='No reading yet — the first one lands ~5 minutes into a live session.';
+  document.getElementById('sentiment-card-time').textContent='';
   renderSpeakerCalibration();
   startListening();
   boardSessionName.textContent=sessionInput.value||'New Session';
   dbCreateSession();
+  summaryBuffer=''; // Phase 3: fresh rolling-summary window per session
+  if(summaryTimerInterval)clearInterval(summaryTimerInterval);
+  summaryTimerInterval=setInterval(runRollingSummary,SUMMARY_INTERVAL_MS);
+});
+cbPause.addEventListener('click',()=>{
+  if(isPaused)resumeListening();else pauseListening();
 });
 cbStop.addEventListener('click',()=>{
-  cbStart.style.display='';cbStop.style.display='none';
+  cbStart.style.display='';cbPause.style.display='none';cbStop.style.display='none';
+  isPaused=false;cbPause.textContent='⏸ Pause';cbPause.classList.remove('cb-pause-active');
   stopListening();
   dbEndSession();
+  if(summaryTimerInterval){clearInterval(summaryTimerInterval);summaryTimerInterval=null;}
 });
 
 /* ── ASK ADRIAN ── */
@@ -1835,8 +2187,8 @@ askFreeform.addEventListener('click',async()=>{
 });
 
 /* ── SAVE / EXPORT ── */
-cbSave.addEventListener('click',()=>exportBoard());
-document.getElementById('btn-export').addEventListener('click',()=>exportBoard());
+cbSave.addEventListener('click',()=>exportSession());
+document.getElementById('btn-export').addEventListener('click',()=>exportSession());
 document.getElementById('btn-clear-session').addEventListener('click',()=>{
   if(!confirm('Clear all items and transcript?'))return;
   CATS.forEach(c=>{items[c.key]=[];counters[c.key]=0;renderColItems(c.key);});
@@ -1851,17 +2203,79 @@ document.getElementById('btn-save-summary').addEventListener('click',async()=>{
   await callAI(prompt,true);
 });
 
-function exportBoard(){
+/* ── EXPORT (checkbox-selectable sections) ── */
+function exportSession(){
+  const opts={};
+  document.querySelectorAll('.export-opt input[type=checkbox]').forEach(cb=>{opts[cb.dataset.key]=cb.checked;});
+  if(!Object.values(opts).some(Boolean)){showError('Select at least one section to include.');return;}
+
   const lines=[`Session: ${sessionInput.value||'Untitled'}`,`Date: ${new Date().toLocaleDateString()}`,``];
-  CATS.forEach(c=>{
-    lines.push(`== ${c.label.toUpperCase()} ==`);
-    items[c.key].forEach(i=>lines.push(`${i.num}. ${i.text}`));
-    if(!items[c.key].length)lines.push('(none)');
+
+  const selectedCats=CATS.filter(c=>opts['item-'+c.key]);
+  if(selectedCats.length){
+    lines.push('== BOARD ITEMS ==');
+    selectedCats.forEach(c=>{
+      lines.push(`-- ${c.label.toUpperCase()} --`);
+      items[c.key].forEach(i=>lines.push(`${i.num}. ${i.text}`));
+      if(!items[c.key].length)lines.push('(none)');
+    });
     lines.push('');
-  });
+  }
+
+  if(opts.agenda){
+    lines.push('== AGENDA / SEGMENTS ==');
+    if(agenda.length){
+      agenda.forEach(seg=>{
+        const status=seg.ended_at?'done':(seg.started_at?'in progress':'not started');
+        lines.push(`- ${seg.label} (${seg.segment_type}) — ${status}`);
+      });
+    }else lines.push('(no agenda set)');
+    lines.push('');
+  }
+
+  if(opts.thoughts){
+    lines.push('== AI INSIGHTS & SUMMARIES ==');
+    if(thoughts.length){
+      thoughts.slice().reverse().forEach(t=>lines.push(`[${t.time}] ${t.headline}: ${t.text}`));
+    }else lines.push('(none captured)');
+    lines.push('');
+  }
+
+  if(opts.sentiment){
+    lines.push('== SENTIMENT READINGS ==');
+    if(sentimentHistory.length){
+      sentimentHistory.forEach(s=>lines.push(`[${new Date(s.at).toLocaleTimeString()}] ${s.text}`));
+    }else lines.push('(no readings yet — needs a live session ~5+ minutes long)');
+    lines.push('');
+  }
+
+  if(opts.talktime){
+    lines.push('== TALK-TIME BREAKDOWN ==');
+    const snap=talkTimeSnapshot();
+    const names=Object.keys(snap);
+    if(names.length){
+      const total=names.reduce((s,n)=>s+snap[n],0)||1;
+      names.sort((a,b)=>snap[b]-snap[a]).forEach(n=>lines.push(`${n}: ${Math.round(snap[n]/total*100)}% (${snap[n]}s)`));
+    }else lines.push('(no talk-time data — needs Deepgram speaker detection enabled)');
+    lines.push('');
+  }
+
+  if(opts.transcript){
+    lines.push('== FULL TRANSCRIPT ==');
+    if(transcriptEntries.length){
+      transcriptEntries.forEach(e=>lines.push(`[${e.ts}]${e.speaker?' '+e.speaker+':':''} ${e.text}`));
+    }else lines.push('(no transcript captured)');
+    lines.push('');
+  }
+
   const blob=new Blob([lines.join('\n')],{type:'text/plain'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`session-board-${Date.now()}.txt`;a.click();
-  const item={id:Date.now(),title:`Board Export — ${new Date().toLocaleTimeString()}`,meta:CATS.map(c=>`${c.label}: ${items[c.key].length}`).join(' · ')};
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`session-export-${Date.now()}.txt`;a.click();
+  const includedLabels={agenda:'Agenda',thoughts:'Insights',sentiment:'Sentiment',talktime:'Talk-Time',transcript:'Transcript'};
+  const metaParts=[
+    ...selectedCats.map(c=>c.label),
+    ...Object.keys(includedLabels).filter(k=>opts[k]).map(k=>includedLabels[k]),
+  ];
+  const item={id:Date.now(),title:`Session Export — ${new Date().toLocaleTimeString()}`,meta:metaParts.join(' · ')};
   savedItems.unshift(item);renderSaved();
 }
 
@@ -1994,8 +2408,15 @@ sessionInput.addEventListener('input',()=>{boardSessionName.textContent=sessionI
 function escHtml(str){const d=document.createElement('div');d.appendChild(document.createTextNode(str));return d.innerHTML;}
 function showError(msg){errorBanner.textContent=msg;errorBanner.style.display='block';setTimeout(()=>errorBanner.style.display='none',6000);}
 
+function populateExportItemOptions(){
+  const wrap=document.getElementById('export-items-options');
+  if(!wrap)return;
+  wrap.innerHTML=CATS.map(c=>`<label class="export-opt"><input type="checkbox" data-key="item-${c.key}" checked/> ${c.icon} ${c.label}</label>`).join('');
+}
+
 /* ── INIT ── */
 buildColumns();
+populateExportItemOptions();
 initAudChips();
 initKeywords();
 initSupabase();

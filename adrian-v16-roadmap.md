@@ -49,9 +49,13 @@ These two are really one feature: you can't have "start/end segment" without som
 
 A clean, independent win — ship it any time, doesn't block on anything above. Adds a third state alongside the existing Start/Stop: "paused" keeps the session live (timer keeps running, segment stays open) but stops feeding the mic into the AI pipeline, versus Stop which ends the session entirely. Mostly a state-machine addition to the existing `startListening`/`stopListening` functions.
 
+**Done 2026-09-03** — a Pause/Resume button now sits between Start and Stop. `pauseListening()` tears down whichever mic path is active (Deepgram socket/recorder or the Web Speech recognizer) without calling `stopTimer()`, `dbEndSession()`, or touching `activeSegmentIndex`/`agenda`, so the elapsed timer and the active segment both keep running. `resumeListening()` just calls the existing `startListening()` dispatcher again — same mic-path detection as a fresh Start, but without resetting speaker calibration or creating a new `sessions` row. Verified with a headless Playwright run against the state variables directly (elapsed time keeps advancing while paused, `isListening` flips off/on correctly, Stop still fully resets state).
+
 ## Phase 3 — Summarization engine + 5-minute auto-summaries
 
 Build one reusable function: "summarize transcript chunks in this time/segment window." Wire it to a client-side 5-minute timer while a session is live, writing rows into `summaries`. This is the same function Phase 5 (segment-end consolidation) and Phase 8 (AI training support) will both call again later — building it once here avoids writing three slightly-different summarization prompts.
+
+**Done 2026-09-03** — `summarizeText(text, label)` is the reusable engine: a plain-text-in, plain-text-out call to Claude with its own narrative-summary system prompt, deliberately kept separate from `callAI()`'s EOS classification JSON pipeline. `summaryBuffer` accumulates finalized transcript continuously (alongside, but independent of, the classification `transcriptBuffer`); a `setInterval` wired into Start/Stop calls `runRollingSummary()` every 5 minutes, which skips silently if fewer than 30 words came in that window, otherwise summarizes, writes a `rolling_5min` row via `dbInsertSummary()` (tagged to the active segment if one is running), and surfaces the result in the facilitator's existing Thoughts panel plus a toast. Verified with a headless Playwright run against mocked Claude/Supabase responses: short buffers are skipped, long ones produce a summary, write the DB row, and reset the buffer; the timer starts on Start and clears on Stop.
 
 ## Phase 4 — Ask Adrian: recent-audio observations
 
@@ -87,6 +91,15 @@ The most product-specific layer, sitting on everything below it:
 
 (Explicitly out of scope for now: Adrian narrating or leading segments via voice.)
 
+## Phase 9 — Sentiment & talk-time + agenda-email intake
+
+Added outside the original sequencing (requested directly, like Phase 2 an independent slot-in) — a facilitator-side read on the room, plus a faster way to set up a session than typing out attendees and agenda by hand.
+
+- **Talk-time breakdown** — per-speaker cumulative speaking duration, shown as a % bar per name. Requires Deepgram diarization to be active (Web Speech has no concept of "who"); tracked from Deepgram's per-word `start`/`end` timestamps, summed per speaker-turn. Keyed by raw speaker index internally (like `dgSpeakerNames`) so a mid-session rename in Speaker Calibration doesn't lose history.
+- **Current sentiment** — a 1-2 sentence plain-text read on tone/energy, refreshed on the same 5-minute cadence as the Phase 3 rolling summary (same transcript window, a separate Claude call — kept out of `summarizeText()` so that function's plain-summary contract stays reusable for Phase 5/8). Persisted to a new `sentiment_readings` table alongside a snapshot of talk-time at that moment.
+- **Facilitator-controlled audience sharing** — generalized the existing "Show on Audience Display" chip mechanism (previously just the 6 EOS categories) rather than building a one-off toggle: a `sentiment` chip was added to the same row, and the audience view gates a new bottom-left panel on `audienceVisible.has('sentiment')`. Any future facilitator-side panel can follow the same one-line pattern — add a chip, gate the corresponding audience element.
+- **Agenda-email intake** — a paste-only textarea in the Agenda tab (no file upload: this app has no backend, so there's no reliable way to parse a real Outlook `.msg` or MIME `.eml` file in-browser; pasting the email body gets Claude the same information). Claude extracts `{attendees, agenda}` as JSON; the agenda replaces the current draft agenda (same shape `addAgendaItem`/`loadDefaultAgenda` already use), and attendee names populate a `<datalist>` of suggestions on the Speaker Calibration inputs — still free text, just faster to fill in correctly.
+
 ---
 
 ## Suggested build order at a glance
@@ -100,5 +113,6 @@ The most product-specific layer, sitting on everything below it:
 7. Previous-quarter carryover (Phase 6)
 8. Transcript replay/testing harness (Phase 7)
 9. AI-training support: summaries + discussion ideas (Phase 8)
+10. Sentiment & talk-time + agenda-email intake (Phase 9 — independent, built out of order)
 
 Open question worth deciding before Phase 0 starts: do you want `agendas` and historical `items`/`rocks` scoped per client (so CE Floyd's agenda template and rock history stay separate from a future second client), or is everything still single-client for now with multi-client structure added later? The schema above assumes multi-client from day one since it's a small amount of extra design work now versus a migration later.
