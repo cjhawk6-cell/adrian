@@ -20,6 +20,7 @@ window.CLIENT_PROFILES = {
       'Current strategic focus #2',
     ],
     terminology: 'Client-specific acronyms and jargon, comma separated',
+    coreValues: ['Core value #1', 'Core value #2'], // feeds the "Work the Ideas" acronym word bank
     toneGuidance: 'Notes on how Adrian should sound and what to emphasize for this client.',
   },
 };

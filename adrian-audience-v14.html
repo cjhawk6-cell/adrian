@@ -507,12 +507,12 @@ function handleListState(trigger){
   if(hasNew)flashCapture();
 }
 
-/* ── SENTIMENT / TALK-TIME (Phase 9, facilitator-toggled via the same
+/* ── PACING (talk-time + sentiment, Phase 9, facilitator-toggled via the same
    audienceVisible mechanism as the board categories) ── */
 function renderSentimentPanel(speakerTalk,sentiment){
   const panel=document.getElementById('aud-sentiment-panel');
   if(!panel)return;
-  if(!audienceVisible.has('sentiment')){panel.classList.remove('visible');return;}
+  if(!audienceVisible.has('pacing')){panel.classList.remove('visible');return;}
   panel.classList.add('visible');
 
   const list=document.getElementById('aud-talktime-list');

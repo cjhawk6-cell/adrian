@@ -85,6 +85,11 @@ create table if not exists items (
   resolved_at timestamptz
 );
 alter table items add column if not exists speaker text;
+-- Hierarchy (rock -> boulder, pebble -> rock). Self-referencing, nullable —
+-- most items have no parent, and both AI-suggested and manual tagging leave
+-- it null rather than guess. "set null" on delete so removing a boulder
+-- doesn't cascade-delete the rocks that rolled up to it.
+alter table items add column if not exists parent_item_id uuid references items(id) on delete set null;
 
 -- Every time the same underlying point gets raised again after an item
 -- already exists (whether that's one person repeating themselves or a
@@ -141,6 +146,7 @@ create index if not exists idx_segments_session on segments(session_id);
 create index if not exists idx_transcript_chunks_session on transcript_chunks(session_id, created_at);
 create index if not exists idx_items_session on items(session_id, created_at);
 create index if not exists idx_items_client_quarter_category on items(client_key, quarter, category);
+create index if not exists idx_items_parent on items(parent_item_id);
 create index if not exists idx_quotes_session on quotes(session_id, created_at);
 create index if not exists idx_summaries_session on summaries(session_id, created_at);
 create index if not exists idx_sentiment_readings_session on sentiment_readings(session_id, created_at);

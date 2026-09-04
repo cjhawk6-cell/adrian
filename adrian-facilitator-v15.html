@@ -17,7 +17,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 #app{display:flex;height:100vh;background:#0d1a13;}
 
 /* ── LEFT PANEL ── */
-#ctrl{width:340px;flex-shrink:0;background:#111a14;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow:hidden;}
+#ctrl{width:460px;min-width:360px;max-width:680px;flex-shrink:0;background:#111a14;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow:hidden;resize:horizontal;}
 #ctrl-header{background:#0d1a13;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
 #ctrl-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 #ctrl-logo{width:28px;height:28px;background:var(--yellow);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--green);}
@@ -47,7 +47,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 #client-context-badge{font-size:9px;padding:2px 7px;border-radius:8px;background:rgba(100,255,180,.15);color:#64ffb4;border:1px solid rgba(100,255,180,.3);display:none;white-space:nowrap;}
 #client-context-badge.visible{display:inline-block;}
 
-/* ── AUDIENCE VISIBILITY CHIPS ── */
+/* ── AUDIENCE VISIBILITY CHIPS — always visible (a live control) ── */
 #aud-vis-section{margin-top:10px;}
 #aud-vis-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:6px;}
 #aud-vis-chips{display:flex;flex-wrap:wrap;gap:5px;}
@@ -57,24 +57,42 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .aud-chip[data-key="roadblock"].active{background:rgba(252,211,77,.18);border-color:rgba(252,211,77,.4);color:#fcd34d;}
 .aud-chip[data-key="boulder"].active{background:rgba(196,181,253,.18);border-color:rgba(196,181,253,.4);color:#c4b5fd;}
 .aud-chip[data-key="todo"].active{background:rgba(147,197,253,.18);border-color:rgba(147,197,253,.4);color:#93c5fd;}
-.aud-chip[data-key="pebble"].active{background:rgba(253,186,116,.18);border-color:rgba(253,186,116,.4);color:#fdba74;}
 .aud-chip[data-key="parking"].active{background:rgba(148,163,184,.18);border-color:rgba(148,163,184,.4);color:#94a3b8;}
-#aud-vis-hint{font-size:9px;color:rgba(255,255,255,.2);margin-top:5px;line-height:1.4;}
+.aud-chip[data-key="pacing"].active{background:rgba(255,244,0,.18);border-color:rgba(255,244,0,.4);color:var(--yellow);}
+
+/* ── SETUP DRAWER — client / API keys / session name. Collapses to a one-line
+   summary once a session is live; expands again on click, any time. ── */
+#ctrl-setup-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:6px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;cursor:pointer;}
+#ctrl-setup-summary-text{font-size:11px;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#ctrl-setup-toggle{flex-shrink:0;background:none;border:none;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;font-family:var(--font);padding:2px 4px;}
+#ctrl-setup-toggle:hover{color:rgba(255,255,255,.8);}
+#ctrl-setup{margin-top:10px;}
+#ctrl-setup.collapsed{display:none;}
+
+/* Client selector */
+#client-row{display:flex;align-items:center;gap:6px;}
+#client-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);font-weight:700;white-space:nowrap;}
+#client-select{flex:1;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;font-size:11px;color:white;font-family:var(--font);cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;}
+#client-select option{background:#1a2a20;color:white;}
+#client-select.active{border-color:rgba(100,255,180,.4);background:rgba(100,255,180,.08);}
+#client-context-badge{font-size:9px;padding:2px 7px;border-radius:8px;background:rgba(100,255,180,.15);color:#64ffb4;border:1px solid rgba(100,255,180,.3);display:none;white-space:nowrap;}
+#client-context-badge.visible{display:inline-block;}
 
 /* API + session */
 #ctrl-api-row,#ctrl-dg-row{display:flex;align-items:center;gap:6px;margin-top:8px;}
 #ctrl-api-label,#ctrl-dg-label{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap;}
 #ctrl-api-input,#ctrl-dg-input{flex:1;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);}
+#ctrl-session{width:100%;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);margin-top:8px;}
+#ctrl-session::placeholder,#ctrl-api-input::placeholder,#ctrl-dg-input::placeholder{color:rgba(255,255,255,.25);}
 
-/* Speaker calibration (Tier 1 — session-only) */
-#speaker-calib-wrap{margin-top:8px;padding:8px;background:rgba(196,130,255,.06);border:1px solid rgba(196,130,255,.2);border-radius:6px;}
+/* Speaker calibration (Tier 1 — session-only). Lives in the Pacing tab now,
+   next to the talk-time bars it feeds, instead of floating in the header. */
+#speaker-calib-wrap{margin-bottom:10px;padding:8px;background:rgba(196,130,255,.06);border:1px solid rgba(196,130,255,.2);border-radius:6px;}
 #speaker-calib-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(196,130,255,.7);font-weight:700;margin-bottom:6px;}
 .speaker-calib-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
 .speaker-calib-idx{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap;width:66px;flex-shrink:0;}
 .speaker-calib-input{flex:1;padding:4px 7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:4px;font-size:11px;color:white;font-family:var(--font);}
 .tr-speaker{font-size:9px;font-weight:700;color:#c482ff;text-transform:uppercase;letter-spacing:.3px;margin-right:4px;}
-#ctrl-session{width:100%;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);margin-top:6px;}
-#ctrl-session::placeholder,#ctrl-api-input::placeholder,#ctrl-dg-input::placeholder{color:rgba(255,255,255,.25);}
 
 /* supabase row */
 #ctrl-supa-row{display:flex;align-items:center;gap:6px;margin-top:6px;}
@@ -132,25 +150,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 /* keywords tab */
 .kw-section{margin-bottom:14px;}
 .kw-section-title{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.3);font-weight:700;margin-bottom:8px;}
+#kw-hint{font-size:10px;color:rgba(255,255,255,.3);line-height:1.5;margin-bottom:8px;}
 .kw-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
-.kw-badge{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid transparent;}
-.kw-badge:hover{filter:brightness(1.2);}
-.kw-badge-fire-btn{padding:2px 6px;border-radius:8px;border:none;cursor:pointer;font-size:9px;background:rgba(255,255,255,.15);color:white;font-family:var(--font);font-weight:700;transition:all .15s;flex-shrink:0;}
-.kw-badge-fire-btn:hover{background:rgba(255,244,0,.4);color:#333;}
+.kw-badge{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:600;transition:all .15s;border:1px solid transparent;}
+.kw-badge.pinned{border-style:dashed;}
+.kw-badge-count{opacity:.6;font-weight:700;}
 .kw-badge-del-btn{padding:2px 5px;border-radius:8px;border:none;cursor:pointer;font-size:9px;background:rgba(255,60,60,.2);color:#ff8080;font-family:var(--font);font-weight:700;transition:all .15s;flex-shrink:0;}
 .kw-badge-del-btn:hover{background:rgba(255,60,60,.45);}
-.emote-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
-.emote-btn{padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.1);cursor:pointer;font-size:14px;background:rgba(255,255,255,.05);transition:all .15s;display:flex;align-items:center;gap:5px;font-family:var(--font);}
-.emote-btn:hover{background:rgba(255,255,255,.15);transform:scale(1.1);border-color:rgba(255,255,255,.25);}
-.emote-btn:active{transform:scale(.93);}
-.emote-btn-label{font-size:9px;color:rgba(255,255,255,.4);font-weight:500;}
 .kw-add-row{display:flex;gap:6px;margin-top:6px;}
 .kw-add-input{flex:1;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);}
 .kw-add-input::placeholder{color:rgba(255,255,255,.25);}
 .kw-add-btn{padding:5px 10px;border-radius:5px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);background:var(--green);color:white;transition:all .15s;}
 .kw-add-btn:hover{background:var(--green2);}
-.kw-suggest-btn{width:100%;padding:7px;border-radius:6px;border:1px dashed rgba(255,244,0,.3);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);background:rgba(255,244,0,.05);color:var(--yellow);transition:all .15s;margin-top:4px;}
-.kw-suggest-btn:hover{background:rgba(255,244,0,.1);}
 
 /* saved tab */
 .save-btn-row{display:flex;gap:6px;margin-top:8px;}
@@ -196,6 +207,64 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 #ask-freeform:hover{background:rgba(100,200,255,.25);}
 #ask-submit{background:var(--yellow);color:var(--charcoal);}
 #ask-submit:hover{background:#ede900;}
+
+/* Pebbles-for-a-rock modal (Phase 10 step 3) */
+#pebble-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;}
+#pebble-overlay.visible{display:flex;}
+#pebble-card{background:#1a2520;border:1px solid rgba(253,186,116,.25);border-radius:14px;padding:24px;width:480px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+#pebble-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;}
+#pebble-card-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fdba74;margin-bottom:4px;}
+#pebble-card-rock-text{font-size:12px;color:rgba(255,255,255,.6);line-height:1.4;}
+#pebble-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:14px;cursor:pointer;flex-shrink:0;padding:2px 4px;}
+#pebble-close:hover{color:white;}
+#pebble-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:220px;overflow-y:auto;}
+#pebble-add-row{display:flex;gap:6px;margin-bottom:10px;}
+#pebble-add-input{flex:1;padding:7px 9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:white;font-family:var(--font);font-size:12px;outline:none;}
+#pebble-add-input::placeholder{color:rgba(255,255,255,.25);}
+#pebble-add-btn{padding:7px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:var(--green);color:white;font-family:var(--font);}
+#pebble-add-btn:hover{background:var(--green2);}
+#pebble-suggest-btn{width:100%;padding:8px;border-radius:6px;border:1px dashed rgba(253,186,116,.4);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);background:rgba(253,186,116,.06);color:#fdba74;transition:all .15s;}
+#pebble-suggest-btn:hover{background:rgba(253,186,116,.12);}
+#pebble-suggest-btn:disabled{opacity:.5;cursor:default;}
+#pebble-suggest-status{font-size:10px;color:rgba(255,255,255,.4);margin-top:6px;min-height:12px;}
+#pebble-suggestions{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+.pebble-suggestion{display:flex;align-items:center;gap:8px;padding:6px 9px;background:rgba(253,186,116,.06);border:1px solid rgba(253,186,116,.2);border-radius:6px;font-size:11px;color:rgba(255,255,255,.8);}
+.pebble-suggestion span{flex:1;line-height:1.4;}
+.pebble-suggestion button{flex-shrink:0;padding:3px 8px;border-radius:4px;border:none;cursor:pointer;font-size:10px;font-weight:700;font-family:var(--font);}
+.pebble-suggestion-add{background:var(--green);color:white;}
+.pebble-suggestion-add:hover{background:var(--green2);}
+.pebble-suggestion-dismiss{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);}
+.pebble-suggestion-dismiss:hover{background:rgba(255,255,255,.15);}
+
+/* Work the Ideas — acronym builder modal (Phase 10 step 5) */
+#idea-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;}
+#idea-overlay.visible{display:flex;}
+#idea-card{background:#1a2520;border:1px solid rgba(196,181,253,.3);border-radius:14px;padding:24px;width:560px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+#idea-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+#idea-card-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c4b5fd;margin-bottom:4px;}
+#idea-card-subtitle{font-size:12px;color:rgba(255,255,255,.55);line-height:1.4;}
+#idea-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:14px;cursor:pointer;flex-shrink:0;padding:2px 4px;}
+#idea-close:hover{color:white;}
+#idea-acronym-preview{font-size:28px;font-weight:800;letter-spacing:4px;color:#c4b5fd;text-align:center;padding:14px 0;background:rgba(196,181,253,.06);border:1px dashed rgba(196,181,253,.25);border-radius:10px;margin-bottom:16px;}
+#idea-item-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.idea-item-row{display:flex;align-items:center;gap:8px;}
+.idea-item-letter{width:26px;height:26px;flex-shrink:0;border-radius:6px;background:rgba(196,181,253,.15);color:#c4b5fd;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.idea-item-input{flex:1;padding:7px 9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:white;font-family:var(--font);font-size:12px;outline:none;}
+.idea-item-input:focus{border-color:rgba(196,181,253,.5);}
+#idea-wordbank-section{border-top:1px solid rgba(255,255,255,.08);padding-top:14px;}
+#idea-wordbank-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+#idea-wordbank-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);font-weight:700;}
+#idea-suggest-words-btn{font-size:10px;padding:4px 9px;border-radius:5px;border:1px dashed rgba(196,181,253,.4);background:rgba(196,181,253,.06);color:#c4b5fd;cursor:pointer;font-family:var(--font);font-weight:600;}
+#idea-suggest-words-btn:hover{background:rgba(196,181,253,.15);}
+#idea-suggest-words-btn:disabled{opacity:.5;cursor:default;}
+#idea-wordbank-hint{font-size:10px;color:rgba(255,255,255,.25);margin-bottom:6px;}
+#idea-wordbank-status{font-size:10px;color:rgba(255,255,255,.4);min-height:12px;margin-bottom:4px;}
+#idea-wordbank{display:flex;flex-wrap:wrap;gap:5px;}
+.idea-wordbank-chip{padding:4px 9px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;background:rgba(99,179,237,.15);color:#90cdf4;border:1px solid rgba(99,179,237,.33);}
+.idea-wordbank-chip:hover{filter:brightness(1.25);}
+.idea-wordbank-chip.ai{background:rgba(196,181,253,.15);color:#c4b5fd;border-color:rgba(196,181,253,.35);}
+.hier-work-ideas-btn{font-size:9px;padding:2px 6px;border-radius:4px;border:1px dashed rgba(196,181,253,.4);background:rgba(196,181,253,.06);color:#c4b5fd;cursor:pointer;font-family:var(--font);flex-shrink:0;white-space:nowrap;}
+.hier-work-ideas-btn:hover{background:rgba(196,181,253,.15);}
 #ask-submit:disabled{opacity:.5;cursor:not-allowed;}
 
 #error-banner{display:none;background:#2a0f0f;border-top:1px solid #4a1a1a;color:#ff8080;padding:7px 14px;font-size:11px;flex-shrink:0;}
@@ -306,6 +375,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .board-item.seg-tagged{padding-left:9px;}
 .board-item-ai-badge{font-size:8px;font-weight:700;padding:1px 5px;border-radius:6px;background:rgba(255,244,0,.15);color:#fff400;letter-spacing:.5px;flex-shrink:0;}
 .board-item-mention-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;background:rgba(255,120,50,.18);color:#ff8c42;letter-spacing:.3px;flex-shrink:0;}
+.board-item-pebble-count{font-size:9px;font-weight:600;color:rgba(253,186,116,.7);flex-shrink:0;white-space:nowrap;}
+.board-item.rock-clickable{cursor:pointer;}
+.board-item.rock-clickable:hover{background:rgba(255,255,255,.1);border-color:rgba(253,186,116,.3);}
 .board-item-mention-badge.corroborated{background:rgba(196,130,255,.2);color:#c482ff;}
 .board-item.drag-over{outline:2px dashed rgba(255,255,255,.4);outline-offset:-2px;}
 .board-item[draggable="true"]{cursor:grab;}
@@ -344,13 +416,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .board-col-items{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:5px;}
 .board-col-items::-webkit-scrollbar{width:3px;}
 .board-col-items::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
-.board-item{display:flex;align-items:flex-start;gap:6px;padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);animation:cFadeIn .3s ease;cursor:default;}
+.board-item{display:flex;flex-direction:column;gap:5px;padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);animation:cFadeIn .3s ease;cursor:default;}
 .board-item:hover{background:rgba(255,255,255,.08);}
+.board-item-row{display:flex;align-items:flex-start;gap:6px;}
 .board-item-num{font-size:10px;font-weight:700;min-width:18px;flex-shrink:0;padding-top:1px;}
 .board-item-text{font-size:11px;line-height:1.45;color:rgba(255,255,255,.8);flex:1;word-break:break-word;}
 .board-item-del{padding:1px 4px;border-radius:3px;border:none;cursor:pointer;font-size:9px;background:rgba(255,60,60,.12);color:rgba(255,128,128,.6);font-family:var(--font);transition:all .15s;flex-shrink:0;margin-top:1px;opacity:0;}
 .board-item:hover .board-item-del{opacity:1;}
 .board-item-del:hover{background:rgba(255,60,60,.35);color:#ff8080;}
+.board-item-parent-row{display:flex;align-items:center;gap:5px;padding-left:24px;}
+.board-item-parent-label{font-size:9px;color:rgba(255,255,255,.3);white-space:nowrap;}
+.board-item-parent-select{flex:1;font-size:10px;padding:2px 5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:rgba(255,255,255,.7);font-family:var(--font);min-width:0;}
+.board-item-parent-select option{background:#1a2a20;color:white;}
 .board-col-empty{font-size:10px;color:rgba(255,255,255,.15);padding:8px 4px;font-style:italic;text-align:center;}
 
 /* board quick-add inline */
@@ -361,6 +438,20 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .board-col-add-inp:focus{border-color:rgba(255,255,255,.3);}
 .board-col-add-ok{padding:5px 9px;border-radius:5px;border:none;cursor:pointer;font-size:11px;font-weight:700;font-family:var(--font);background:var(--green);color:white;transition:all .15s;}
 .board-col-add-ok:hover{background:var(--green2);}
+
+/* ── STRATEGIC PLAN PANEL (Boulders -> Rocks hierarchy, Phase 10 step 2) ── */
+.board-hier-panel{flex:1.6;max-width:480px;} /* wider than a flat column — it's carrying two levels */
+.hier-group{border:1px solid rgba(255,255,255,.06);border-radius:8px;margin-bottom:8px;padding:8px;background:rgba(255,255,255,.02);transition:background .15s;}
+.hier-group.hier-drop-target{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);}
+.hier-boulder-head{display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;}
+.hier-boulder-head .board-item-text{font-weight:600;}
+.hier-add-rock-btn{font-size:9px;padding:2px 6px;border-radius:4px;border:1px dashed rgba(255,255,255,.2);background:none;color:rgba(255,255,255,.4);cursor:pointer;font-family:var(--font);flex-shrink:0;white-space:nowrap;}
+.hier-add-rock-btn:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.4);}
+.hier-rock-list{display:flex;flex-direction:column;gap:5px;padding-left:14px;border-left:2px solid rgba(196,181,253,.15);}
+.hier-empty{font-size:10px;color:rgba(255,255,255,.15);font-style:italic;padding:4px 2px;}
+.hier-unassigned{border-style:dashed;}
+.hier-group-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.3);font-weight:700;margin-bottom:6px;}
+.hier-rock-add-row{padding:4px 0 0;}
 
 /* board command bar */
 #board-cmd-bar{padding:10px 16px;border-top:1px solid rgba(255,255,255,.07);background:rgba(13,26,19,.9);backdrop-filter:blur(8px);flex-shrink:0;display:flex;gap:8px;align-items:center;}
@@ -439,16 +530,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
         <button class="cb" id="cb-save">⬇ Save</button>
       </div>
 
-      <!-- Client selector -->
-      <div id="client-row">
-        <span id="client-label">Client</span>
-        <select id="client-select">
-          <option value="">— No client selected —</option>
-        </select>
-        <span id="client-context-badge">✦ Context loaded</span>
-      </div>
-
-      <!-- Audience visibility chips -->
+      <!-- Audience visibility chips — a live control (toggled during the session), so it
+           stays outside the setup drawer and always visible. -->
       <div id="aud-vis-section">
         <div id="aud-vis-label">Show on Audience Display</div>
         <div id="aud-vis-chips">
@@ -456,27 +539,37 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
           <div class="aud-chip active" data-key="roadblock">⚠️ Roadblocks</div>
           <div class="aud-chip" data-key="boulder">⛰️ Boulders</div>
           <div class="aud-chip" data-key="todo">✅ To-Dos</div>
-          <div class="aud-chip" data-key="pebble">🔸 Pebbles</div>
           <div class="aud-chip" data-key="parking">🅿️ Long Term</div>
-          <div class="aud-chip" data-key="sentiment">💬 Sentiment</div>
+          <div class="aud-chip" data-key="pacing">🎯 Pacing</div>
         </div>
-        <div id="aud-vis-hint">Tap chips to toggle what the audience sees</div>
       </div>
 
-      <div id="ctrl-api-row">
-        <span id="ctrl-api-label">API Key</span>
-        <input id="ctrl-api-input" type="password" placeholder="sk-ant-..."/>
+      <!-- Setup drawer: client / API keys / session name. The bar is always visible;
+           the fields below collapse once a session goes live (click the bar to
+           toggle either way, any time). -->
+      <div id="ctrl-setup-bar">
+        <span id="ctrl-setup-summary-text">No client · Untitled session</span>
+        <button id="ctrl-setup-toggle">Collapse ▴</button>
       </div>
-      <div id="ctrl-dg-row">
-        <span id="ctrl-dg-label">Deepgram</span>
-        <input id="ctrl-dg-input" type="password" placeholder="Optional — enables speaker detection"/>
+      <div id="ctrl-setup">
+        <div id="client-row">
+          <span id="client-label">Client</span>
+          <select id="client-select">
+            <option value="">— No client selected —</option>
+          </select>
+          <span id="client-context-badge">✦ Context loaded</span>
+        </div>
+        <div id="ctrl-api-row">
+          <span id="ctrl-api-label">API Key</span>
+          <input id="ctrl-api-input" type="password" placeholder="sk-ant-..."/>
+        </div>
+        <div id="ctrl-dg-row">
+          <span id="ctrl-dg-label">Deepgram</span>
+          <input id="ctrl-dg-input" type="password" placeholder="Optional — enables speaker detection"/>
+        </div>
+        <input id="ctrl-session" type="text" placeholder="Session name (e.g. Q3 Planning — Acme)"/>
       </div>
-      <div id="speaker-calib-wrap" style="display:none;">
-        <div id="speaker-calib-label">Speakers detected — assign names:</div>
-        <div id="speaker-calib-list"></div>
-        <datalist id="speaker-attendee-list"></datalist>
-      </div>
-      <input id="ctrl-session" type="text" placeholder="Session name (e.g. Q3 Planning — Acme)"/>
+
       <div id="ctrl-supa-row">
         <div id="ctrl-supa-dot"></div>
         <span id="ctrl-supa-label">Supabase: connecting…</span>
@@ -496,7 +589,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
       <button class="ctab" data-tab="keywords">Keywords</button>
       <button class="ctab" data-tab="saved">Saved</button>
       <button class="ctab" data-tab="agenda">Agenda</button>
-      <button class="ctab" data-tab="sentiment">Sentiment</button>
+      <button class="ctab" data-tab="pacing">Pacing</button>
     </div>
 
     <div id="ctrl-body">
@@ -523,20 +616,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
         <div id="transcript-empty" style="font-size:11px;color:rgba(255,255,255,.2);padding:10px 4px;font-style:italic;">Transcript will appear here…</div>
       </div>
 
-      <!-- Keywords tab -->
+      <!-- Keywords tab (Phase 10 step 4: passive frequency tracker) -->
       <div class="tab-pane" id="tab-keywords">
         <div class="kw-section">
-          <div class="kw-section-title">Active Keywords</div>
+          <div class="kw-section-title">Tracked Keywords</div>
+          <div id="kw-hint">Words mentioned 2+ times, ranked by frequency — useful raw material for naming a Boulder/Rock acronym later. Pin one to always show it, even before it's said enough.</div>
           <div id="kw-grid" class="kw-grid"></div>
+          <div id="kw-empty" style="font-size:11px;color:rgba(255,255,255,.2);padding:8px 4px;font-style:italic;">Nothing tracked yet — starts filling in once the session is live.</div>
           <div class="kw-add-row">
-            <input class="kw-add-input" id="kw-add-input" placeholder="Add keyword…"/>
-            <button class="kw-add-btn" id="kw-add-btn">+ Add</button>
+            <input class="kw-add-input" id="kw-add-input" placeholder="Pin a word…"/>
+            <button class="kw-add-btn" id="kw-add-btn">📌 Pin</button>
           </div>
-          <button class="kw-suggest-btn" id="kw-suggest-btn">✦ Suggest keywords from transcript</button>
-        </div>
-        <div class="kw-section">
-          <div class="kw-section-title">Quick Reactions</div>
-          <div class="emote-grid" id="emote-grid"></div>
         </div>
       </div>
 
@@ -556,6 +646,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
           <label class="export-opt"><input type="checkbox" data-key="thoughts" checked/> AI Insights &amp; Summaries</label>
           <label class="export-opt"><input type="checkbox" data-key="sentiment" checked/> Sentiment Readings</label>
           <label class="export-opt"><input type="checkbox" data-key="talktime" checked/> Talk-Time Breakdown</label>
+          <label class="export-opt"><input type="checkbox" data-key="keywords" checked/> Tracked Keywords</label>
           <label class="export-opt"><input type="checkbox" data-key="transcript"/> Full Transcript</label>
         </div>
         <button class="save-action-btn" id="btn-export" style="width:100%;">⬇ Export Session</button>
@@ -597,8 +688,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
       </div>
 
       <!-- Sentiment tab -->
-      <div class="tab-pane" id="tab-sentiment">
-        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Talk-time needs Deepgram speaker detection running (enter a Deepgram key above). Sentiment refreshes every 5 minutes alongside the rolling summary.</div>
+      <div class="tab-pane" id="tab-pacing">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Talk-time and sentiment need Deepgram speaker detection running (enter a Deepgram key in Setup). Sentiment refreshes every 5 minutes alongside the rolling summary.</div>
+        <div id="speaker-calib-wrap" style="display:none;">
+          <div id="speaker-calib-label">Speakers detected — assign names:</div>
+          <div id="speaker-calib-list"></div>
+          <datalist id="speaker-attendee-list"></datalist>
+        </div>
         <div id="talktime-section">
           <div id="talktime-label">Talk Time</div>
           <div id="talktime-list"></div>
@@ -746,6 +842,51 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
     </div>
   </div>
 
+  <!-- Pebbles for a Rock (Phase 10 step 3) -->
+  <div id="pebble-overlay">
+    <div id="pebble-card">
+      <div id="pebble-card-header">
+        <div>
+          <div id="pebble-card-title">PEBBLES</div>
+          <div id="pebble-card-rock-text"></div>
+        </div>
+        <button id="pebble-close">✕</button>
+      </div>
+      <div id="pebble-list"></div>
+      <div id="pebble-add-row">
+        <input id="pebble-add-input" placeholder="Add a pebble for this rock…"/>
+        <button id="pebble-add-btn">↵</button>
+      </div>
+      <button id="pebble-suggest-btn">✦ Suggest pebbles from transcript</button>
+      <div id="pebble-suggest-status"></div>
+      <div id="pebble-suggestions"></div>
+    </div>
+  </div>
+
+  <!-- Work the Ideas — acronym builder (Phase 10 step 5) -->
+  <div id="idea-overlay">
+    <div id="idea-card">
+      <div id="idea-card-header">
+        <div>
+          <div id="idea-card-title">WORK THE IDEAS</div>
+          <div id="idea-card-subtitle"></div>
+        </div>
+        <button id="idea-close">✕</button>
+      </div>
+      <div id="idea-acronym-preview">—</div>
+      <div id="idea-item-list"></div>
+      <div id="idea-wordbank-section">
+        <div id="idea-wordbank-head">
+          <span id="idea-wordbank-label">Word Bank</span>
+          <button id="idea-suggest-words-btn">✦ Suggest words</button>
+        </div>
+        <div id="idea-wordbank-hint">Click a word to insert it into whichever item you're editing.</div>
+        <div id="idea-wordbank-status"></div>
+        <div id="idea-wordbank"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-container"></div>
 </div>
 
@@ -767,6 +908,12 @@ const CATS=[
   {key:'pebble',   label:'Pebbles',       icon:'🔸',color:'#fdba74',toastBg:'#2e1a0d',badgeBg:'rgba(253,186,116,.15)'},
   {key:'parking',  label:'Long Term',     icon:'🅿️',color:'#94a3b8',toastBg:'#1a1a1a',badgeBg:'rgba(148,163,184,.15)'},
 ];
+
+// Hierarchy: a rock optionally ties to a boulder, a pebble optionally ties to a
+// rock. Keyed by child category -> parent category. Tagging is hybrid — the
+// live classification AI may suggest a link (only when the transcript itself
+// makes it explicit), and there's always a manual override per item.
+const PARENT_CAT={rock:'boulder',pebble:'rock'};
 
 /* ── STATE ── */
 let activeClient=null; // key into CLIENT_PROFILES
@@ -815,6 +962,10 @@ let parsedAttendees=[]; // names pulled from a pasted agenda email, offered as S
 let agenda=[]; // [{label, segment_type, dbId, started_at, ended_at}]
 let activeSegmentIndex=-1;
 let dragState=null; // {key, idx} of the item card currently being dragged
+
+/* ── PHASE 10 STEP 3: PEBBLES-FOR-A-ROCK OVERLAY ── */
+let pebbleOverlayRockNum=null; // which rock's overlay is open, by stable .num (not array index — deletions shift indices)
+let pebbleSuggestions=[]; // AI-proposed candidate pebbles for the currently-open rock, not yet added
 const CFG=window.ADRIAN_CONFIG||{};
 const SUPABASE_URL=CFG.SUPABASE_URL||'';
 const SUPABASE_KEY=CFG.SUPABASE_KEY||'';
@@ -823,7 +974,6 @@ const SESSION_ID=CFG.SESSION_ID||'main-session';
 if(!SUPABASE_URL||!SUPABASE_KEY){console.error('Adrian: config.js not found or incomplete. Copy config.example.js to config.js and add your Supabase URL/key.');}
 const tagMap={AI:'tc-tag-ai',Strategy:'tc-tag-strategy',Action:'tc-tag-action',Risk:'tc-tag-risk',Opportunity:'tc-tag-opportunity',Automation:'tc-tag-ai',People:'tc-tag-strategy',Process:'tc-tag-action',Technology:'tc-tag-ai',Data:'tc-tag-ai',Quip:'tc-tag-quip',Finance:'tc-tag-action',Operations:'tc-tag-strategy',Culture:'tc-tag-opportunity',Sales:'tc-tag-opportunity'};
 const bbTagMap={AI:'bb-tag-ai',Strategy:'bb-tag-strategy',Action:'bb-tag-action',Risk:'bb-tag-risk',Opportunity:'bb-tag-opportunity',Automation:'bb-tag-ai',People:'bb-tag-strategy',Process:'bb-tag-action',Technology:'bb-tag-ai',Data:'bb-tag-ai',Finance:'bb-tag-action',Operations:'bb-tag-strategy',Culture:'bb-tag-opportunity',Sales:'bb-tag-opportunity'};
-const EMOTES=[{e:'👏',l:'Applause'},{e:'💡',l:'Idea'},{e:'🔥',l:'Hot'},{e:'⚠️',l:'Flag'},{e:'✅',l:'Agree'},{e:'❓',l:'Question'}];
 
 /* ── DOM REFS ── */
 const cbStart=document.getElementById('cb-start');
@@ -863,92 +1013,261 @@ const askSubmit=document.getElementById('ask-submit');
 const askCancel=document.getElementById('ask-cancel');
 const askFreeform=document.getElementById('ask-freeform');
 
-/* ── BUILD BOARD COLUMNS ── */
+/* ── BUILD BOARD COLUMNS ──
+   Layout (Phase 10 step 2): Roadblocks | Strategic Plan (Boulders->Rocks
+   hierarchy panel) | To-Dos | Long Term. Pebbles no longer get a column —
+   they surface via a per-Rock overlay (Phase 10 step 3) instead. */
 function buildColumns(){
   boardCols.innerHTML='';
-  CATS.forEach(cat=>{
-    const col=document.createElement('div');
-    col.className='board-col';
-    col.id=`col-${cat.key}`;
-    col.innerHTML=`
-      <div class="board-col-header">
-        <span class="board-col-icon">${cat.icon}</span>
-        <span class="board-col-label" style="color:${cat.color}">${cat.label}</span>
-        <span class="board-col-badge" id="badge-${cat.key}" style="background:${cat.badgeBg};color:${cat.color}">0</span>
-        <button class="board-col-add" data-key="${cat.key}" title="Quick add">+</button>
-      </div>
-      <div class="board-col-items" id="items-${cat.key}">
-        <div class="board-col-empty" id="empty-${cat.key}">No ${cat.label.toLowerCase()} yet</div>
-      </div>
-      <div class="board-col-add-row" id="addrow-${cat.key}">
-        <input class="board-col-add-inp" id="addinp-${cat.key}" placeholder="Add ${cat.label.toLowerCase().replace(/1-yr /,'')}…"/>
-        <button class="board-col-add-ok" data-key="${cat.key}">↵</button>
+  buildFlatColumn('roadblock');
+  buildBoulderRockPanel();
+  buildFlatColumn('todo');
+  buildFlatColumn('parking');
+}
+
+/* Cross-category reclassify (fromKey!==toKey) or same-category re-parent
+   (fromKey===toKey, e.g. dragging a rock from Unassigned onto a specific
+   boulder) — the single drop handler every drop zone below calls into. */
+function handleItemDrop(toKey,parentNum){
+  if(!dragState)return;
+  const {key:fromKey,idx:fromIdx}=dragState;
+  dragState=null;
+  if(fromKey===toKey){
+    if(PARENT_CAT[toKey])setItemParent(fromKey,fromIdx,parentNum);
+    return;
+  }
+  const [moved]=items[fromKey].splice(fromIdx,1);
+  if(!moved)return;
+  counters[toKey]++;
+  moved.num=counters[toKey];
+  moved.parentNum=PARENT_CAT[toKey]?parentNum:null;
+  items[toKey].push(moved);
+  renderColItems(fromKey);
+  renderColItems(toKey);
+  syncSupabase();
+  dbInsertItem(toKey,moved.text,moved.num,moved.speaker,moved.parentNum).then(id=>{moved.dbId=id;}); // durable record under its new category
+}
+
+function buildFlatColumn(key){
+  const cat=CATS.find(c=>c.key===key);
+  const col=document.createElement('div');
+  col.className='board-col';
+  col.id=`col-${cat.key}`;
+  col.innerHTML=`
+    <div class="board-col-header">
+      <span class="board-col-icon">${cat.icon}</span>
+      <span class="board-col-label" style="color:${cat.color}">${cat.label}</span>
+      <span class="board-col-badge" id="badge-${cat.key}" style="background:${cat.badgeBg};color:${cat.color}">0</span>
+      <button class="board-col-add" data-key="${cat.key}" title="Quick add">+</button>
+    </div>
+    <div class="board-col-items" id="items-${cat.key}">
+      <div class="board-col-empty" id="empty-${cat.key}">No ${cat.label.toLowerCase()} yet</div>
+    </div>
+    <div class="board-col-add-row" id="addrow-${cat.key}">
+      <input class="board-col-add-inp" id="addinp-${cat.key}" placeholder="Add ${cat.label.toLowerCase().replace(/1-yr /,'')}…"/>
+      <button class="board-col-add-ok" data-key="${cat.key}">↵</button>
+    </div>`;
+  boardCols.appendChild(col);
+
+  const rowId=`addrow-${cat.key}`,inpId=`addinp-${cat.key}`;
+  col.querySelector('.board-col-add').addEventListener('click',()=>openQuickAdd(rowId,inpId));
+  col.querySelector('.board-col-add-ok').addEventListener('click',()=>commitQuickAdd(cat.key,rowId,inpId));
+  col.querySelector('.board-col-add-inp').addEventListener('keydown',e=>{
+    if(e.key==='Enter')commitQuickAdd(cat.key,rowId,inpId);
+    if(e.key==='Escape')closeQuickAdd(rowId,inpId);
+  });
+
+  col.addEventListener('dragover',e=>{if(!dragState)return;e.preventDefault();col.classList.add('drop-target');});
+  col.addEventListener('dragleave',()=>col.classList.remove('drop-target'));
+  col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('drop-target');handleItemDrop(cat.key,null);});
+}
+
+/* ── STRATEGIC PLAN PANEL (Boulders -> Rocks) ── */
+function buildBoulderRockPanel(){
+  const boulderCat=CATS.find(c=>c.key==='boulder');
+  const col=document.createElement('div');
+  col.className='board-col board-hier-panel';
+  col.id='col-boulder-rock';
+  col.innerHTML=`
+    <div class="board-col-header">
+      <span class="board-col-icon">${boulderCat.icon}</span>
+      <span class="board-col-label" style="color:${boulderCat.color}">Strategic Plan</span>
+      <span class="board-col-badge" id="badge-boulder" style="background:${boulderCat.badgeBg};color:${boulderCat.color}">0</span>
+      <button class="hier-work-ideas-btn" id="work-ideas-boulder-btn" title="Work the Boulders into an acronym">✦ Work</button>
+      <button class="board-col-add" data-key="boulder" title="Add boulder">+</button>
+    </div>
+    <div class="board-col-items" id="items-boulder-rock-panel"></div>
+    <div class="board-col-add-row" id="addrow-boulder">
+      <input class="board-col-add-inp" id="addinp-boulder" placeholder="Add boulder…"/>
+      <button class="board-col-add-ok" data-key="boulder">↵</button>
+    </div>`;
+  boardCols.appendChild(col);
+
+  col.querySelector('#work-ideas-boulder-btn').addEventListener('click',e=>{e.stopPropagation();openIdeaOverlay({level:'boulder'});});
+  col.querySelector('.board-col-add').addEventListener('click',()=>openQuickAdd('addrow-boulder','addinp-boulder'));
+  col.querySelector('.board-col-add-ok').addEventListener('click',()=>commitQuickAdd('boulder','addrow-boulder','addinp-boulder'));
+  col.querySelector('.board-col-add-inp').addEventListener('keydown',e=>{
+    if(e.key==='Enter')commitQuickAdd('boulder','addrow-boulder','addinp-boulder');
+    if(e.key==='Escape')closeQuickAdd('addrow-boulder','addinp-boulder');
+  });
+
+  // Outer panel is the 'boulder' drop target — a drop that lands outside every
+  // specific boulder group / the Unassigned zone below just becomes a boulder.
+  col.addEventListener('dragover',e=>{if(!dragState)return;e.preventDefault();col.classList.add('drop-target');});
+  col.addEventListener('dragleave',()=>col.classList.remove('drop-target'));
+  col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('drop-target');handleItemDrop('boulder',null);});
+
+  renderBoulderRockPanel();
+}
+
+function renderBoulderRockPanel(){
+  const container=document.getElementById('items-boulder-rock-panel');
+  if(!container)return;
+  const badge=document.getElementById('badge-boulder');
+  if(badge)badge.textContent=items.boulder.length;
+
+  const unassignedRocks=items.rock.filter(r=>r.parentNum==null||!items.boulder.some(b=>b.num===r.parentNum));
+
+  const boulderGroupsHtml=items.boulder.map(boulder=>{
+    const rocks=items.rock.filter(r=>r.parentNum===boulder.num);
+    const rocksHtml=rocks.length
+      ?rocks.map(r=>boardItemCardHtml('rock',items.rock.indexOf(r),r)).join('')
+      :'<div class="hier-empty">No rocks tied yet</div>';
+    return `
+      <div class="hier-group" data-boulder-num="${boulder.num}">
+        <div class="hier-boulder-head">
+          <span class="board-item-num" style="color:${CATS.find(c=>c.key==='boulder').color}">⛰️#${boulder.num}</span>
+          <span class="board-item-text">${escHtml(boulder.text)}</span>
+          <button class="hier-work-ideas-btn" data-work-boulder-num="${boulder.num}" title="Work this boulder's rocks into an acronym">✦ Work</button>
+          <button class="hier-add-rock-btn" data-boulder-num="${boulder.num}">+ Rock</button>
+          <button class="board-item-del" data-key="boulder" data-idx="${items.boulder.indexOf(boulder)}">✕</button>
+        </div>
+        <div class="hier-rock-list">${rocksHtml}</div>
+        <div class="board-col-add-row hier-rock-add-row" id="addrow-rock-${boulder.num}">
+          <input class="board-col-add-inp" id="addinp-rock-${boulder.num}" placeholder="Add rock under this boulder…"/>
+          <button class="board-col-add-ok">↵</button>
+        </div>
       </div>`;
-    boardCols.appendChild(col);
+  }).join('');
 
-    // quick-add button
-    col.querySelector('.board-col-add').addEventListener('click',()=>openQuickAdd(cat.key));
-    // ok button
-    col.querySelector('.board-col-add-ok').addEventListener('click',()=>commitQuickAdd(cat.key));
-    // enter key in input
-    col.querySelector('.board-col-add-inp').addEventListener('keydown',e=>{if(e.key==='Enter')commitQuickAdd(cat.key);if(e.key==='Escape')closeQuickAdd(cat.key);});
+  const unassignedHtml=`
+    <div class="hier-group hier-unassigned">
+      <div class="hier-boulder-head">
+        <span class="hier-group-label">Unassigned Rocks</span>
+        <button class="hier-add-rock-btn" id="hier-add-rock-unassigned-btn">+ Rock</button>
+      </div>
+      <div class="hier-rock-list">
+        ${unassignedRocks.length?unassignedRocks.map(r=>boardItemCardHtml('rock',items.rock.indexOf(r),r)).join(''):'<div class="hier-empty">No unassigned rocks</div>'}
+      </div>
+      <div class="board-col-add-row hier-rock-add-row" id="addrow-rock-unassigned">
+        <input class="board-col-add-inp" id="addinp-rock-unassigned" placeholder="Add rock…"/>
+        <button class="board-col-add-ok">↵</button>
+      </div>
+    </div>`;
 
-    // drag-and-drop reclassification target
-    col.addEventListener('dragover',e=>{
-      if(!dragState)return;
-      e.preventDefault();
-      col.classList.add('drop-target');
-    });
-    col.addEventListener('dragleave',()=>col.classList.remove('drop-target'));
-    col.addEventListener('drop',e=>{
-      e.preventDefault();
-      col.classList.remove('drop-target');
-      if(!dragState||dragState.key===cat.key)return;
-      const {key:fromKey,idx:fromIdx}=dragState;
-      const [moved]=items[fromKey].splice(fromIdx,1);
-      if(!moved)return;
-      counters[cat.key]++;
-      moved.num=counters[cat.key];
-      items[cat.key].push(moved);
-      renderColItems(fromKey);
-      renderColItems(cat.key);
-      syncSupabase();
-      dbInsertItem(cat.key,moved.text,moved.num,moved.speaker).then(id=>{moved.dbId=id;}); // durable record under its new category
-      dragState=null;
+  container.innerHTML=(boulderGroupsHtml||'<div class="board-col-empty">No boulders yet — add one above</div>')+unassignedHtml;
+  wireItemCardEvents(container);
+
+  // "+Rock" reveals that boulder's own inline add-row (same open/close/commit flow as any column)
+  container.querySelectorAll('.hier-add-rock-btn[data-boulder-num]').forEach(btn=>{
+    const n=parseInt(btn.dataset.boulderNum);
+    btn.addEventListener('click',()=>openQuickAdd(`addrow-rock-${n}`,`addinp-rock-${n}`));
+  });
+  container.querySelectorAll('.hier-work-ideas-btn[data-work-boulder-num]').forEach(btn=>{
+    const n=parseInt(btn.dataset.workBoulderNum);
+    btn.addEventListener('click',()=>openIdeaOverlay({level:'rock',boulderNum:n}));
+  });
+  const unassignedAddBtn=document.getElementById('hier-add-rock-unassigned-btn');
+  if(unassignedAddBtn)unassignedAddBtn.addEventListener('click',()=>openQuickAdd('addrow-rock-unassigned','addinp-rock-unassigned'));
+  items.boulder.forEach(boulder=>{
+    const rowId=`addrow-rock-${boulder.num}`,inpId=`addinp-rock-${boulder.num}`;
+    const row=document.getElementById(rowId);
+    if(!row)return;
+    row.querySelector('.board-col-add-ok').addEventListener('click',()=>commitQuickAdd('rock',rowId,inpId,boulder.num));
+    row.querySelector('.board-col-add-inp').addEventListener('keydown',e=>{
+      if(e.key==='Enter')commitQuickAdd('rock',rowId,inpId,boulder.num);
+      if(e.key==='Escape')closeQuickAdd(rowId,inpId);
     });
   });
+  {
+    const rowId='addrow-rock-unassigned',inpId='addinp-rock-unassigned';
+    const row=document.getElementById(rowId);
+    row.querySelector('.board-col-add-ok').addEventListener('click',()=>commitQuickAdd('rock',rowId,inpId,null));
+    row.querySelector('.board-col-add-inp').addEventListener('keydown',e=>{
+      if(e.key==='Enter')commitQuickAdd('rock',rowId,inpId,null);
+      if(e.key==='Escape')closeQuickAdd(rowId,inpId);
+    });
+  }
+
+  // Rock drop targets: a specific boulder's group ties the dropped item to it;
+  // Unassigned clears the tie. stopPropagation so the outer panel's own
+  // 'boulder' drop target doesn't also fire for the same drop.
+  container.querySelectorAll('.hier-group[data-boulder-num]').forEach(group=>{
+    const n=parseInt(group.dataset.boulderNum);
+    group.addEventListener('dragover',e=>{if(!dragState)return;e.preventDefault();e.stopPropagation();group.classList.add('hier-drop-target');});
+    group.addEventListener('dragleave',()=>group.classList.remove('hier-drop-target'));
+    group.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();group.classList.remove('hier-drop-target');handleItemDrop('rock',n);});
+  });
+  const unassignedGroup=container.querySelector('.hier-unassigned');
+  if(unassignedGroup){
+    unassignedGroup.addEventListener('dragover',e=>{if(!dragState)return;e.preventDefault();e.stopPropagation();unassignedGroup.classList.add('hier-drop-target');});
+    unassignedGroup.addEventListener('dragleave',()=>unassignedGroup.classList.remove('hier-drop-target'));
+    unassignedGroup.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();unassignedGroup.classList.remove('hier-drop-target');handleItemDrop('rock',null);});
+  }
 }
 
-function openQuickAdd(key){
-  CATS.forEach(c=>closeQuickAdd(c.key));
-  const row=document.getElementById(`addrow-${key}`);
+/* Generalized so the same open/close/commit flow works for a flat column's
+   add-row (addrow-<key>) and for a specific boulder's nested "+Rock" add-row
+   (addrow-rock-<boulderNum>) or the Unassigned Rocks add-row. */
+function openQuickAdd(rowId,inputId){
+  document.querySelectorAll('.board-col-add-row.open').forEach(r=>r.classList.remove('open'));
+  const row=document.getElementById(rowId);
+  if(!row)return;
   row.classList.add('open');
-  setTimeout(()=>document.getElementById(`addinp-${key}`).focus(),50);
+  setTimeout(()=>{const inp=document.getElementById(inputId);if(inp)inp.focus();},50);
 }
-function closeQuickAdd(key){
-  const row=document.getElementById(`addrow-${key}`);
-  if(row){row.classList.remove('open');document.getElementById(`addinp-${key}`).value='';}
+function closeQuickAdd(rowId,inputId){
+  const row=document.getElementById(rowId);
+  if(row)row.classList.remove('open');
+  const inp=document.getElementById(inputId);
+  if(inp)inp.value='';
 }
-function commitQuickAdd(key){
-  const inp=document.getElementById(`addinp-${key}`);
+function commitQuickAdd(key,rowId,inputId,parentNum=null){
+  const inp=document.getElementById(inputId);
   const text=inp.value.trim();
   if(!text)return;
-  addItem(key,text,false);
-  closeQuickAdd(key);
+  addItem(key,text,false,parentNum);
+  closeQuickAdd(rowId,inputId);
 }
 
 /* ── ITEM MANAGEMENT ── */
-function addItem(key,text,fromAI=false){
+function addItem(key,text,fromAI=false,parentNum=null){
   counters[key]++;
   const activeSeg=agenda[activeSegmentIndex]||null;
   const speaker=dgActive?resolveSpeakerName(dgLastSpeaker):null;
-  const item={num:counters[key],text,fromAI,segType:activeSeg?activeSeg.segment_type:null,segLabel:activeSeg?activeSeg.label:null,dbId:null,mentionCount:0,speaker,mentionSpeakers:speaker?[speaker]:[]};
+  // parentNum is only meaningful for categories in PARENT_CAT (rock->boulder, pebble->rock)
+  const item={num:counters[key],text,fromAI,segType:activeSeg?activeSeg.segment_type:null,segLabel:activeSeg?activeSeg.label:null,dbId:null,mentionCount:0,speaker,mentionSpeakers:speaker?[speaker]:[],parentNum:PARENT_CAT[key]?parentNum:null};
   items[key].push(item);
   renderColItems(key);
   showToast(key,text);
   if(!fromAI)pulseOrb(key);
   syncSupabase();
-  dbInsertItem(key,text,item.num,speaker).then(id=>{item.dbId=id;});
+  dbInsertItem(key,text,item.num,speaker,item.parentNum).then(id=>{item.dbId=id;});
+}
+
+/* Manually (re)assign or clear an item's parent link — the always-available
+   override alongside the AI's own best-effort suggestion at capture time. */
+function setItemParent(key,idx,parentNum){
+  const item=items[key][idx];
+  if(!item)return;
+  item.parentNum=parentNum||null;
+  renderColItems(key);
+  syncSupabase();
+  if(item.dbId){
+    const parentCat=PARENT_CAT[key];
+    const parent=parentCat&&parentNum?items[parentCat].find(p=>p.num===parentNum):null;
+    dbUpdateItemParent(item.dbId,parent?parent.dbId||null:null);
+  }
 }
 
 function logItemMention(key,num,text){
@@ -970,6 +1289,18 @@ function segmentColor(segType){
   return c?c.color:'#94a3b8'; // 'custom' or unmatched segment types get a neutral strip
 }
 
+function parentPickerHtml(key,idx,it,parentCat){
+  const parentLabel=CATS.find(c=>c.key===parentCat).label.replace(/^1-Yr /,'');
+  const options=items[parentCat].map(p=>`<option value="${p.num}"${it.parentNum===p.num?' selected':''}>#${p.num} ${escHtml(p.text.length>28?p.text.slice(0,28)+'…':p.text)}</option>`).join('');
+  return `<div class="board-item-parent-row">
+    <span class="board-item-parent-label">↳ Ties to ${parentLabel}:</span>
+    <select class="board-item-parent-select" data-key="${key}" data-idx="${idx}">
+      <option value="">None</option>
+      ${options}
+    </select>
+  </div>`;
+}
+
 function mentionBadgeHtml(it){
   if(!it.mentionCount)return '';
   const distinctSpeakers=(it.mentionSpeakers||[]).length;
@@ -982,25 +1313,35 @@ function mentionBadgeHtml(it){
   return `<span class="board-item-mention-badge" title="Mentioned again ${it.mentionCount} time${it.mentionCount>1?'s':''} this session">🔁 ×${it.mentionCount+1}</span>`;
 }
 
-function renderColItems(key){
+/* Shared card template — used by both the flat columns (renderColItems) and
+   the nested rocks inside the Boulders/Rocks panel (renderBoulderRockPanel).
+   idx must be the item's real index within items[key], not a filtered index. */
+function boardItemCardHtml(key,idx,it){
   const cat=CATS.find(c=>c.key===key);
-  const container=document.getElementById(`items-${key}`);
-  const emptyEl=document.getElementById(`empty-${key}`);
-  const badge=document.getElementById(`badge-${key}`);
-  const arr=items[key];
-  badge.textContent=arr.length;
-  if(!arr.length){
-    container.innerHTML=`<div class="board-col-empty" id="empty-${key}">No ${cat.label.toLowerCase()} yet</div>`;
-    return;
-  }
-  container.innerHTML=arr.map((it,idx)=>`
-    <div class="board-item${it.segType?' seg-tagged':''}" draggable="true" data-key="${key}" data-idx="${idx}" style="border-left-color:${segmentColor(it.segType)}" title="${it.segLabel?escHtml(it.segLabel):''}">
-      <span class="board-item-num" style="color:${cat.color}">#${it.num}</span>
-      <span class="board-item-text">${escHtml(it.text)}</span>
-      ${it.fromAI?'<span class="board-item-ai-badge">AI</span>':''}
-      ${mentionBadgeHtml(it)}
-      <button class="board-item-del" data-key="${key}" data-idx="${idx}">✕</button>
-    </div>`).join('');
+  const parentCat=PARENT_CAT[key];
+  return `
+    <div class="board-item${it.segType?' seg-tagged':''}${key==='rock'?' rock-clickable':''}" draggable="true" data-key="${key}" data-idx="${idx}" data-num="${it.num}" style="border-left-color:${segmentColor(it.segType)}" title="${it.segLabel?escHtml(it.segLabel):(key==='rock'?'Click to see/add pebbles for this rock':'')}">
+      <div class="board-item-row">
+        <span class="board-item-num" style="color:${cat.color}">#${it.num}</span>
+        <span class="board-item-text">${escHtml(it.text)}</span>
+        ${it.fromAI?'<span class="board-item-ai-badge">AI</span>':''}
+        ${mentionBadgeHtml(it)}
+        ${key==='rock'?`<span class="board-item-pebble-count" title="Pebbles tied to this rock">🔸${items.pebble.filter(p=>p.parentNum===it.num).length}</span>`:''}
+        <button class="board-item-del" data-key="${key}" data-idx="${idx}">✕</button>
+      </div>
+      ${parentCat?parentPickerHtml(key,idx,it,parentCat):''}
+    </div>`;
+}
+
+/* Wires parent-select, delete, and drag-source events for cards inside any
+   container (flat column or a group within the Boulders/Rocks panel). */
+function wireItemCardEvents(container){
+  container.querySelectorAll('.board-item-parent-select').forEach(sel=>{
+    sel.addEventListener('change',()=>{
+      const k=sel.dataset.key;const i=parseInt(sel.dataset.idx);
+      setItemParent(k,i,sel.value?parseInt(sel.value):null);
+    });
+  });
   container.querySelectorAll('.board-item-del').forEach(btn=>{
     btn.addEventListener('click',e=>{
       e.stopPropagation();
@@ -1018,10 +1359,316 @@ function renderColItems(key){
     });
     card.addEventListener('dragend',()=>{
       card.classList.remove('dragging');
-      document.querySelectorAll('.board-col.drop-target').forEach(c=>c.classList.remove('drop-target'));
+      document.querySelectorAll('.board-col.drop-target,.hier-drop-target').forEach(c=>c.classList.remove('drop-target','hier-drop-target'));
+    });
+  });
+  // Rock cards open the pebbles-for-this-rock overlay (Phase 10 step 3) —
+  // ignore clicks on the delete button or the parent-tie dropdown.
+  container.querySelectorAll('.board-item[data-key="rock"]').forEach(card=>{
+    card.addEventListener('click',e=>{
+      if(e.target.closest('.board-item-del,.board-item-parent-select'))return;
+      openPebbleOverlay(parseInt(card.dataset.num));
     });
   });
 }
+
+function renderColItems(key){
+  if(key==='boulder'||key==='rock'){renderBoulderRockPanel();return;}
+  if(key==='pebble'){renderPebbleOverlay();return;} // pebbles have no board column — they live in the per-rock overlay
+  const container=document.getElementById(`items-${key}`);
+  if(!container)return; // anything else without a rendered column — no-op
+  const cat=CATS.find(c=>c.key===key);
+  const badge=document.getElementById(`badge-${key}`);
+  const arr=items[key];
+  badge.textContent=arr.length;
+  if(!arr.length){
+    container.innerHTML=`<div class="board-col-empty" id="empty-${key}">No ${cat.label.toLowerCase()} yet</div>`;
+    return;
+  }
+  container.innerHTML=arr.map((it,idx)=>boardItemCardHtml(key,idx,it)).join('');
+  wireItemCardEvents(container);
+}
+
+/* ── PEBBLES-FOR-A-ROCK OVERLAY ── */
+function openPebbleOverlay(rockNum){
+  pebbleOverlayRockNum=rockNum;
+  pebbleSuggestions=[];
+  document.getElementById('pebble-suggest-status').textContent='';
+  document.getElementById('pebble-overlay').classList.add('visible');
+  renderPebbleOverlay();
+}
+function closePebbleOverlay(){
+  document.getElementById('pebble-overlay').classList.remove('visible');
+  pebbleOverlayRockNum=null;
+  pebbleSuggestions=[];
+}
+function renderPebbleOverlay(){
+  if(pebbleOverlayRockNum==null)return; // overlay isn't open — nothing to refresh
+  const rock=items.rock.find(r=>r.num===pebbleOverlayRockNum);
+  if(!rock){closePebbleOverlay();return;} // the rock got deleted/reclassified out from under the open overlay
+  document.getElementById('pebble-card-rock-text').textContent=`🪨 #${rock.num}: ${rock.text}`;
+
+  const list=document.getElementById('pebble-list');
+  const pebbles=items.pebble.filter(p=>p.parentNum===rock.num);
+  if(!pebbles.length){
+    list.innerHTML='<div class="hier-empty">No pebbles tied to this rock yet</div>';
+  }else{
+    list.innerHTML=pebbles.map(p=>boardItemCardHtml('pebble',items.pebble.indexOf(p),p)).join('');
+    wireItemCardEvents(list);
+  }
+  renderPebbleSuggestions();
+}
+
+function renderPebbleSuggestions(){
+  const wrap=document.getElementById('pebble-suggestions');
+  if(!pebbleSuggestions.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=pebbleSuggestions.map((text,i)=>`
+    <div class="pebble-suggestion">
+      <span>${escHtml(text)}</span>
+      <button class="pebble-suggestion-add" data-i="${i}">Add</button>
+      <button class="pebble-suggestion-dismiss" data-i="${i}">✕</button>
+    </div>`).join('');
+  wrap.querySelectorAll('.pebble-suggestion-add').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i=parseInt(btn.dataset.i);
+      const text=pebbleSuggestions[i];
+      pebbleSuggestions.splice(i,1);
+      addItem('pebble',text,true,pebbleOverlayRockNum);
+      renderPebbleSuggestions();
+    });
+  });
+  wrap.querySelectorAll('.pebble-suggestion-dismiss').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      pebbleSuggestions.splice(parseInt(btn.dataset.i),1);
+      renderPebbleSuggestions();
+    });
+  });
+}
+
+/* On-demand, scoped to one rock: Claude reads the session transcript with an
+   instruction to only surface pebbles that actually relate to this rock,
+   grounded in what was said — not invented filler. There's no per-item
+   transcript-window tracking today, so "scoped" here means the prompt does
+   the scoping rather than a mechanical slice of the transcript. */
+async function suggestPebblesForRock(rock){
+  const apiKey=apiInput.value.trim();
+  if(!apiKey)return null;
+  const transcriptText=transcriptEntries.map(e=>e.text).join(' ').trim();
+  if(!transcriptText)return null;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:400,
+        system:'You are reviewing a live EOS/Traction planning session transcript to help break one Rock (a quarterly priority) down into Pebbles (small, concrete sub-tasks). Return ONLY a JSON array of 2-4 short pebble strings (max 12 words each) — no other text. Only include pebbles clearly grounded in what was actually said about this rock; if nothing in the transcript relates to it, return an empty array. Do not invent generic filler tasks.',
+        messages:[{role:'user',content:`Rock: "${rock.text}"\n\nSession transcript so far:\n"${transcriptText}"`}]
+      })
+    });
+    if(!res.ok)return null;
+    const data=await res.json();
+    const raw=data.content[0].text.trim();
+    let parsed;
+    try{parsed=JSON.parse(raw);}
+    catch(e){const m=raw.match(/\[[\s\S]*\]/);if(m)parsed=JSON.parse(m[0]);else return null;}
+    if(!Array.isArray(parsed))return null;
+    return parsed.filter(t=>typeof t==='string'&&t.trim()).map(t=>t.trim());
+  }catch(e){return null;}
+}
+
+document.getElementById('pebble-close').addEventListener('click',closePebbleOverlay);
+document.getElementById('pebble-add-btn').addEventListener('click',()=>{
+  const inp=document.getElementById('pebble-add-input');
+  const text=inp.value.trim();
+  if(!text||pebbleOverlayRockNum==null)return;
+  addItem('pebble',text,false,pebbleOverlayRockNum);
+  inp.value='';
+});
+document.getElementById('pebble-add-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter')document.getElementById('pebble-add-btn').click();
+});
+document.getElementById('pebble-suggest-btn').addEventListener('click',async()=>{
+  if(pebbleOverlayRockNum==null)return;
+  const rock=items.rock.find(r=>r.num===pebbleOverlayRockNum);
+  if(!rock)return;
+  const apiKey=apiInput.value.trim();
+  if(!apiKey){document.getElementById('pebble-suggest-status').textContent='Enter your Claude API key above first.';return;}
+  const btn=document.getElementById('pebble-suggest-btn');
+  const status=document.getElementById('pebble-suggest-status');
+  btn.disabled=true;status.textContent='Thinking…';
+  const suggestions=await suggestPebblesForRock(rock);
+  btn.disabled=false;
+  if(!suggestions){status.textContent='Could not generate suggestions — check the API key or try again.';return;}
+  if(!suggestions.length){status.textContent='Nothing in the transcript yet relates to this rock.';return;}
+  status.textContent='';
+  pebbleSuggestions.push(...suggestions);
+  renderPebbleSuggestions();
+});
+
+/* ── WORK THE IDEAS — acronym builder (Phase 10 step 5) ──
+   Two entry points into one modal, strictly scoped to whichever level it's
+   opened from — Boulders only, or one Boulder's Rocks only, never mixed. */
+let ideaOverlayScope=null; // {level:'boulder'} or {level:'rock', boulderNum:N}
+let ideaAiWords=[]; // AI-suggested words for the currently open overlay, session-only, not persisted
+let lastFocusedIdeaInput=null;
+
+function openIdeaOverlay(scope){
+  ideaOverlayScope=scope;
+  ideaAiWords=[];
+  document.getElementById('idea-wordbank-status').textContent='';
+  document.getElementById('idea-overlay').classList.add('visible');
+  renderIdeaOverlay();
+}
+function closeIdeaOverlay(){
+  document.getElementById('idea-overlay').classList.remove('visible');
+  ideaOverlayScope=null;
+  ideaAiWords=[];
+  lastFocusedIdeaInput=null;
+}
+function getIdeaItems(){
+  if(!ideaOverlayScope)return [];
+  if(ideaOverlayScope.level==='boulder')return items.boulder;
+  return items.rock.filter(r=>r.parentNum===ideaOverlayScope.boulderNum);
+}
+function acronymLetter(text){return (text.trim()[0]||'?').toUpperCase();}
+
+function renderIdeaOverlay(){
+  if(!ideaOverlayScope)return;
+  const key=ideaOverlayScope.level;
+  const arr=getIdeaItems();
+
+  document.getElementById('idea-card-subtitle').textContent=ideaOverlayScope.level==='boulder'
+    ?'Naming the 1-Year Plan — working the Boulders'
+    :`Naming this quarter — working the Rocks under "${(items.boulder.find(b=>b.num===ideaOverlayScope.boulderNum)||{}).text||''}"`;
+
+  const list=document.getElementById('idea-item-list');
+  if(!arr.length){
+    list.innerHTML='<div class="hier-empty">Nothing to work yet — add some on the board first.</div>';
+    document.getElementById('idea-acronym-preview').textContent='—';
+  }else{
+    list.innerHTML=arr.map(it=>`
+      <div class="idea-item-row">
+        <span class="idea-item-letter">${acronymLetter(it.text)}</span>
+        <input class="idea-item-input" data-key="${key}" data-idx="${items[key].indexOf(it)}" value="${escHtml(it.text)}"/>
+      </div>`).join('');
+    list.querySelectorAll('.idea-item-input').forEach(inp=>{
+      inp.addEventListener('focus',()=>{lastFocusedIdeaInput=inp;});
+      inp.addEventListener('input',()=>{
+        inp.closest('.idea-item-row').querySelector('.idea-item-letter').textContent=acronymLetter(inp.value);
+        updateAcronymPreviewLive();
+      });
+      inp.addEventListener('blur',()=>updateItemText(inp.dataset.key,parseInt(inp.dataset.idx),inp.value));
+    });
+    updateAcronymPreviewLive();
+  }
+  renderIdeaWordbank();
+}
+function updateAcronymPreviewLive(){
+  const letters=[...document.querySelectorAll('#idea-item-list .idea-item-letter')].map(el=>el.textContent);
+  document.getElementById('idea-acronym-preview').textContent=letters.length?letters.join('-'):'—';
+}
+
+function renderIdeaWordbank(){
+  const wrap=document.getElementById('idea-wordbank');
+  const tracked=keywords.filter(k=>k.pinned||k.count>=2).sort((a,b)=>b.count-a.count).map(k=>k.text);
+  const combined=[...new Set([...ideaAiWords,...tracked])]; // AI suggestions first — they're the reason someone clicked Suggest
+  if(!combined.length){wrap.innerHTML='<div class="hier-empty">No words yet — track some keywords or click Suggest.</div>';return;}
+  wrap.innerHTML=combined.map(w=>{
+    const isAi=ideaAiWords.includes(w);
+    return `<div class="idea-wordbank-chip${isAi?' ai':''}" data-word="${escHtml(w)}">${escHtml(w)}</div>`;
+  }).join('');
+  wrap.querySelectorAll('.idea-wordbank-chip').forEach(chip=>{
+    chip.addEventListener('click',()=>insertWordIntoFocusedInput(chip.dataset.word));
+  });
+}
+
+/* Inserts at the cursor of whichever item input was last focused (falling
+   back to the first one), so browsing the word bank feeds directly into
+   rewording an item rather than requiring copy/paste. */
+function insertWordIntoFocusedInput(word){
+  const target=(lastFocusedIdeaInput&&document.body.contains(lastFocusedIdeaInput))?lastFocusedIdeaInput:document.querySelector('.idea-item-input');
+  if(!target)return;
+  const start=target.selectionStart??target.value.length;
+  const end=target.selectionEnd??target.value.length;
+  const capitalized=word.charAt(0).toUpperCase()+word.slice(1);
+  target.value=target.value.slice(0,start)+capitalized+target.value.slice(end);
+  target.focus();
+  target.setSelectionRange(start+capitalized.length,start+capitalized.length);
+  target.dispatchEvent(new Event('input',{bubbles:true}));
+}
+
+/* Generalized text-edit path — no board item had an in-place edit before
+   this. Mirrors the dbInsertItem/dbUpdateItemParent best-effort pattern. */
+function updateItemText(key,idx,newText){
+  const text=newText.trim();
+  const item=items[key][idx];
+  if(!item||!text||item.text===text)return;
+  item.text=text;
+  renderColItems(key);
+  syncSupabase();
+  if(item.dbId)dbUpdateItemText(item.dbId,text);
+}
+async function dbUpdateItemText(itemDbId,text){
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/items?id=eq.${itemDbId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({text})
+    });
+  }catch(e){}
+}
+
+/* On-demand — pulls industry/terminology/active-themes/core-values from the
+   selected client's profile (all optional; degrades to generic wording with
+   no client selected) to suggest acronym-friendly single words. */
+async function suggestWordsForIdea(scopeLabel){
+  const apiKey=apiInput.value.trim();
+  if(!apiKey)return null;
+  const client=activeClient?CLIENT_PROFILES[activeClient]:null;
+  const contextBlock=client?`
+Industry: ${client.industry}
+Company terminology: ${client.terminology}
+Active strategic themes: ${(client.activeThemes||[]).join('; ')}
+${client.coreValues&&client.coreValues.length?`Core values: ${client.coreValues.join('; ')}`:''}`:'No client selected — suggest general strategic-planning vocabulary.';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:300,
+        system:`You are helping a facilitator brainstorm an acronym for ${scopeLabel} in a strategic planning session. Suggest 6-10 short, punchy, single words (nouns/verbs/adjectives — no phrases) that could each anchor one letter of an acronym and genuinely relate to the company below. Return ONLY a JSON array of strings, no other text.\n${contextBlock}`,
+        messages:[{role:'user',content:'Suggest the words.'}]
+      })
+    });
+    if(!res.ok)return null;
+    const data=await res.json();
+    const raw=data.content[0].text.trim();
+    let parsed;
+    try{parsed=JSON.parse(raw);}
+    catch(e){const m=raw.match(/\[[\s\S]*\]/);if(m)parsed=JSON.parse(m[0]);else return null;}
+    if(!Array.isArray(parsed))return null;
+    return parsed.filter(w=>typeof w==='string'&&w.trim()).map(w=>w.trim());
+  }catch(e){return null;}
+}
+
+document.getElementById('idea-close').addEventListener('click',closeIdeaOverlay);
+document.getElementById('idea-suggest-words-btn').addEventListener('click',async()=>{
+  if(!ideaOverlayScope)return;
+  const apiKey=apiInput.value.trim();
+  const status=document.getElementById('idea-wordbank-status');
+  if(!apiKey){status.textContent='Enter your Claude API key above first.';return;}
+  const btn=document.getElementById('idea-suggest-words-btn');
+  btn.disabled=true;status.textContent='Thinking…';
+  const scopeLabel=ideaOverlayScope.level==='boulder'?'the 1-year plan':"this quarter's rocks";
+  const words=await suggestWordsForIdea(scopeLabel);
+  btn.disabled=false;
+  if(!words){status.textContent='Could not generate suggestions — check the API key or try again.';return;}
+  status.textContent='';
+  ideaAiWords=[...new Set([...ideaAiWords,...words])];
+  renderIdeaWordbank();
+});
 
 function showToast(key,text){
   const cat=CATS.find(c=>c.key===key);
@@ -1086,6 +1733,32 @@ document.querySelectorAll('.ctab').forEach(tab=>{
     tab.classList.add('active');
     document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
   });
+});
+
+/* ── SETUP DRAWER (client / API keys / session name) ──
+   Setup-only fields matter most before a session starts and take up space
+   the facilitator needs once it's live. Collapses to a one-line summary on
+   Start, expands again on Stop — and the toggle works any time regardless
+   of session state, so nothing is ever locked away. */
+const ctrlSetup=document.getElementById('ctrl-setup');
+const ctrlSetupToggle=document.getElementById('ctrl-setup-toggle');
+const ctrlSetupSummaryText=document.getElementById('ctrl-setup-summary-text');
+
+function updateSetupSummaryText(){
+  const clientName=activeClient?(CLIENT_PROFILES[activeClient]?.name||activeClient):'No client';
+  ctrlSetupSummaryText.textContent=`${clientName} · ${sessionInput.value||'Untitled session'}`;
+}
+function collapseSetup(){
+  ctrlSetup.classList.add('collapsed');
+  ctrlSetupToggle.textContent='Edit ▾';
+  updateSetupSummaryText();
+}
+function expandSetup(){
+  ctrlSetup.classList.remove('collapsed');
+  ctrlSetupToggle.textContent='Collapse ▴';
+}
+document.getElementById('ctrl-setup-bar').addEventListener('click',()=>{
+  if(ctrlSetup.classList.contains('collapsed'))expandSetup();else collapseSetup();
 });
 
 /* ── TIMER ── */
@@ -1180,6 +1853,7 @@ function startListeningWebSpeech(){
     if(final){
       transcriptBuffer+=final;
       summaryBuffer+=final;
+      trackKeywordsFromText(final);
       wordCount+=final.trim().split(/\s+/).length;
       wordcountEl.textContent=wordCount+' words';
       addTranscriptEntry(final.trim(),false);
@@ -1290,6 +1964,7 @@ function commitDiarizedFinal(speakerIdx,text,durationSec=0){
   if(durationSec>0)recordTalkTime(speakerIdx,durationSec);
   transcriptBuffer+=text+' ';
   summaryBuffer+=text+' ';
+  trackKeywordsFromText(text);
   wordCount+=text.trim().split(/\s+/).length;
   wordcountEl.textContent=wordCount+' words';
   addTranscriptEntry(text.trim(),false,speakerName);
@@ -1494,7 +2169,7 @@ Required JSON format:
   "insight": "1-3 sentence observation or synthesis${client?` — tailor language and analogies to ${client.name}'s context and industry`:''}",
   "tags": ["tag1","tag2"],
   "captures": [
-    {"type": "rock|roadblock|boulder|todo|pebble|parking", "text": "item text, concise and actionable", "matches_item_num": null}
+    {"type": "rock|roadblock|boulder|todo|pebble|parking", "text": "item text, concise and actionable", "matches_item_num": null, "parent_num": null}
   ]
 }
 
@@ -1505,6 +2180,7 @@ Rules:
 - insight should be a genuine synthesis, not a summary${client?`\n- Use client-specific terminology naturally when relevant (${client.terminology})`:''}
 - captures text should be concise (max 10 words)
 - matches_item_num: if this transcript segment is restating or echoing an item already captured this session (same underlying point, even if worded differently or said by someone else), set this to that item's number within its category instead of treating it as new. Leave it null if the point is genuinely new. This matters even if it sounds like a different person saying it — same underlying issue/rock/etc still counts as a match.
+- parent_num: rocks typically break down from a boulder, and pebbles typically break down from a rock. If a "rock" capture's parent boulder, or a "pebble" capture's parent rock, is unambiguous from what was actually said (e.g. "that's part of our boulder to expand into the Southeast" / "that pebble is part of the hiring rock"), set this to that parent item's number within its category. Leave it null otherwise — do NOT guess a link that the transcript doesn't state. This field is meaningless for other capture types.
 ${userQuestion?`\nUser question: ${userQuestion}`:''}`;
 
   const userMsg=isFreeform
@@ -1537,7 +2213,9 @@ function handleAIResult(parsed){
       if(cap.matches_item_num){
         logItemMention(cap.type,cap.matches_item_num,cap.text.trim());
       }else{
-        addItem(cap.type,cap.text.trim(),true);
+        const parentCat=PARENT_CAT[cap.type];
+        const parentNum=(parentCat&&cap.parent_num&&items[parentCat].some(p=>p.num===cap.parent_num))?cap.parent_num:null;
+        addItem(cap.type,cap.text.trim(),true,parentNum);
       }
     });
   }
@@ -1789,9 +2467,11 @@ async function dbEndSession(){
   }catch(e){}
 }
 
-async function dbInsertItem(category,text,num,speaker=null){
+async function dbInsertItem(category,text,num,speaker=null,parentNum=null){
   if(!dbSessionId)return null; // no durable session yet (e.g. migration not run) — live board still works
   const activeSeg=agenda[activeSegmentIndex]||null;
+  const parentCat=PARENT_CAT[category];
+  const parent=parentCat&&parentNum?items[parentCat].find(p=>p.num===parentNum):null;
   try{
     const res=await fetch(`${SUPABASE_URL}/rest/v1/items`,{
       method:'POST',
@@ -1801,6 +2481,7 @@ async function dbInsertItem(category,text,num,speaker=null){
         segment_id:activeSeg?activeSeg.dbId||null:null,
         client_key:activeClient||null,
         category,text,num,speaker,
+        parent_item_id:parent?parent.dbId||null:null,
         quarter:currentQuarter(),
         status:'open'
       })
@@ -1811,6 +2492,17 @@ async function dbInsertItem(category,text,num,speaker=null){
     }
   }catch(e){}
   return null;
+}
+
+async function dbUpdateItemParent(itemDbId,parentDbId){
+  if(!itemDbId)return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/items?id=eq.${itemDbId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({parent_item_id:parentDbId})
+    });
+  }catch(e){}
 }
 
 async function dbInsertItemMention(itemDbId,text,speaker=null){
@@ -2149,6 +2841,7 @@ cbStart.addEventListener('click',()=>{
   isPaused=false;cbPause.textContent='⏸ Pause';cbPause.classList.remove('cb-pause-active');
   dgSeenSpeakers=new Set();dgSpeakerNames={};dgLastSpeaker=null; // fresh calibration per session
   speakerTalkSec={};currentSentiment=null;sentimentHistory=[];renderTalkTime();renderSentiment();
+  initKeywords(); // fresh keyword tracking per session — a new quarter shouldn't inherit last session's pins/counts
   document.getElementById('sentiment-card-text').textContent='No reading yet — the first one lands ~5 minutes into a live session.';
   document.getElementById('sentiment-card-time').textContent='';
   renderSpeakerCalibration();
@@ -2158,6 +2851,7 @@ cbStart.addEventListener('click',()=>{
   summaryBuffer=''; // Phase 3: fresh rolling-summary window per session
   if(summaryTimerInterval)clearInterval(summaryTimerInterval);
   summaryTimerInterval=setInterval(runRollingSummary,SUMMARY_INTERVAL_MS);
+  collapseSetup();
 });
 cbPause.addEventListener('click',()=>{
   if(isPaused)resumeListening();else pauseListening();
@@ -2168,6 +2862,7 @@ cbStop.addEventListener('click',()=>{
   stopListening();
   dbEndSession();
   if(summaryTimerInterval){clearInterval(summaryTimerInterval);summaryTimerInterval=null;}
+  expandSetup();
 });
 
 /* ── ASK ADRIAN ── */
@@ -2260,6 +2955,15 @@ function exportSession(){
     lines.push('');
   }
 
+  if(opts.keywords){
+    lines.push('== TRACKED KEYWORDS ==');
+    const visible=keywords.filter(k=>k.pinned||k.count>=2).sort((a,b)=>b.count-a.count||a.text.localeCompare(b.text));
+    if(visible.length){
+      visible.forEach(k=>lines.push(`${k.text}${k.count>0?` (×${k.count})`:''}${k.pinned?' [pinned]':''}`));
+    }else lines.push('(nothing tracked yet)');
+    lines.push('');
+  }
+
   if(opts.transcript){
     lines.push('== FULL TRANSCRIPT ==');
     if(transcriptEntries.length){
@@ -2270,7 +2974,7 @@ function exportSession(){
 
   const blob=new Blob([lines.join('\n')],{type:'text/plain'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`session-export-${Date.now()}.txt`;a.click();
-  const includedLabels={agenda:'Agenda',thoughts:'Insights',sentiment:'Sentiment',talktime:'Talk-Time',transcript:'Transcript'};
+  const includedLabels={agenda:'Agenda',thoughts:'Insights',sentiment:'Sentiment',talktime:'Talk-Time',keywords:'Keywords',transcript:'Transcript'};
   const metaParts=[
     ...selectedCats.map(c=>c.label),
     ...Object.keys(includedLabels).filter(k=>opts[k]).map(k=>includedLabels[k]),
@@ -2287,59 +2991,61 @@ function renderSaved(){
   el.innerHTML=savedItems.map(s=>`<div class="saved-item"><div class="saved-item-title">${escHtml(s.title)}</div><div class="saved-item-meta">${escHtml(s.meta||'')}</div></div>`).join('');
 }
 
-/* ── KEYWORDS ── */
-const defaultKeywords=['Strategy','Revenue','Hiring','Culture','Technology','Process','Q3 Rock','Q4 Rock'];
+/* ── KEYWORDS (Phase 10 step 4: passive frequency tracker) ──
+   Replaces the old static manually-curated watchlist and its half-working
+   "suggest" button (which misused the classification prompt). Tracking is
+   automatic — every finalized transcript chunk feeds trackKeywordsFromText —
+   with a lightweight manual "pin" so a consultant can force a word to show
+   before it's been said enough times. Feeds the word bank in step 5. */
+const KEYWORD_STOPWORDS=new Set(['the','a','an','and','or','but','so','if','of','to','in','on','for','with','at','by','from','as','is','are','was','were','be','been','being','it','its','this','that','these','those','we','our','us','you','your','im',"i'm",'they','their','them','he','she','his','her','not','no','yes','do','does','did','have','has','had','will','would','should','could','can','just','like','know','think','going','get','got','gonna','kinda','sort','actually','really','basically','um','uh','okay','ok','yeah','right','well','maybe','also','about','into','out','up','down','over','under','more','most','some','any','all','one','two','there','here','what','when','where','who','why','how']);
+
 function initKeywords(){
-  keywords=defaultKeywords.map(k=>({text:k,color:'#90cdf4',bgColor:'rgba(99,179,237,.15)'}));
+  keywords=[];
   renderKeywords();
-  initEmotes();
+}
+
+function trackKeywordsFromText(text){
+  const words=text.toLowerCase().replace(/[^a-z0-9'\s-]/g,' ').split(/\s+/).filter(w=>w.length>2&&!KEYWORD_STOPWORDS.has(w));
+  if(!words.length)return;
+  words.forEach(w=>{
+    let entry=keywords.find(k=>k.text===w);
+    if(!entry){entry={text:w,count:0,pinned:false};keywords.push(entry);}
+    entry.count++;
+  });
+  renderKeywords();
 }
 
 function renderKeywords(){
   const grid=document.getElementById('kw-grid');
-  if(!keywords.length){grid.innerHTML='<span style="font-size:10px;color:rgba(255,255,255,.2)">No keywords yet.</span>';return;}
-  grid.innerHTML=keywords.map((kw,i)=>`
-    <div class="kw-badge" style="background:${kw.bgColor};color:${kw.color};border-color:${kw.color}33">
+  const empty=document.getElementById('kw-empty');
+  const visible=keywords.filter(k=>k.pinned||k.count>=2).sort((a,b)=>b.count-a.count||a.text.localeCompare(b.text));
+  if(!visible.length){empty.style.display='';grid.innerHTML='';return;}
+  empty.style.display='none';
+  grid.innerHTML=visible.map(kw=>{
+    const i=keywords.indexOf(kw);
+    const style=kw.pinned?'background:rgba(255,244,0,.12);color:var(--yellow);border-color:rgba(255,244,0,.35)':'background:rgba(99,179,237,.15);color:#90cdf4;border-color:rgba(99,179,237,.33)';
+    return `<div class="kw-badge${kw.pinned?' pinned':''}" style="${style}">
       <span>${escHtml(kw.text)}</span>
-      <button class="kw-badge-fire-btn" data-i="${i}">📡</button>
-      <button class="kw-badge-del-btn" data-i="${i}">✕</button>
-    </div>`).join('');
-  grid.querySelectorAll('.kw-badge-fire-btn').forEach(b=>b.addEventListener('click',()=>fireKeyword(keywords[parseInt(b.dataset.i)].text)));
-  grid.querySelectorAll('.kw-badge-del-btn').forEach(b=>b.addEventListener('click',()=>{keywords.splice(parseInt(b.dataset.i),1);renderKeywords();}));
-}
-
-function fireKeyword(kw){showToast('rock',`Keyword fired: ${kw}`);}
-
-function initEmotes(){
-  const grid=document.getElementById('emote-grid');
-  grid.innerHTML=EMOTES.map(em=>`<button class="emote-btn" data-e="${em.e}"><span>${em.e}</span><span class="emote-btn-label">${em.l}</span></button>`).join('');
-  grid.querySelectorAll('.emote-btn').forEach(b=>b.addEventListener('click',()=>fireEmote(b.dataset.e)));
-}
-
-async function fireEmote(emoji){
-  try{
-    await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${SESSION_ID}`,{
-      method:'PATCH',
-      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
-      body:JSON.stringify({_reaction_trigger:{type:'reaction',emoji,at:Date.now()},updated_at:new Date().toISOString()})
-    });
-  }catch(e){}
+      ${kw.count>0?`<span class="kw-badge-count">×${kw.count}</span>`:''}
+      <button class="kw-badge-del-btn" data-i="${i}" title="${kw.pinned?'Unpin':'Hide'}">✕</button>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.kw-badge-del-btn').forEach(b=>b.addEventListener('click',()=>{
+    keywords.splice(parseInt(b.dataset.i),1);
+    renderKeywords();
+  }));
 }
 
 document.getElementById('kw-add-btn').addEventListener('click',()=>{
-  const inp=document.getElementById('kw-add-input');const v=inp.value.trim();
+  const inp=document.getElementById('kw-add-input');const v=inp.value.trim().toLowerCase();
   if(!v)return;
-  keywords.push({text:v,color:'#c4b5fd',bgColor:'rgba(196,181,253,.12)'});
+  let entry=keywords.find(k=>k.text===v);
+  if(!entry){entry={text:v,count:0,pinned:true};keywords.push(entry);}
+  else entry.pinned=true;
   renderKeywords();inp.value='';
 });
 document.getElementById('kw-add-input').addEventListener('keydown',e=>{
   if(e.key==='Enter'){document.getElementById('kw-add-btn').click();}
-});
-document.getElementById('kw-suggest-btn').addEventListener('click',async()=>{
-  const apiKey=apiInput.value.trim();if(!apiKey)return;
-  const context=transcriptEntries.slice(-10).map(e=>e.text).join(' ');
-  if(!context.trim())return;
-  await callAI(`Extract 5 important keyword topics from: "${context}"`,true);
 });
 
 /* ── CLIENT SELECTOR ── */
@@ -2399,10 +3105,11 @@ clientSelect.addEventListener('change',()=>{
   syncSupabase(); // push clientKey to audience immediately
   dbUpdateSessionClient(); // keep the durable session row's client_key in sync too
   loadSavedAgendas(); // refresh the saved-agenda list for whichever client is now active
+  updateSetupSummaryText();
 });
 
 /* ── SESSION NAME SYNC ── */
-sessionInput.addEventListener('input',()=>{boardSessionName.textContent=sessionInput.value||'New Session';});
+sessionInput.addEventListener('input',()=>{boardSessionName.textContent=sessionInput.value||'New Session';updateSetupSummaryText();});
 
 /* ── UTILS ── */
 function escHtml(str){const d=document.createElement('div');d.appendChild(document.createTextNode(str));return d.innerHTML;}
