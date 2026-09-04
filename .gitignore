@@ -4,6 +4,9 @@ config.js
 # Local client context — never commit (client names, leadership, strategy)
 clients.js
 
+# Local client logo/trademark asset — never commit
+cef-logo.js
+
 # Local Deepgram test credentials/audio — never commit
 deepgram.local.json
 voice-test/

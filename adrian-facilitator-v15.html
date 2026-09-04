@@ -85,6 +85,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 #ctrl-session{width:100%;padding:5px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);margin-top:8px;}
 #ctrl-session::placeholder,#ctrl-api-input::placeholder,#ctrl-dg-input::placeholder{color:rgba(255,255,255,.25);}
 
+/* Test Mode / replay harness (Phase 7) */
+#testmode-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+#testmode-label{font-size:10px;color:rgba(255,255,255,.4);line-height:1.4;}
+#testmode-panel{margin-top:8px;}
+#testmode-transcript-input{width:100%;min-height:70px;padding:7px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:11px;color:white;font-family:var(--font);resize:vertical;box-sizing:border-box;}
+#testmode-transcript-input::placeholder{color:rgba(255,255,255,.25);}
+#testmode-hint{font-size:9px;color:rgba(255,255,255,.25);line-height:1.5;margin-top:4px;}
+
 /* Speaker calibration (Tier 1 — session-only). Lives in the Pacing tab now,
    next to the talk-time bars it feeds, instead of floating in the header. */
 #speaker-calib-wrap{margin-bottom:10px;padding:8px;background:rgba(196,130,255,.06);border:1px solid rgba(196,130,255,.2);border-radius:6px;}
@@ -164,10 +172,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .kw-add-btn:hover{background:var(--green2);}
 
 /* saved tab */
-.save-btn-row{display:flex;gap:6px;margin-top:8px;}
+.save-btn-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.save-btn-row .save-action-btn{min-width:110px;}
 .save-action-btn{flex:1;padding:7px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);transition:all .15s;}
 #btn-save-summary{background:var(--green);color:white;}
 #btn-save-summary:hover{background:var(--green2);}
+#btn-browse-session{background:rgba(100,255,180,.12);color:#64ffb4;border:1px solid rgba(100,255,180,.25);}
+#btn-browse-session:hover{background:rgba(100,255,180,.2);}
+#btn-check-carryover{background:rgba(147,197,253,.12);color:#93c5fd;border:1px solid rgba(147,197,253,.25);}
+#btn-check-carryover:hover{background:rgba(147,197,253,.2);}
+#btn-past-sessions{background:rgba(196,181,253,.12);color:#c4b5fd;border:1px solid rgba(196,181,253,.25);}
+#btn-past-sessions:hover{background:rgba(196,181,253,.2);}
 #btn-export{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.1);margin-top:8px;}
 #btn-export:hover{background:rgba(255,255,255,.14);}
 #btn-clear-session{background:rgba(200,0,0,.15);color:#ff8080;border:1px solid rgba(200,0,0,.2);}
@@ -199,10 +214,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 #ask-input:focus{border-color:var(--yellow);}
 #ask-input::placeholder{color:rgba(255,255,255,.25);}
 #ask-hint{font-size:11px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.4;}
-#ask-buttons{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+#ask-buttons{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px;}
 .ask-btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s;}
 #ask-cancel{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);}
 #ask-cancel:hover{background:rgba(255,255,255,.15);}
+#ask-recent-audio{background:rgba(100,255,180,.15);color:#64ffb4;border:1px solid rgba(100,255,180,.3);}
+#ask-recent-audio:hover{background:rgba(100,255,180,.25);}
+#ask-discussion-ideas{background:rgba(196,181,253,.15);color:#c4b5fd;border:1px solid rgba(196,181,253,.3);}
+#ask-discussion-ideas:hover{background:rgba(196,181,253,.25);}
 #ask-freeform{background:rgba(100,200,255,.15);color:#93c5fd;border:1px solid rgba(100,200,255,.3);}
 #ask-freeform:hover{background:rgba(100,200,255,.25);}
 #ask-submit{background:var(--yellow);color:var(--charcoal);}
@@ -265,6 +284,67 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .idea-wordbank-chip.ai{background:rgba(196,181,253,.15);color:#c4b5fd;border-color:rgba(196,181,253,.35);}
 .hier-work-ideas-btn{font-size:9px;padding:2px 6px;border-radius:4px;border:1px dashed rgba(196,181,253,.4);background:rgba(196,181,253,.06);color:#c4b5fd;cursor:pointer;font-family:var(--font);flex-shrink:0;white-space:nowrap;}
 .hier-work-ideas-btn:hover{background:rgba(196,181,253,.15);}
+
+/* Segment Review modal (Phase 5) */
+#segreview-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;}
+#segreview-overlay.visible{display:flex;}
+#segreview-card{background:#1a2520;border:1px solid rgba(100,255,180,.3);border-radius:14px;padding:24px;width:520px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+#segreview-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;}
+#segreview-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#64ffb4;margin-bottom:4px;}
+#segreview-subtitle{font-size:12px;color:rgba(255,255,255,.55);}
+#segreview-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:14px;cursor:pointer;flex-shrink:0;padding:2px 4px;}
+#segreview-close:hover{color:white;}
+.segreview-section-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);font-weight:700;margin:14px 0 6px;}
+.segreview-section-label:first-child{margin-top:0;}
+#segreview-proposed-list{display:flex;flex-direction:column;gap:6px;}
+.segreview-proposed-row{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:rgba(100,255,180,.06);border:1px solid rgba(100,255,180,.2);border-radius:8px;}
+.segreview-proposed-text{flex:1;font-size:12px;color:rgba(255,255,255,.85);line-height:1.4;}
+.segreview-proposed-quote{font-size:10px;color:rgba(255,255,255,.4);font-style:italic;margin-top:4px;}
+.segreview-accept-btn,.segreview-dismiss-btn{flex-shrink:0;padding:4px 9px;border-radius:5px;border:none;cursor:pointer;font-size:10px;font-weight:700;font-family:var(--font);}
+.segreview-accept-btn{background:var(--green);color:white;}
+.segreview-accept-btn:hover{background:var(--green2);}
+.segreview-dismiss-btn{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);}
+.segreview-dismiss-btn:hover{background:rgba(255,255,255,.15);}
+#segreview-items-list,#segreview-quotes-list{display:flex;flex-direction:column;gap:5px;}
+.segreview-item-row{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,.75);padding:4px 2px;}
+.segreview-quote-row{font-size:11px;color:rgba(255,255,255,.7);font-style:italic;padding:4px 2px;line-height:1.4;}
+.segreview-quote-speaker{font-style:normal;color:rgba(255,255,255,.35);}
+
+/* Carryover modal (Phase 6) */
+#carryover-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;}
+#carryover-overlay.visible{display:flex;}
+#carryover-card{background:#1a2520;border:1px solid rgba(147,197,253,.3);border-radius:14px;padding:24px;width:520px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+#carryover-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
+#carryover-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;margin-bottom:4px;}
+#carryover-subtitle{font-size:12px;color:rgba(255,255,255,.55);}
+#carryover-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:14px;cursor:pointer;flex-shrink:0;padding:2px 4px;}
+#carryover-close:hover{color:white;}
+#carryover-incomplete-list,#carryover-complete-list{display:flex;flex-direction:column;gap:6px;}
+.carryover-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(147,197,253,.06);border:1px solid rgba(147,197,253,.2);border-radius:8px;}
+.carryover-row-text{flex:1;font-size:12px;color:rgba(255,255,255,.85);line-height:1.4;}
+.carryover-add-btn{flex-shrink:0;padding:4px 10px;border-radius:5px;border:none;cursor:pointer;font-size:10px;font-weight:700;font-family:var(--font);background:var(--green);color:white;}
+.carryover-add-btn:hover{background:var(--green2);}
+.carryover-row.done{opacity:.55;}
+.carryover-row-check{flex-shrink:0;color:#64ffb4;font-size:12px;}
+
+/* Past Sessions modal (Phase 8) */
+#pastsessions-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;}
+#pastsessions-overlay.visible{display:flex;}
+#pastsessions-card{background:#1a2520;border:1px solid rgba(196,181,253,.3);border-radius:14px;padding:24px;width:520px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+#pastsessions-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+#pastsessions-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c4b5fd;}
+#pastsessions-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:14px;cursor:pointer;flex-shrink:0;padding:2px 4px;}
+#pastsessions-close:hover{color:white;}
+#pastsessions-list{display:flex;flex-direction:column;gap:6px;}
+.pastsession-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;}
+.pastsession-row-info{flex:1;min-width:0;}
+.pastsession-row-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.85);}
+.pastsession-row-meta{font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;}
+.pastsession-summarize-btn{flex-shrink:0;padding:5px 10px;border-radius:5px;border:none;cursor:pointer;font-size:10px;font-weight:700;font-family:var(--font);background:rgba(196,181,253,.15);color:#c4b5fd;}
+.pastsession-summarize-btn:hover{background:rgba(196,181,253,.3);}
+.pastsession-summarize-btn:disabled{opacity:.5;cursor:default;}
+#pastsessions-summary-section{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);}
+#pastsessions-summary-text{font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;}
 #ask-submit:disabled{opacity:.5;cursor:not-allowed;}
 
 #error-banner{display:none;background:#2a0f0f;border-top:1px solid #4a1a1a;color:#ff8080;padding:7px 14px;font-size:11px;flex-shrink:0;}
@@ -319,6 +399,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .agenda-row{display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:6px;margin-bottom:6px;}
 .agenda-row-label{flex:1;font-size:12px;color:rgba(255,255,255,.75);}
 .agenda-row-type{font-size:9px;padding:2px 6px;border-radius:8px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);}
+.agenda-row-review{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:12px;padding:2px 4px;}
+.agenda-row-review:hover{color:#64ffb4;}
 .agenda-row-del{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:12px;padding:2px 4px;}
 .agenda-row-del:hover{color:#ff8080;}
 #agenda-add-row{display:flex;gap:5px;margin-top:8px;}
@@ -376,6 +458,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .board-item-ai-badge{font-size:8px;font-weight:700;padding:1px 5px;border-radius:6px;background:rgba(255,244,0,.15);color:#fff400;letter-spacing:.5px;flex-shrink:0;}
 .board-item-mention-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;background:rgba(255,120,50,.18);color:#ff8c42;letter-spacing:.3px;flex-shrink:0;}
 .board-item-pebble-count{font-size:9px;font-weight:600;color:rgba(253,186,116,.7);flex-shrink:0;white-space:nowrap;}
+.board-item-status-btn{width:16px;height:16px;flex-shrink:0;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:none;color:rgba(255,255,255,.3);font-size:10px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.board-item-status-btn.complete{background:var(--green);border-color:var(--green);color:white;}
+.board-item.item-complete .board-item-text{opacity:.5;text-decoration:line-through;}
+.board-item-carried-badge{font-size:10px;color:#93c5fd;}
 .board-item.rock-clickable{cursor:pointer;}
 .board-item.rock-clickable:hover{background:rgba(255,255,255,.1);border-color:rgba(253,186,116,.3);}
 .board-item-mention-badge.corroborated{background:rgba(196,130,255,.2);color:#c482ff;}
@@ -568,6 +654,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
           <input id="ctrl-dg-input" type="password" placeholder="Optional — enables speaker detection"/>
         </div>
         <input id="ctrl-session" type="text" placeholder="Session name (e.g. Q3 Planning — Acme)"/>
+        <div id="testmode-row">
+          <label class="toggle-switch"><input type="checkbox" id="testmode-toggle"/><span class="toggle-slider"></span></label>
+          <span id="testmode-label">🧪 Test Mode — replay a saved transcript instead of the mic</span>
+        </div>
+        <div id="testmode-panel" style="display:none;">
+          <textarea id="testmode-transcript-input" placeholder="Paste a saved transcript to replay…"></textarea>
+          <div id="testmode-hint">Feeds the pasted text through the same live pipeline (classification, summaries, keywords) on a simulated timer — nothing is written durably while testing, so it's safe to replay against a real client's agenda.</div>
+        </div>
       </div>
 
       <div id="ctrl-supa-row">
@@ -635,6 +729,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
         <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Session insights &amp; exports</div>
         <div class="save-btn-row">
           <button class="save-action-btn" id="btn-save-summary">✦ AI Summary</button>
+          <button class="save-action-btn" id="btn-browse-session">📋 Browse Session</button>
+          <button class="save-action-btn" id="btn-check-carryover">📅 Carryover</button>
+          <button class="save-action-btn" id="btn-past-sessions">📚 Past Sessions</button>
         </div>
 
         <div id="export-options">
@@ -777,13 +874,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
             <path d="M6 36 Q42 44 78 36 L76 38 Q42 46 8 38 Z" fill="#e6b800"/>
             <!-- brim top edge -->
             <path d="M14 36 Q42 41 70 36" fill="none" stroke="#e0a800" stroke-width="1.2"/>
-            <!-- CE Floyd badge — blue rect + actual logo paths scaled inside -->
+            <!-- Client logo badge — blue rect + logo scaled inside. Path data
+                 loads at runtime from cef-logo.js (gitignored, local-only) —
+                 see README "Client data". A generic placeholder shows without it. -->
             <rect x="28" y="19" width="28" height="18" rx="2.5" fill="#1172ba"/>
-            <!-- Logo: white version of the 3 CEF paths, nested svg scales them -->
-            <svg x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
-              <path fill="white" d="m172.18,592.41H0V0c.82,0,1.92,0,3.02,0C200.14,0,397.26,0,594.38,0c3.7,0,3.71.01,3.71,3.67,0,35.5,0,71.01,0,106.51q0,4.02-3.96,4.07c-1.6.02-3.2.02-4.8.02-137.79,0-275.57,0-413.36,0q-4.36,0-4.36,4.37c.03,19.31.07,38.61.09,57.92.16,137.21.32,274.42.48,411.63,0,1.3,0,2.61,0,4.23Z"/>
-              <path fill="white" d="m240.13,357.5v-4.08c0-36.16.03-72.32-.06-108.49,0-2.81.65-3.65,3.58-3.65,75.25.09,150.5.08,225.74.03,2.44,0,3.44.45,3.43,3.22-.09,36.54-.09,73.08,0,109.62,0,2.71-.74,3.46-3.47,3.46-74.68-.09-149.36-.09-224.05-.11-1.59,0-3.18,0-5.17,0Z"/>
-              <path fill="white" d="m239.88,478.23h113.5v114.05h-113.5v-114.05Z"/>
+            <svg class="hat-logo-svg" x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
+              <circle cx="299" cy="296" r="220" fill="white" opacity=".85"/>
             </svg>
           </svg>
         </div>
@@ -836,6 +932,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
       <div id="ask-hint">Adrian will respond with a thought displayed as an overlay on the board.</div>
       <div id="ask-buttons">
         <button class="ask-btn" id="ask-cancel">Cancel</button>
+        <button class="ask-btn" id="ask-recent-audio" title="Summarizes the current segment (or the whole session, if none is active) — no typing needed">🎙 What's Happening Now</button>
+        <button class="ask-btn" id="ask-discussion-ideas" title="Suggests discussion topics from the agenda, this quarter's carried-over rocks, and the client's active themes">💡 Discussion Ideas</button>
         <button class="ask-btn" id="ask-freeform">Freestyle</button>
         <button class="ask-btn" id="ask-submit">Ask ▶</button>
       </div>
@@ -887,6 +985,61 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
     </div>
   </div>
 
+  <!-- Segment Review — proposed rocks + browse (Phase 5) -->
+  <div id="segreview-overlay">
+    <div id="segreview-card">
+      <div id="segreview-header">
+        <div>
+          <div id="segreview-title">SEGMENT REVIEW</div>
+          <div id="segreview-subtitle"></div>
+        </div>
+        <button id="segreview-close">✕</button>
+      </div>
+      <div id="segreview-body">
+        <div id="segreview-proposed-section" style="display:none;">
+          <div class="segreview-section-label">Proposed Rocks</div>
+          <div id="segreview-proposed-list"></div>
+        </div>
+        <div class="segreview-section-label">Items Captured</div>
+        <div id="segreview-items-list"></div>
+        <div class="segreview-section-label">Quotes</div>
+        <div id="segreview-quotes-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carryover — last quarter's rocks (Phase 6) -->
+  <div id="carryover-overlay">
+    <div id="carryover-card">
+      <div id="carryover-header">
+        <div>
+          <div id="carryover-title">LAST QUARTER'S ROCKS</div>
+          <div id="carryover-subtitle"></div>
+        </div>
+        <button id="carryover-close">✕</button>
+      </div>
+      <div class="segreview-section-label">Incomplete — carry into this quarter?</div>
+      <div id="carryover-incomplete-list"></div>
+      <div class="segreview-section-label">Completed last quarter</div>
+      <div id="carryover-complete-list"></div>
+    </div>
+  </div>
+
+  <!-- Past Sessions — summarize a prior session for leadership prep (Phase 8) -->
+  <div id="pastsessions-overlay">
+    <div id="pastsessions-card">
+      <div id="pastsessions-header">
+        <div id="pastsessions-title">PAST SESSIONS</div>
+        <button id="pastsessions-close">✕</button>
+      </div>
+      <div id="pastsessions-list"></div>
+      <div id="pastsessions-summary-section" style="display:none;">
+        <div class="segreview-section-label">Summary</div>
+        <div id="pastsessions-summary-text"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-container"></div>
 </div>
 
@@ -894,6 +1047,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 <script src="config.js"></script>
 <!-- Local client context — see clients.example.js. Never commit clients.js. -->
 <script src="clients.js"></script>
+<!-- Local client logo asset — see cef-logo.example.js. Never commit cef-logo.js. -->
+<script src="cef-logo.js"></script>
 <script>
 /* ── CLIENT CONFIG ── */
 const CLIENT_PROFILES=window.CLIENT_PROFILES||{};
@@ -930,6 +1085,9 @@ let transcriptBuffer='';
 let wordCount=0;
 let transcriptEntries=[];
 let thoughts=[];
+/* ── PHASE 5: QUOTE CAPTURE + SEGMENT CONSOLIDATION ── */
+let quotes=[]; // {text, speaker, segIdx, dbId, at} — notable verbatim lines pulled out by the live classification pipeline
+let segmentReviews={}; // {[segIdx]: {segLabel, proposed:[{text, supportingQuote}]}} — AI-proposed rocks list once a "rock"-type segment ends
 let savedItems=[];
 let keywords=[];
 let lastAiCallTime=0;
@@ -962,6 +1120,13 @@ let parsedAttendees=[]; // names pulled from a pasted agenda email, offered as S
 let agenda=[]; // [{label, segment_type, dbId, started_at, ended_at}]
 let activeSegmentIndex=-1;
 let dragState=null; // {key, idx} of the item card currently being dragged
+
+/* ── PHASE 7: TESTING HARNESS (transcript replay) ── */
+let testMode=false;
+let replayInterval=null;
+let replayChunks=[];
+let replayIdx=0;
+const REPLAY_INTERVAL_MS=3000; // simulated pace between spoken chunks
 
 /* ── PHASE 10 STEP 3: PEBBLES-FOR-A-ROCK OVERLAY ── */
 let pebbleOverlayRockNum=null; // which rock's overlay is open, by stable .num (not array index — deletions shift indices)
@@ -1012,6 +1177,8 @@ const askInput=document.getElementById('ask-input');
 const askSubmit=document.getElementById('ask-submit');
 const askCancel=document.getElementById('ask-cancel');
 const askFreeform=document.getElementById('ask-freeform');
+const askRecentAudio=document.getElementById('ask-recent-audio');
+const askDiscussionIdeas=document.getElementById('ask-discussion-ideas');
 
 /* ── BUILD BOARD COLUMNS ──
    Layout (Phase 10 step 2): Roadblocks | Strategic Plan (Boulders->Rocks
@@ -1241,18 +1408,39 @@ function commitQuickAdd(key,rowId,inputId,parentNum=null){
 }
 
 /* ── ITEM MANAGEMENT ── */
-function addItem(key,text,fromAI=false,parentNum=null){
+function addItem(key,text,fromAI=false,parentNum=null,carriedOver=false){
   counters[key]++;
   const activeSeg=agenda[activeSegmentIndex]||null;
   const speaker=dgActive?resolveSpeakerName(dgLastSpeaker):null;
   // parentNum is only meaningful for categories in PARENT_CAT (rock->boulder, pebble->rock)
-  const item={num:counters[key],text,fromAI,segType:activeSeg?activeSeg.segment_type:null,segLabel:activeSeg?activeSeg.label:null,dbId:null,mentionCount:0,speaker,mentionSpeakers:speaker?[speaker]:[],parentNum:PARENT_CAT[key]?parentNum:null};
+  const item={num:counters[key],text,fromAI,segType:activeSeg?activeSeg.segment_type:null,segLabel:activeSeg?activeSeg.label:null,dbId:null,mentionCount:0,speaker,mentionSpeakers:speaker?[speaker]:[],parentNum:PARENT_CAT[key]?parentNum:null,status:'open',carriedOver}; // carriedOver: true only for rocks re-added via the Phase 6 carryover flow — Phase 8 references these specifically
   items[key].push(item);
   renderColItems(key);
   showToast(key,text);
   if(!fromAI)pulseOrb(key);
   syncSupabase();
   dbInsertItem(key,text,item.num,speaker,item.parentNum).then(id=>{item.dbId=id;});
+}
+
+/* Toggles a rock between 'open' and 'complete' — the only status distinction
+   the app needs today, since Phase 6 carryover treats anything not 'complete'
+   as incomplete rather than requiring a separate tri-state UI. */
+function setItemStatus(key,idx,status){
+  const item=items[key][idx];
+  if(!item)return;
+  item.status=status;
+  renderColItems(key);
+  syncSupabase();
+  if(item.dbId)dbUpdateItemStatus(item.dbId,status);
+}
+async function dbUpdateItemStatus(itemDbId,status){
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/items?id=eq.${itemDbId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({status})
+    });
+  }catch(e){}
 }
 
 /* Manually (re)assign or clear an item's parent link — the always-available
@@ -1320,13 +1508,14 @@ function boardItemCardHtml(key,idx,it){
   const cat=CATS.find(c=>c.key===key);
   const parentCat=PARENT_CAT[key];
   return `
-    <div class="board-item${it.segType?' seg-tagged':''}${key==='rock'?' rock-clickable':''}" draggable="true" data-key="${key}" data-idx="${idx}" data-num="${it.num}" style="border-left-color:${segmentColor(it.segType)}" title="${it.segLabel?escHtml(it.segLabel):(key==='rock'?'Click to see/add pebbles for this rock':'')}">
+    <div class="board-item${it.segType?' seg-tagged':''}${key==='rock'?' rock-clickable':''}${it.status==='complete'?' item-complete':''}" draggable="true" data-key="${key}" data-idx="${idx}" data-num="${it.num}" style="border-left-color:${segmentColor(it.segType)}" title="${it.segLabel?escHtml(it.segLabel):(key==='rock'?'Click to see/add pebbles for this rock':'')}">
       <div class="board-item-row">
         <span class="board-item-num" style="color:${cat.color}">#${it.num}</span>
-        <span class="board-item-text">${escHtml(it.text)}</span>
+        <span class="board-item-text">${escHtml(it.text)}${it.carriedOver?' <span class=\"board-item-carried-badge\" title=\"Carried over from last quarter\">↩</span>':''}</span>
         ${it.fromAI?'<span class="board-item-ai-badge">AI</span>':''}
         ${mentionBadgeHtml(it)}
-        ${key==='rock'?`<span class="board-item-pebble-count" title="Pebbles tied to this rock">🔸${items.pebble.filter(p=>p.parentNum===it.num).length}</span>`:''}
+        ${key==='rock'?`<span class="board-item-pebble-count" title="Pebbles tied to this rock">🔸${items.pebble.filter(p=>p.parentNum===it.num).length}</span>
+        <button class="board-item-status-btn${it.status==='complete'?' complete':''}" data-key="${key}" data-idx="${idx}" title="${it.status==='complete'?'Mark open again':'Mark complete'}">${it.status==='complete'?'✓':'○'}</button>`:''}
         <button class="board-item-del" data-key="${key}" data-idx="${idx}">✕</button>
       </div>
       ${parentCat?parentPickerHtml(key,idx,it,parentCat):''}
@@ -1351,6 +1540,13 @@ function wireItemCardEvents(container){
       syncSupabase();
     });
   });
+  container.querySelectorAll('.board-item-status-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const k=btn.dataset.key;const i=parseInt(btn.dataset.idx);
+      setItemStatus(k,i,items[k][i].status==='complete'?'open':'complete');
+    });
+  });
   container.querySelectorAll('.board-item').forEach(card=>{
     card.addEventListener('dragstart',e=>{
       dragState={key:card.dataset.key,idx:parseInt(card.dataset.idx)};
@@ -1366,7 +1562,7 @@ function wireItemCardEvents(container){
   // ignore clicks on the delete button or the parent-tie dropdown.
   container.querySelectorAll('.board-item[data-key="rock"]').forEach(card=>{
     card.addEventListener('click',e=>{
-      if(e.target.closest('.board-item-del,.board-item-parent-select'))return;
+      if(e.target.closest('.board-item-del,.board-item-parent-select,.board-item-status-btn'))return;
       openPebbleOverlay(parseInt(card.dataset.num));
     });
   });
@@ -1789,21 +1985,80 @@ function setOrbState(state){
 }
 
 /* ── SPEECH RECOGNITION (dispatcher — Deepgram if a key is entered, Web Speech API otherwise) ── */
+/* Returns false only for a synchronously-known failure (Test Mode with
+   nothing pasted) — cbStart's handler checks this before touching any
+   button/session state, so a failed start never leaves the UI half-"live". */
 function startListening(){
+  if(testMode){
+    if(replayChunks.length&&replayIdx<replayChunks.length){restartReplayInterval();return true;} // resuming from a pause — keep position
+    return startReplay(); // fresh start (or a finished replay run again)
+  }
   if(dgInput.value.trim()){
     startListeningDeepgram();
   }else{
     startListeningWebSpeech();
   }
+  return true;
 }
 
 function stopListening(){
+  if(testMode){stopReplay();return;}
   if(dgActive){
     stopListeningDeepgram();
   }else{
     stopListeningWebSpeech();
   }
 }
+
+/* ── PHASE 7: TESTING HARNESS ──
+   Feeds a pasted transcript through the exact same pipeline a live mic
+   would (classification, keyword tracking, rolling summaries) on a
+   simulated timer, so a new prompt or feature can be validated against a
+   real past session before running it live. Test Mode sessions never call
+   dbCreateSession() (see cbStart), so every dbInsertX call downstream is
+   already a no-op via its existing "no session, no durable write" guard —
+   nothing from a replay ever reaches carryover or session history. */
+function startReplay(){
+  const raw=document.getElementById('testmode-transcript-input').value.trim();
+  if(!raw){showError('Paste a saved transcript to replay first.');return false;}
+  replayChunks=raw.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
+  replayIdx=0;
+  isListening=true;
+  recDot.classList.add('live');
+  statusText.textContent='Replaying (Test Mode)…';
+  setOrbState('listening');
+  startTimer();
+  restartReplayInterval();
+  return true;
+}
+function restartReplayInterval(){
+  if(replayInterval)clearInterval(replayInterval);
+  replayInterval=setInterval(replayTick,REPLAY_INTERVAL_MS);
+}
+function replayTick(){
+  if(replayIdx>=replayChunks.length){cbStop.click();return;} // finished — run the same full stop path a facilitator clicking Stop would
+  const chunk=replayChunks[replayIdx++];
+  transcriptBuffer+=chunk+' ';
+  summaryBuffer+=chunk+' ';
+  trackKeywordsFromText(chunk);
+  wordCount+=chunk.trim().split(/\s+/).length;
+  wordcountEl.textContent=wordCount+' words';
+  addTranscriptEntry(chunk,false);
+  maybeCallAI();
+}
+function stopReplay(){
+  if(replayInterval){clearInterval(replayInterval);replayInterval=null;}
+  replayChunks=[];replayIdx=0;
+  isListening=false;
+  recDot.classList.remove('live');
+  statusText.textContent='Stopped';
+  setOrbState('standby');
+  stopTimer();
+}
+document.getElementById('testmode-toggle').addEventListener('change',e=>{
+  testMode=e.target.checked;
+  document.getElementById('testmode-panel').style.display=testMode?'':'none';
+});
 
 /* ── PHASE 2: PAUSE / RESUME ── a third state alongside Start/Stop — the
    session timer keeps running and the active segment stays open, but the
@@ -1812,6 +2067,7 @@ function stopListening(){
 function pauseListening(){
   isPaused=true;
   isListening=false; // set before tearing down so WebSpeech's onend / Deepgram's onclose don't auto-restart or error
+  if(testMode&&replayInterval){clearInterval(replayInterval);replayInterval=null;} // keeps replayChunks/replayIdx — resumeListening() picks up where it left off
   dgActive=false;
   if(dgMediaRecorder){try{dgMediaRecorder.stop();}catch(e){}}
   dgMediaRecorder=null;
@@ -2104,7 +2360,7 @@ function addTranscriptEntry(text,isInterim,speaker=null){
   d.innerHTML=`<div class="tr-time">${ts}</div><div class="tr-text${isInterim?' interim':''}">${speakerTag}${escHtml(text)}</div>`;
   transcriptList.appendChild(d);
   transcriptList.scrollTop=transcriptList.scrollHeight;
-  transcriptEntries.push({ts,text,isInterim,speaker});
+  transcriptEntries.push({ts,text,isInterim,speaker,segIdx:activeSegmentIndex}); // segIdx: which agenda segment was active when this was said — lets Phase 4's "what's happening now" scope to just the current segment
   dbInsertTranscriptChunk(text,speaker);
 }
 
@@ -2170,7 +2426,8 @@ Required JSON format:
   "tags": ["tag1","tag2"],
   "captures": [
     {"type": "rock|roadblock|boulder|todo|pebble|parking", "text": "item text, concise and actionable", "matches_item_num": null, "parent_num": null}
-  ]
+  ],
+  "quote": null
 }
 
 Rules:
@@ -2181,6 +2438,7 @@ Rules:
 - captures text should be concise (max 10 words)
 - matches_item_num: if this transcript segment is restating or echoing an item already captured this session (same underlying point, even if worded differently or said by someone else), set this to that item's number within its category instead of treating it as new. Leave it null if the point is genuinely new. This matters even if it sounds like a different person saying it — same underlying issue/rock/etc still counts as a match.
 - parent_num: rocks typically break down from a boulder, and pebbles typically break down from a rock. If a "rock" capture's parent boulder, or a "pebble" capture's parent rock, is unambiguous from what was actually said (e.g. "that's part of our boulder to expand into the Southeast" / "that pebble is part of the hiring rock"), set this to that parent item's number within its category. Leave it null otherwise — do NOT guess a link that the transcript doesn't state. This field is meaningless for other capture types.
+- quote: if this transcript segment contains a genuinely notable, quotable verbatim line (a strong soundbite, a clear declaration, something worth remembering exactly as said) include it word-for-word here. Most segments won't have one — leave null rather than force it. Never paraphrase; only exact transcript wording.
 ${userQuestion?`\nUser question: ${userQuestion}`:''}`;
 
   const userMsg=isFreeform
@@ -2219,6 +2477,7 @@ function handleAIResult(parsed){
       }
     });
   }
+  if(parsed.quote&&typeof parsed.quote==='string'&&parsed.quote.trim())captureQuote(parsed.quote.trim());
   // Show thought
   const autoShow=document.getElementById('auto-show-toggle').checked;
   if(parsed.insight){
@@ -2228,6 +2487,28 @@ function handleAIResult(parsed){
     if(autoShow)showBubble(thought);
     else setOrbState(isListening?'listening':'standby');
   }
+}
+
+function captureQuote(text){
+  const speaker=dgActive?resolveSpeakerName(dgLastSpeaker):null;
+  const quote={text,speaker,segIdx:activeSegmentIndex,dbId:null,at:Date.now()};
+  quotes.push(quote);
+  showToastPlain(`💬 ${speaker?speaker+': ':''}"${text.length>60?text.slice(0,60)+'…':text}"`);
+  dbInsertQuote(text,speaker).then(id=>{quote.dbId=id;});
+}
+
+async function dbInsertQuote(text,speaker){
+  if(!dbSessionId)return null;
+  const activeSeg=agenda[activeSegmentIndex]||null;
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/quotes`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=representation'},
+      body:JSON.stringify({session_id:dbSessionId,segment_id:activeSeg?activeSeg.dbId||null:null,speaker,text})
+    });
+    if(res.ok){const rows=await res.json();return rows&&rows[0]?rows[0].id:null;}
+  }catch(e){}
+  return null;
 }
 
 /* ── PHASE 3: SUMMARIZATION ENGINE ──
@@ -2424,6 +2705,13 @@ async function initSupabase(){
 
 function currentQuarter(d=new Date()){
   return `${d.getFullYear()}-Q${Math.floor(d.getMonth()/3)+1}`;
+}
+function previousQuarter(q){
+  const m=q.match(/^(\d{4})-Q([1-4])$/);
+  if(!m)return q;
+  let year=parseInt(m[1]),qn=parseInt(m[2])-1;
+  if(qn<1){qn=4;year--;}
+  return `${year}-Q${qn}`;
 }
 
 async function dbCreateSession(){
@@ -2735,11 +3023,15 @@ function renderAgendaTab(){
     return `<div class="agenda-row">
       <span class="agenda-row-label">${idx+1}. ${escHtml(seg.label)}</span>
       <span class="agenda-row-type">${typeLabel}</span>
+      <button class="agenda-row-review" data-idx="${idx}" title="Review what's been captured for this segment">👁</button>
       <button class="agenda-row-del" data-idx="${idx}">✕</button>
     </div>`;
   }).join('');
   agendaList.querySelectorAll('.agenda-row-del').forEach(btn=>{
     btn.addEventListener('click',()=>removeAgendaItem(parseInt(btn.dataset.idx)));
+  });
+  agendaList.querySelectorAll('.agenda-row-review').forEach(btn=>{
+    btn.addEventListener('click',()=>openSegmentReview({type:'segment',idx:parseInt(btn.dataset.idx)}));
   });
 }
 
@@ -2808,6 +3100,7 @@ async function endSegment(idx){
   if(activeSegmentIndex===idx)activeSegmentIndex=-1;
   renderAgendaRail();
   syncSupabase();
+  if(seg.segment_type==='rock')consolidateRocksForSegment(seg,idx); // fire-and-forget — toasts a click-through when ready
   if(!seg.dbId)return;
   try{
     await fetch(`${SUPABASE_URL}/rest/v1/segments?id=eq.${seg.dbId}`,{
@@ -2816,6 +3109,282 @@ async function endSegment(idx){
       body:JSON.stringify({ended_at:seg.ended_at})
     });
   }catch(e){}
+}
+
+/* On a "rock"-type segment ending, consolidate everything captured during it
+   (items across all categories tagged to this segment's label, plus notable
+   quotes) into a clean, deduplicated proposed Rocks list — a raw item dump
+   usually has near-duplicates and mis-tagged noise a facilitator has to sort
+   through by hand. Best-effort and silent: no API key or nothing captured
+   just means no review appears, no error banner. */
+async function consolidateRocksForSegment(seg,idx){
+  const apiKey=apiInput.value.trim();
+  if(!apiKey)return;
+  const segItems=CATS.flatMap(c=>items[c.key].filter(it=>it.segLabel===seg.label));
+  const segQuotes=quotes.filter(q=>q.segIdx===idx);
+  if(!segItems.length&&!segQuotes.length)return;
+  const itemsBlock=segItems.length?segItems.map(it=>`- [${it.segType||'item'}] ${it.text}`).join('\n'):'(none)';
+  const quotesBlock=segQuotes.length?segQuotes.map(q=>`- "${q.text}"${q.speaker?` — ${q.speaker}`:''}`).join('\n'):'(none)';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:600,
+        system:'You are consolidating everything captured during a "Rocks Review" segment of a live EOS/Traction strategic planning session into a clean, deduplicated proposed Rocks list for the quarter. Merge near-duplicates, drop noise or anything mis-tagged that is not actually a rock-level priority, keep genuinely distinct rocks separate. Return ONLY a JSON array, no other text: [{"text":"concise rock, max 12 words","supportingQuote":null}] — supportingQuote is a verbatim quote from the list below if one directly supports that rock, else null. If nothing rock-worthy was captured, return an empty array.',
+        messages:[{role:'user',content:`Items captured during this segment:\n${itemsBlock}\n\nNotable quotes from this segment:\n${quotesBlock}`}]
+      })
+    });
+    if(!res.ok)return;
+    const data=await res.json();
+    const raw=data.content[0].text.trim();
+    let parsed;
+    try{parsed=JSON.parse(raw);}
+    catch(e){const m=raw.match(/\[[\s\S]*\]/);if(m)parsed=JSON.parse(m[0]);else return;}
+    if(!Array.isArray(parsed))return;
+    const proposed=parsed.filter(p=>p&&typeof p.text==='string'&&p.text.trim()).map(p=>({text:p.text.trim(),supportingQuote:(typeof p.supportingQuote==='string'&&p.supportingQuote.trim())?p.supportingQuote.trim():null}));
+    if(!proposed.length)return;
+    segmentReviews[idx]={segLabel:seg.label,proposed};
+    const t=document.createElement('div');
+    t.className='toast';t.style.background='#111a14';t.style.color='#64ffb4';t.style.borderColor='rgba(100,255,180,.3)';t.style.cursor='pointer';
+    t.innerHTML=`<div class="toast-label">✦ Rocks Review ready</div>"${escHtml(seg.label)}" — click to review`;
+    t.addEventListener('click',()=>{openSegmentReview({type:'segment',idx});t.remove();});
+    document.getElementById('toast-container').appendChild(t);
+    setTimeout(()=>t.classList.add('visible'),10);
+    setTimeout(()=>{t.classList.remove('visible');setTimeout(()=>t.remove(),400);},10000);
+  }catch(e){}
+}
+
+/* ── SEGMENT REVIEW — proposed rocks + manual browse (Phase 5) ──
+   Two ways in: a "👁 Review" button per agenda row (scoped to that segment,
+   live or ended), and a "📋 Browse Whole Session" button in the Saved tab.
+   A rocks-segment's AI-proposed list (if one exists) shows at the top with
+   per-item Accept/Dismiss; everything captured is listed below either way. */
+let segReviewScope=null; // {type:'segment', idx} or {type:'session'}
+
+function openSegmentReview(scope){
+  segReviewScope=scope;
+  document.getElementById('segreview-overlay').classList.add('visible');
+  renderSegmentReview();
+}
+function closeSegmentReview(){
+  document.getElementById('segreview-overlay').classList.remove('visible');
+  segReviewScope=null;
+}
+function renderSegmentReview(){
+  if(!segReviewScope)return;
+  let segItems,segQuotes,subtitle,review=null;
+  if(segReviewScope.type==='segment'){
+    const seg=agenda[segReviewScope.idx];
+    if(!seg){closeSegmentReview();return;}
+    subtitle=`Segment: ${seg.label}`;
+    segItems=CATS.flatMap(c=>items[c.key].filter(it=>it.segLabel===seg.label).map(it=>({...it,__cat:c.key})));
+    segQuotes=quotes.filter(q=>q.segIdx===segReviewScope.idx);
+    review=segmentReviews[segReviewScope.idx]||null;
+  }else{
+    subtitle='Whole Session';
+    segItems=CATS.flatMap(c=>items[c.key].map(it=>({...it,__cat:c.key})));
+    segQuotes=quotes;
+  }
+  document.getElementById('segreview-subtitle').textContent=subtitle;
+
+  const proposedSection=document.getElementById('segreview-proposed-section');
+  if(review&&review.proposed.length){
+    proposedSection.style.display='';
+    const list=document.getElementById('segreview-proposed-list');
+    list.innerHTML=review.proposed.map((p,i)=>`
+      <div class="segreview-proposed-row">
+        <div class="segreview-proposed-text">${escHtml(p.text)}${p.supportingQuote?`<div class="segreview-proposed-quote">"${escHtml(p.supportingQuote)}"</div>`:''}</div>
+        <button class="segreview-accept-btn" data-i="${i}">Accept</button>
+        <button class="segreview-dismiss-btn" data-i="${i}">✕</button>
+      </div>`).join('');
+    list.querySelectorAll('.segreview-accept-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const i=parseInt(btn.dataset.i);
+        addItem('rock',review.proposed[i].text,true);
+        review.proposed.splice(i,1);
+        renderSegmentReview();
+      });
+    });
+    list.querySelectorAll('.segreview-dismiss-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        review.proposed.splice(parseInt(btn.dataset.i),1);
+        renderSegmentReview();
+      });
+    });
+  }else{
+    proposedSection.style.display='none';
+  }
+
+  const itemsList=document.getElementById('segreview-items-list');
+  itemsList.innerHTML=segItems.length
+    ?segItems.map(it=>{const cat=CATS.find(c=>c.key===it.__cat);return `<div class="segreview-item-row"><span style="color:${cat.color}">${cat.icon}</span><span>${escHtml(it.text)}</span></div>`;}).join('')
+    :'<div class="hier-empty">Nothing captured yet</div>';
+
+  const quotesList=document.getElementById('segreview-quotes-list');
+  quotesList.innerHTML=segQuotes.length
+    ?segQuotes.map(q=>`<div class="segreview-quote-row">"${escHtml(q.text)}"${q.speaker?` <span class="segreview-quote-speaker">— ${escHtml(q.speaker)}</span>`:''}</div>`).join('')
+    :'<div class="hier-empty">No quotes captured yet</div>';
+}
+document.getElementById('segreview-close').addEventListener('click',closeSegmentReview);
+
+/* ── PHASE 6: PREVIOUS-QUARTER ROCKS CARRYOVER ──
+   Queries last quarter's rocks for the active client the moment a session
+   starts. Best-effort and silent — no client selected, no prior data, or a
+   failed request just means the modal never opens; nothing blocks Start. */
+let carryoverIncomplete=[];
+let carryoverComplete=[];
+
+async function checkCarryover(){
+  carryoverIncomplete=[];carryoverComplete=[];
+  if(!activeClient)return;
+  const prevQ=previousQuarter(currentQuarter());
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/items?client_key=eq.${encodeURIComponent(activeClient)}&quarter=eq.${encodeURIComponent(prevQ)}&category=eq.rock&select=*`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
+    });
+    if(!res.ok)return;
+    const rows=await res.json();
+    if(!rows.length)return;
+    carryoverIncomplete=rows.filter(r=>r.status!=='complete'&&r.status!=='carried_over');
+    carryoverComplete=rows.filter(r=>r.status==='complete');
+    if(carryoverIncomplete.length||carryoverComplete.length)openCarryoverOverlay();
+  }catch(e){}
+}
+
+function openCarryoverOverlay(){
+  document.getElementById('carryover-overlay').classList.add('visible');
+  renderCarryoverOverlay();
+}
+function closeCarryoverOverlay(){
+  document.getElementById('carryover-overlay').classList.remove('visible');
+}
+function renderCarryoverOverlay(){
+  document.getElementById('carryover-subtitle').textContent=`${CLIENT_PROFILES[activeClient]?.name||activeClient} — ${previousQuarter(currentQuarter())}`;
+  const incList=document.getElementById('carryover-incomplete-list');
+  incList.innerHTML=carryoverIncomplete.length
+    ?carryoverIncomplete.map((r,i)=>`<div class="carryover-row"><span class="carryover-row-text">${escHtml(r.text)}</span><button class="carryover-add-btn" data-i="${i}">+ Carry Over</button></div>`).join('')
+    :'<div class="hier-empty">Nothing incomplete — clean slate.</div>';
+  incList.querySelectorAll('.carryover-add-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i=parseInt(btn.dataset.i);
+      const row=carryoverIncomplete[i];
+      addItem('rock',row.text,true,null,true); // carriedOver=true — Phase 8 references these specifically
+      dbMarkItemCarriedOver(row.id);
+      carryoverIncomplete.splice(i,1);
+      renderCarryoverOverlay();
+    });
+  });
+  const compList=document.getElementById('carryover-complete-list');
+  compList.innerHTML=carryoverComplete.length
+    ?carryoverComplete.map(r=>`<div class="carryover-row done"><span class="carryover-row-check">✓</span><span class="carryover-row-text">${escHtml(r.text)}</span></div>`).join('')
+    :'<div class="hier-empty">Nothing marked complete last quarter.</div>';
+}
+async function dbMarkItemCarriedOver(itemDbId){
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/items?id=eq.${itemDbId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({status:'carried_over'})
+    });
+  }catch(e){}
+}
+document.getElementById('carryover-close').addEventListener('click',closeCarryoverOverlay);
+
+/* ── PHASE 8: AI-TRAINING SUPPORT ──
+   Part 1: summarize a full past session (reuses summarizeText() from Phase 3
+   against a full stored transcript instead of a live window — same engine,
+   different input, exactly as the roadmap called for). */
+let pastSessions=[];
+
+async function openPastSessions(){
+  if(!activeClient){showError('Select a client first.');return;}
+  document.getElementById('pastsessions-overlay').classList.add('visible');
+  document.getElementById('pastsessions-summary-section').style.display='none';
+  document.getElementById('pastsessions-list').innerHTML='<div class="hier-empty">Loading…</div>';
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/sessions?client_key=eq.${encodeURIComponent(activeClient)}&order=started_at.desc&select=*`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
+    });
+    pastSessions=res.ok?await res.json():[];
+  }catch(e){pastSessions=[];}
+  renderPastSessions();
+}
+function closePastSessions(){document.getElementById('pastsessions-overlay').classList.remove('visible');}
+function renderPastSessions(){
+  const list=document.getElementById('pastsessions-list');
+  if(!pastSessions.length){list.innerHTML='<div class="hier-empty">No past sessions found for this client.</div>';return;}
+  list.innerHTML=pastSessions.map((s,i)=>`
+    <div class="pastsession-row">
+      <div class="pastsession-row-info">
+        <div class="pastsession-row-title">${escHtml(s.name||'Untitled')}</div>
+        <div class="pastsession-row-meta">${escHtml(s.quarter||'')}${s.started_at?' · '+new Date(s.started_at).toLocaleDateString():''}</div>
+      </div>
+      <button class="pastsession-summarize-btn" data-i="${i}">✦ Summarize</button>
+    </div>`).join('');
+  list.querySelectorAll('.pastsession-summarize-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>summarizePastSession(parseInt(btn.dataset.i),btn));
+  });
+}
+async function summarizePastSession(i,btn){
+  const session=pastSessions[i];
+  const apiKey=apiInput.value.trim();
+  if(!apiKey){showError('Enter your Claude API key above first.');return;}
+  const originalLabel=btn.textContent;
+  btn.disabled=true;btn.textContent='Thinking…';
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/transcript_chunks?session_id=eq.${session.id}&order=created_at.asc&select=text`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
+    });
+    const rows=res.ok?await res.json():[];
+    const fullText=rows.map(r=>r.text).join(' ').trim();
+    if(!fullText){showError('No stored transcript for that session.');return;}
+    const summary=await summarizeText(fullText,`the past session "${session.name||'Untitled'}"`);
+    if(!summary){showError('Could not generate a summary — check the API key or try again.');return;}
+    document.getElementById('pastsessions-summary-section').style.display='';
+    document.getElementById('pastsessions-summary-text').textContent=summary;
+  }catch(e){showError('Could not load that session\'s transcript.');}
+  finally{btn.disabled=false;btn.textContent=originalLabel;}
+}
+document.getElementById('pastsessions-close').addEventListener('click',closePastSessions);
+document.getElementById('btn-past-sessions').addEventListener('click',openPastSessions);
+
+/* Part 2: proactively suggest discussion topics using the agenda, this
+   quarter's carried-over rocks, and the client's active themes. Surfaces
+   through the same Thoughts-panel-plus-bubble path Phase 3/4 already use. */
+async function suggestDiscussionTopics(){
+  const apiKey=apiInput.value.trim();
+  if(!apiKey){showError('Enter your Claude API key above first.');return;}
+  const client=activeClient?CLIENT_PROFILES[activeClient]:null;
+  const agendaBlock=agenda.length?agenda.map(s=>`- ${s.label} (${s.segment_type})`).join('\n'):'(no agenda set)';
+  const carriedBlock=items.rock.filter(r=>r.carriedOver).map(r=>`- ${r.text}`).join('\n')||'(none)';
+  const themesBlock=(client&&client.activeThemes&&client.activeThemes.length)?client.activeThemes.map(t=>`- ${t}`).join('\n'):'(none)';
+  setOrbState('thinking');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:400,
+        system:'You are helping a facilitator prepare for an upcoming or in-progress EOS/Traction strategic planning segment. Using the agenda, this quarter\'s carried-over (still-open) rocks, and the company\'s active strategic themes below, proactively suggest 3-5 specific discussion questions or topics worth raising. Return ONLY a JSON array of strings, no other text.',
+        messages:[{role:'user',content:`Agenda:\n${agendaBlock}\n\nCarried-over rocks:\n${carriedBlock}\n\nActive themes:\n${themesBlock}`}]
+      })
+    });
+    if(!res.ok)throw new Error('request failed');
+    const data=await res.json();
+    const raw=data.content[0].text.trim();
+    let ideas;
+    try{ideas=JSON.parse(raw);}
+    catch(e){const m=raw.match(/\[[\s\S]*\]/);if(m)ideas=JSON.parse(m[0]);else throw new Error('parse failed');}
+    if(!Array.isArray(ideas)||!ideas.length){showError('No discussion ideas came back — try again once more is captured.');setOrbState(isListening?'listening':'standby');return;}
+    const thought={id:Date.now(),headline:'DISCUSSION IDEAS',text:ideas.map((t,i)=>`${i+1}. ${t}`).join(' '),tags:[],time:new Date().toLocaleTimeString()};
+    thoughts.unshift(thought);
+    renderThoughts();
+    if(document.getElementById('auto-show-toggle').checked)showBubble(thought);
+    else setOrbState(isListening?'listening':'standby');
+  }catch(e){showError('Could not generate discussion ideas — check the API key or try again.');setOrbState(isListening?'listening':'standby');}
 }
 
 document.getElementById('agenda-add-btn').addEventListener('click',()=>{
@@ -2837,17 +3406,21 @@ document.getElementById('agenda-edit-btn').addEventListener('click',()=>{
 
 /* ── START/PAUSE/STOP ── */
 cbStart.addEventListener('click',()=>{
+  // Checked first, before any button/session state changes — a validation
+  // failure (Test Mode with nothing pasted) must leave the UI exactly as it
+  // was, not half-transitioned into a "live" state that isn't actually live.
+  if(!startListening())return;
   cbStart.style.display='none';cbPause.style.display='flex';cbStop.style.display='flex';
   isPaused=false;cbPause.textContent='⏸ Pause';cbPause.classList.remove('cb-pause-active');
   dgSeenSpeakers=new Set();dgSpeakerNames={};dgLastSpeaker=null; // fresh calibration per session
   speakerTalkSec={};currentSentiment=null;sentimentHistory=[];renderTalkTime();renderSentiment();
   initKeywords(); // fresh keyword tracking per session — a new quarter shouldn't inherit last session's pins/counts
+  quotes=[];segmentReviews={};
   document.getElementById('sentiment-card-text').textContent='No reading yet — the first one lands ~5 minutes into a live session.';
   document.getElementById('sentiment-card-time').textContent='';
   renderSpeakerCalibration();
-  startListening();
   boardSessionName.textContent=sessionInput.value||'New Session';
-  dbCreateSession();
+  if(!testMode)dbCreateSession().then(checkCarryover); // Phase 6/durable history — skipped entirely in Test Mode so a replay never pollutes real client history or carryover data
   summaryBuffer=''; // Phase 3: fresh rolling-summary window per session
   if(summaryTimerInterval)clearInterval(summaryTimerInterval);
   summaryTimerInterval=setInterval(runRollingSummary,SUMMARY_INTERVAL_MS);
@@ -2880,6 +3453,31 @@ askFreeform.addEventListener('click',async()=>{
   await callAI(q,true);
   askInput.value='';
 });
+/* Phase 4: one-click "what's happening right now" — reuses the Phase 3
+   summarizer against the current segment's transcript (or the whole
+   session if no segment is active) instead of requiring a typed question. */
+askRecentAudio.addEventListener('click',async()=>{
+  askOverlay.classList.remove('visible');
+  const activeSeg=agenda[activeSegmentIndex]||null;
+  const segText=(activeSeg
+    ?transcriptEntries.filter(e=>e.segIdx===activeSegmentIndex)
+    :transcriptEntries
+  ).map(e=>e.text).join(' ').trim();
+  if(!segText){showError('No transcript yet to summarize.');return;}
+  const label=activeSeg?`the "${activeSeg.label}" segment`:'this session';
+  setOrbState('thinking');
+  const summary=await summarizeText(segText,label);
+  if(!summary){showError('Could not generate a summary — check the API key or try again.');setOrbState(isListening?'listening':'standby');return;}
+  const thought={id:Date.now(),headline:'RIGHT NOW',text:summary,tags:[],time:new Date().toLocaleTimeString()};
+  thoughts.unshift(thought);
+  renderThoughts();
+  if(document.getElementById('auto-show-toggle').checked)showBubble(thought);
+  else setOrbState(isListening?'listening':'standby');
+});
+askDiscussionIdeas.addEventListener('click',async()=>{
+  askOverlay.classList.remove('visible');
+  await suggestDiscussionTopics();
+});
 
 /* ── SAVE / EXPORT ── */
 cbSave.addEventListener('click',()=>exportSession());
@@ -2896,6 +3494,12 @@ document.getElementById('btn-save-summary').addEventListener('click',async()=>{
   const context=CATS.map(c=>`${c.label}:\n${items[c.key].map(i=>`- ${i.text}`).join('\n')||'(none)'}`).join('\n\n');
   const prompt=`Provide a concise executive summary (3-5 sentences) of this strategic planning session:\n\n${context}`;
   await callAI(prompt,true);
+});
+document.getElementById('btn-browse-session').addEventListener('click',()=>openSegmentReview({type:'session'}));
+document.getElementById('btn-check-carryover').addEventListener('click',async()=>{
+  if(!activeClient){showError('Select a client first.');return;}
+  await checkCarryover();
+  if(!carryoverIncomplete.length&&!carryoverComplete.length)showToastPlain(`No rocks found for ${previousQuarter(currentQuarter())}.`);
 });
 
 /* ── EXPORT (checkbox-selectable sections) ── */
@@ -3059,6 +3663,12 @@ function populateClientSelect(){
     opt.value=key;opt.textContent=CLIENT_PROFILES[key].name||key;
     clientSelect.appendChild(opt);
   });
+}
+
+// Real logo path data loads from the gitignored cef-logo.js — the generic
+// placeholder circle already in the markup stays as-is if that file isn't present.
+if(window.CEF_LOGO_PATHS){
+  document.querySelectorAll('.hat-logo-svg').forEach(el=>{el.innerHTML=window.CEF_LOGO_PATHS;});
 }
 populateClientSelect();
 

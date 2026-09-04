@@ -35,7 +35,7 @@ Both apps are single-file, no-build static HTML — no npm, no bundler, no backe
 
 `CLIENT_PROFILES` (leadership names, active strategic themes, ICPs, internal terminology for each client) has been moved out of `adrian-facilitator-v15.html` into `clients.js`, which is gitignored just like `config.js`. `clients.example.js` is committed as the template. The client dropdown in the facilitator now builds its list dynamically from whatever is in `clients.js`, so no client name appears in the committed HTML either.
 
-**One remaining item worth your attention:** the "hard hat" animation feature embeds CE Floyd's actual logo as inline SVG paths directly in `adrian-facilitator-v15.html` and `adrian-audience-v14.html` (search for `orb-hat`, `aud-hat`, `sb-hat`). That's a real client logo/trademark asset sitting in committed, public HTML — separate from the `CLIENT_PROFILES` text data and not addressed by the `.gitignore` change above. If you want that scrubbed too (e.g., moved to a gitignored asset loaded at runtime, or replaced with a generic placeholder badge in the public repo), let me know and I'll do that next — I didn't want to touch a visual feature without checking first.
+The "hard hat" animation's logo badge (in `orb-hat`, `aud-hat`, `sb-hat`) follows the same pattern: the real path data lives in `cef-logo.js`, gitignored just like `config.js`/`clients.js`, loaded at runtime via `<script src="cef-logo.js">`. `cef-logo.example.js` is the committed template. Without a local `cef-logo.js`, the badge renders a generic placeholder circle instead — the committed, public HTML never contains any client-specific logo/trademark asset.
 
 ## Running it
 

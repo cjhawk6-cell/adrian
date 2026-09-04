@@ -223,10 +223,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
           <path d="M6 36 Q42 44 78 36 L76 38 Q42 46 8 38 Z" fill="#e6b800"/>
           <path d="M14 36 Q42 41 70 36" fill="none" stroke="#e0a800" stroke-width="1.2"/>
           <rect x="28" y="19" width="28" height="18" rx="2.5" fill="#1172ba"/>
-          <svg x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
-            <path fill="white" d="m172.18,592.41H0V0c.82,0,1.92,0,3.02,0C200.14,0,397.26,0,594.38,0c3.7,0,3.71.01,3.71,3.67,0,35.5,0,71.01,0,106.51q0,4.02-3.96,4.07c-1.6.02-3.2.02-4.8.02-137.79,0-275.57,0-413.36,0q-4.36,0-4.36,4.37c.03,19.31.07,38.61.09,57.92.16,137.21.32,274.42.48,411.63,0,1.3,0,2.61,0,4.23Z"/>
-            <path fill="white" d="m240.13,357.5v-4.08c0-36.16.03-72.32-.06-108.49,0-2.81.65-3.65,3.58-3.65,75.25.09,150.5.08,225.74.03,2.44,0,3.44.45,3.43,3.22-.09,36.54-.09,73.08,0,109.62,0,2.71-.74,3.46-3.47,3.46-74.68-.09-149.36-.09-224.05-.11-1.59,0-3.18,0-5.17,0Z"/>
-            <path fill="white" d="m239.88,478.23h113.5v114.05h-113.5v-114.05Z"/>
+          <!-- Client logo badge — path data loads at runtime from cef-logo.js
+               (gitignored, local-only) — see README "Client data". A generic
+               placeholder shows without it. -->
+          <svg class="hat-logo-svg" x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
+            <circle cx="299" cy="296" r="220" fill="white" opacity=".85"/>
           </svg>
         </svg>
       </div>
@@ -260,10 +261,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
           <path d="M6 36 Q42 44 78 36 L76 38 Q42 46 8 38 Z" fill="#e6b800"/>
           <path d="M14 36 Q42 41 70 36" fill="none" stroke="#e0a800" stroke-width="1.2"/>
           <rect x="28" y="19" width="28" height="18" rx="2.5" fill="#1172ba"/>
-          <svg x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
-            <path fill="white" d="m172.18,592.41H0V0c.82,0,1.92,0,3.02,0C200.14,0,397.26,0,594.38,0c3.7,0,3.71.01,3.71,3.67,0,35.5,0,71.01,0,106.51q0,4.02-3.96,4.07c-1.6.02-3.2.02-4.8.02-137.79,0-275.57,0-413.36,0q-4.36,0-4.36,4.37c.03,19.31.07,38.61.09,57.92.16,137.21.32,274.42.48,411.63,0,1.3,0,2.61,0,4.23Z"/>
-            <path fill="white" d="m240.13,357.5v-4.08c0-36.16.03-72.32-.06-108.49,0-2.81.65-3.65,3.58-3.65,75.25.09,150.5.08,225.74.03,2.44,0,3.44.45,3.43,3.22-.09,36.54-.09,73.08,0,109.62,0,2.71-.74,3.46-3.47,3.46-74.68-.09-149.36-.09-224.05-.11-1.59,0-3.18,0-5.17,0Z"/>
-            <path fill="white" d="m239.88,478.23h113.5v114.05h-113.5v-114.05Z"/>
+          <!-- Client logo badge — path data loads at runtime from cef-logo.js
+               (gitignored, local-only) — see README "Client data". A generic
+               placeholder shows without it. -->
+          <svg class="hat-logo-svg" x="28" y="19" width="28" height="18" viewBox="0 0 598.09 592.41" preserveAspectRatio="xMidYMid meet">
+            <circle cx="299" cy="296" r="220" fill="white" opacity=".85"/>
           </svg>
         </svg>
       </div>
@@ -333,7 +335,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
 
 <!-- Local Supabase credentials — see config.example.js. Never commit config.js. -->
 <script src="config.js"></script>
+<!-- Local client logo asset — see cef-logo.example.js. Never commit cef-logo.js. -->
+<script src="cef-logo.js"></script>
 <script>
+// Real logo path data loads from the gitignored cef-logo.js — the generic
+// placeholder circle already in the markup stays as-is if that file isn't present.
+if(window.CEF_LOGO_PATHS){
+  document.querySelectorAll('.hat-logo-svg').forEach(el=>{el.innerHTML=window.CEF_LOGO_PATHS;});
+}
+
 /* ── CATEGORY CONFIG (must match facilitator) ── */
 const CATS=[
   {key:'rock',     label:'Rocks',         icon:'🪨',color:'#64ffb4',badgeBg:'rgba(100,255,180,.15)'},
