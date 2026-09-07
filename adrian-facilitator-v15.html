@@ -1080,6 +1080,7 @@ let isPaused=false; // Phase 2: mic feed suspended, but timer/segment/session st
 let elapsedSec=0;
 let timerInterval=null;
 let recognition=null;
+let micDeniedCount=0; // consecutive mic-permission denials on the current Web Speech session — see startListeningWebSpeech
 let aiActive=false;
 let transcriptBuffer='';
 let wordCount=0;
@@ -2097,9 +2098,27 @@ function startListeningWebSpeech(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   recognition=new SR();
   recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
-  recognition.onstart=()=>{isListening=true;recDot.classList.add('live');statusText.textContent='Listening…';setOrbState('listening');startTimer();};
+  recognition.onstart=()=>{isListening=true;micDeniedCount=0;recDot.classList.add('live');statusText.textContent='Listening…';setOrbState('listening');startTimer();};
   recognition.onend=()=>{if(isListening)recognition.start();};
-  recognition.onerror=e=>{if(e.error!=='no-speech')showError('Speech error: '+e.error);};
+  recognition.onerror=e=>{
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+      micDeniedCount++;
+      if(micDeniedCount>=2){
+        // Repeated mic-permission prompts within one session almost always mean the page is
+        // open as a local file:// — Chrome's continuous Web Speech API auto-restarts roughly
+        // every ~60s, and file:// origins don't reliably keep the "Allow" grant across those
+        // restarts the way a real http(s) origin does. Stop restarting instead of looping the
+        // prompt forever; serving the file locally (e.g. `npx serve`) is the real fix.
+        isListening=false;
+        statusText.textContent='Mic access blocked';recDot.classList.remove('live');setOrbState('standby');
+        showError('Microphone access keeps being re-requested — this usually means the page is open as a local file rather than served over http(s). Serve it locally (e.g. "npx serve" in this folder) and reload, then press Start again.');
+        return;
+      }
+      showError('Microphone access needed — click Allow if your browser is prompting.');
+      return;
+    }
+    if(e.error!=='no-speech')showError('Speech error: '+e.error);
+  };
   recognition.onresult=e=>{
     let interim='';let final='';
     for(let i=e.resultIndex;i<e.results.length;i++){
