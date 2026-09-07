@@ -1091,7 +1091,7 @@ let segmentReviews={}; // {[segIdx]: {segLabel, proposed:[{text, supportingQuote
 let savedItems=[];
 let keywords=[];
 let lastAiCallTime=0;
-const AI_INTERVAL_MS=18000;
+const AI_INTERVAL_MS=35000; // min gap between live classification calls. Raised from 18s to 35s: ~half the classification calls (and cost), and a fuller thought per call, for slightly slower board updates. Tunable: lower = more responsive/pricier, higher = cheaper/laggier.
 
 /* ── PHASE 3: SUMMARIZATION ENGINE ── */
 let summaryBuffer=''; // accumulates finalized transcript continuously; drained (and reset) every 5min — independent of transcriptBuffer, which drains every ~18s for live classification
@@ -2415,10 +2415,6 @@ Category definitions:
 - todo: Specific action items, tasks, or follow-ups
 - pebble: Small quick tasks or minor items worth tracking
 - parking: Good ideas that aren't relevant this quarter — long-term consideration
-${existingItemsBlock?`
-Items already captured this session (numbered per category):
-${existingItemsBlock}
-`:''}
 Required JSON format:
 {
   "headline": "2-5 word insight title",
@@ -2439,17 +2435,27 @@ Rules:
 - matches_item_num: if this transcript segment is restating or echoing an item already captured this session (same underlying point, even if worded differently or said by someone else), set this to that item's number within its category instead of treating it as new. Leave it null if the point is genuinely new. This matters even if it sounds like a different person saying it — same underlying issue/rock/etc still counts as a match.
 - parent_num: rocks typically break down from a boulder, and pebbles typically break down from a rock. If a "rock" capture's parent boulder, or a "pebble" capture's parent rock, is unambiguous from what was actually said (e.g. "that's part of our boulder to expand into the Southeast" / "that pebble is part of the hiring rock"), set this to that parent item's number within its category. Leave it null otherwise — do NOT guess a link that the transcript doesn't state. This field is meaningless for other capture types.
 - quote: if this transcript segment contains a genuinely notable, quotable verbatim line (a strong soundbite, a clear declaration, something worth remembering exactly as said) include it word-for-word here. Most segments won't have one — leave null rather than force it. Never paraphrase; only exact transcript wording.
-${userQuestion?`\nUser question: ${userQuestion}`:''}`;
+`;
 
+  // Volatile per-call context (the running captured-items list, plus any freeform question) now
+  // rides in the user turn instead of the system prompt, so the system prompt stays byte-identical
+  // for the whole session and can be prompt-cached (see cache_control below).
+  const itemsContext=existingItemsBlock?`Items already captured this session (numbered per category):\n${existingItemsBlock}\n\n`:'';
+  const questionContext=userQuestion?`Facilitator question: ${userQuestion}\n\n`:'';
   const userMsg=isFreeform
-    ?`The facilitator asks: "${text}"\n\nRecent transcript context:\n${transcriptEntries.slice(-8).map(e=>e.text).join(' ')}`
-    :`Recent meeting transcript segment:\n"${text}"`;
+    ?`${itemsContext}${questionContext}The facilitator asks: "${text}"\n\nRecent transcript context:\n${transcriptEntries.slice(-8).map(e=>e.text).join(' ')}`
+    :`${itemsContext}${questionContext}Recent meeting transcript segment:\n"${text}"`;
 
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,system:sysPrompt,messages:[{role:'user',content:userMsg}]})
+      // Static instructions + client context are marked cache_control:ephemeral, so Anthropic bills
+      // them at ~10% on repeat calls within the ~5-min cache window (classification fires every 35s,
+      // well inside it). Caching engages only when the cached block clears the model minimum
+      // (~1024 tokens for Sonnet); a loaded client profile pushes it over. If it's under, the call
+      // just bills normally, never an error either way.
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,system:[{type:'text',text:sysPrompt,cache_control:{type:'ephemeral'}}],messages:[{role:'user',content:userMsg}]})
     });
     if(!res.ok){const err=await res.json();throw new Error(err.error?.message||res.status);}
     const data=await res.json();
