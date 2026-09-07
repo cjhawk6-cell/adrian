@@ -103,6 +103,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
 .aud-item-text{font-size:clamp(13px,1.4vw,20px);line-height:1.4;color:rgba(255,255,255,.9);font-weight:500;}
 .aud-col-empty{font-size:clamp(11px,1vw,14px);color:rgba(255,255,255,.15);padding:8px;font-style:italic;text-align:center;}
 
+/* Strategic Plan zone (Boulders with tied Rocks nested) — mirrors the
+   facilitator's board-hier-panel so the room sees the same structure,
+   not a flat disconnected list. Only used when both the 'boulder' and
+   'rock' visibility chips are active; either alone still renders flat. */
+.aud-hier-group{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.aud-hier-group:last-child{border-bottom:none;}
+.aud-hier-boulder-head{display:flex;align-items:flex-start;gap:8px;padding:2px 0 6px;}
+.aud-hier-rock-list{display:flex;flex-direction:column;gap:4px;padding-left:26px;border-left:2px solid rgba(196,181,253,.15);margin-left:6px;}
+.aud-hier-rock-list .aud-item{padding:4px 0;border-bottom:none;}
+.aud-hier-empty{font-size:clamp(10px,.95vw,13px);color:rgba(255,255,255,.15);font-style:italic;padding:2px 0 2px 4px;}
+.aud-hier-unassigned-label{font-size:clamp(9px,1vw,12px);font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.35);padding:4px 0;}
+
 /* single-column large text mode */
 #board-columns.single .aud-col{max-width:680px;margin:0 auto;}
 #board-columns.single .aud-item-text{font-size:clamp(18px,2.2vw,30px);}
@@ -405,10 +417,29 @@ function setFaceState(state){
   else{mo.style.display='none';mc.style.display='';}
 }
 
-/* ── BOARD RENDER ── */
+/* ── BOARD RENDER ──
+   Zones mirror the facilitator's actual board (Roadblocks / Strategic Plan
+   Boulder→Rock hierarchy / To-Dos / Pebbles / Long Term) rather than one flat
+   column per raw category — so when both the 'boulder' and 'rock' chips are
+   visible, the room sees the same nested structure the facilitator sees,
+   not two disconnected lists. Either chip alone still renders flat, same as
+   before, so partial visibility keeps working exactly as it did. */
+function computeZones(){
+  const zones=[];
+  if(audienceVisible.has('roadblock'))zones.push({type:'flat',key:'roadblock'});
+  const hasBoulder=audienceVisible.has('boulder'),hasRock=audienceVisible.has('rock');
+  if(hasBoulder&&hasRock)zones.push({type:'hier',key:'boulder-rock'});
+  else if(hasBoulder)zones.push({type:'flat',key:'boulder'});
+  else if(hasRock)zones.push({type:'flat',key:'rock'});
+  if(audienceVisible.has('todo'))zones.push({type:'flat',key:'todo'});
+  if(audienceVisible.has('pebble'))zones.push({type:'flat',key:'pebble'});
+  if(audienceVisible.has('parking'))zones.push({type:'flat',key:'parking'});
+  return zones;
+}
+
 function renderBoard(){
-  const visKeys=[...audienceVisible];
-  if(visKeys.length===0){
+  const zones=computeZones();
+  if(zones.length===0){
     // show Adrian face, hide board
     boardView.classList.remove('visible');
     faceStage.classList.remove('hidden');
@@ -419,36 +450,93 @@ function renderBoard(){
   boardView.classList.add('visible');
 
   boardColumns.className='';
-  if(visKeys.length===1)boardColumns.classList.add('single');
-
-  // Build / update columns
-  const existingCols=new Set(Array.from(boardColumns.querySelectorAll('.aud-col')).map(c=>c.dataset.key));
-  const newKeys=new Set(visKeys);
+  if(zones.length===1)boardColumns.classList.add('single');
 
   // Remove columns no longer visible
+  const zoneKeys=new Set(zones.map(z=>z.key));
   boardColumns.querySelectorAll('.aud-col').forEach(col=>{
-    if(!newKeys.has(col.dataset.key))col.remove();
+    if(!zoneKeys.has(col.dataset.key))col.remove();
   });
 
   // Add or update columns in order
-  visKeys.forEach(key=>{
-    const cat=CATS.find(c=>c.key===key);
-    if(!cat)return;
-    let col=boardColumns.querySelector(`.aud-col[data-key="${key}"]`);
-    if(!col){
-      col=document.createElement('div');
-      col.className='aud-col';col.dataset.key=key;
-      col.innerHTML=`
-        <div class="aud-col-header">
-          <span class="aud-col-icon">${cat.icon}</span>
-          <span class="aud-col-label" style="color:${cat.color}">${cat.label}</span>
-          <span class="aud-col-badge" style="background:${cat.badgeBg};color:${cat.color}">0</span>
-        </div>
-        <div class="aud-col-items" id="aud-items-${key}"></div>`;
-      boardColumns.appendChild(col);
+  zones.forEach(zone=>{
+    let col=boardColumns.querySelector(`.aud-col[data-key="${zone.key}"]`);
+    if(zone.type==='hier'){
+      if(!col){
+        col=document.createElement('div');
+        col.className='aud-col';col.dataset.key=zone.key;
+        col.innerHTML=`
+          <div class="aud-col-header">
+            <span class="aud-col-icon">⛰️</span>
+            <span class="aud-col-label" style="color:#c4b5fd">Strategic Plan</span>
+            <span class="aud-col-badge" style="background:rgba(196,181,253,.15);color:#c4b5fd">0</span>
+          </div>
+          <div class="aud-col-items" id="aud-items-${zone.key}"></div>`;
+        boardColumns.appendChild(col);
+      }
+      renderHierZone(col);
+    }else{
+      const cat=CATS.find(c=>c.key===zone.key);
+      if(!cat)return;
+      if(!col){
+        col=document.createElement('div');
+        col.className='aud-col';col.dataset.key=zone.key;
+        col.innerHTML=`
+          <div class="aud-col-header">
+            <span class="aud-col-icon">${cat.icon}</span>
+            <span class="aud-col-label" style="color:${cat.color}">${cat.label}</span>
+            <span class="aud-col-badge" style="background:${cat.badgeBg};color:${cat.color}">0</span>
+          </div>
+          <div class="aud-col-items" id="aud-items-${zone.key}"></div>`;
+        boardColumns.appendChild(col);
+      }
+      renderColItems(col,cat,currentItems[zone.key]||[]);
     }
-    renderColItems(col,cat,currentItems[key]||[]);
   });
+}
+
+/* Boulders with their tied Rocks nested underneath (parentNum match), plus
+   an Unassigned Rocks group — same grouping logic as the facilitator's
+   buildBoulderRockPanel/renderBoulderRockPanel, read-only. */
+function renderHierZone(col){
+  const badge=col.querySelector('.aud-col-badge');
+  const container=col.querySelector('.aud-col-items');
+  const boulders=currentItems.boulder||[];
+  const rocks=currentItems.rock||[];
+  if(badge)badge.textContent=boulders.length;
+
+  // Skip re-render if nothing actually changed, to avoid animation flicker on every poll.
+  const sig=JSON.stringify({b:boulders.map(b=>[b.num,b.text]),r:rocks.map(r=>[r.num,r.text,r.parentNum])});
+  if(col.dataset.sig===sig)return;
+  col.dataset.sig=sig;
+
+  const unassignedRocks=rocks.filter(r=>r.parentNum==null||!boulders.some(b=>b.num===r.parentNum));
+  const rockItemHtml=r=>`
+    <div class="aud-item aud-hier-rock">
+      <span class="aud-item-num" style="color:#64ffb4">#${r.num}</span>
+      <span class="aud-item-text">${escHtml(r.text)}</span>
+    </div>`;
+
+  const boulderGroupsHtml=boulders.map(b=>{
+    const tied=rocks.filter(r=>r.parentNum===b.num);
+    const rocksHtml=tied.length?tied.map(rockItemHtml).join(''):'<div class="aud-hier-empty">No rocks tied yet</div>';
+    return `
+      <div class="aud-hier-group">
+        <div class="aud-hier-boulder-head">
+          <span class="aud-item-num" style="color:#c4b5fd">⛰️#${b.num}</span>
+          <span class="aud-item-text">${escHtml(b.text)}</span>
+        </div>
+        <div class="aud-hier-rock-list">${rocksHtml}</div>
+      </div>`;
+  }).join('');
+
+  const unassignedHtml=unassignedRocks.length?`
+    <div class="aud-hier-group aud-hier-unassigned">
+      <div class="aud-hier-unassigned-label">Unassigned Rocks</div>
+      <div class="aud-hier-rock-list">${unassignedRocks.map(rockItemHtml).join('')}</div>
+    </div>`:'';
+
+  container.innerHTML=(boulderGroupsHtml||'<div class="aud-col-empty">No boulders yet</div>')+unassignedHtml;
 }
 
 function renderColItems(col,cat,arr){
@@ -496,18 +584,17 @@ function handleListState(trigger){
   const newVisible=new Set(trigger.audienceVisible||[]);
   const newItems=trigger.items||{};
 
-  // Update state
-  const prevSize=audienceVisible.size;
-  audienceVisible=newVisible;
-  CATS.forEach(c=>{currentItems[c.key]=newItems[c.key]||[];});
-
-  // Detect new items for flash
+  // Detect new items for flash — compare against the previous state directly
+  // (not DOM column lookups, which break once boulder/rock render as one
+  // merged hierarchy zone instead of two separate columns).
   let hasNew=false;
   CATS.forEach(c=>{
-    const prev=(currentItems[c.key]||[]).length;// we already updated, so check vs rendered
-    const col=boardColumns.querySelector(`.aud-col[data-key="${c.key}"]`);
-    if(col){const rendered=col.querySelectorAll('.aud-item').length;if((newItems[c.key]||[]).length>rendered)hasNew=true;}
+    if((newItems[c.key]||[]).length>(currentItems[c.key]||[]).length)hasNew=true;
   });
+
+  // Update state
+  audienceVisible=newVisible;
+  CATS.forEach(c=>{currentItems[c.key]=newItems[c.key]||[];});
 
   wearHat(trigger.clientKey||null);
   renderBoard();
