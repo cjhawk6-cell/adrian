@@ -119,6 +119,11 @@ Verified with Playwright: Past Sessions requires a client selected, lists real s
 
 (Explicitly out of scope for now: Adrian narrating or leading segments via voice.)
 
+**Pre-live-test readiness pass (2026-09-07):** while preparing for a consultant's live test session, a second and more serious instance of the same class of bug as the `ai_sessions` fix above was found and fixed:
+
+- **Durable `items` writes were silently failing entirely.** `list_tables` on the live project showed the `items` table missing both the `speaker` and `parent_item_id` columns that `dbInsertItem()` has unconditionally sent in every insert since Phase 1/10 shipped, and `sentiment_readings` (Phase 9) didn't exist as a table at all. PostgREST rejects an insert containing an unrecognized column, and the app's dual-write helpers swallow that failure in an empty `catch(e){}` — so `sessions` had accumulated 16 real rows while `items` sat at 0. This never surfaced in Playwright testing because those tests mock the database layer; it only ever affected the real Supabase project. Fixed by applying the missing columns/table/indexes/RLS from `supabase-schema.sql` via migration, then verified live end-to-end with a real insert/read/delete round trip (item with speaker+parent_item_id, sentiment_readings row, cascade cleanup) — confirmed working, not just schema-shaped-right. Practical effect: item history, hierarchy tagging, and carryover (Phase 6, which depends on querying real historical `items` rows) had never actually been durable until now, independent of anything visible in the live board itself.
+- **v15b retired — merged into v15.** The cost-optimization experiment (`adrian-facilitator-v15b.html`: 18s→35s classification interval, prompt-caching restructure) had only ever been mechanically verified, never run live. Per request, folded directly into `adrian-facilitator-v15.html` — the one file that's actually been exercised end-to-end — and the now-redundant `v15b` file was deleted.
+
 ## Phase 9 — Sentiment & talk-time + agenda-email intake
 
 Added outside the original sequencing (requested directly, like Phase 2 an independent slot-in) — a facilitator-side read on the room, plus a faster way to set up a session than typing out attendees and agenda by hand.
