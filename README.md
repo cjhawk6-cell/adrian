@@ -41,6 +41,12 @@ The "hard hat" animation's logo badge (in `orb-hat`, `aud-hat`, `sb-hat`) follow
 
 1. Copy `config.example.js` to `config.js` and fill in your Supabase project URL and anon key.
 2. Copy `clients.example.js` to `clients.js` and add a profile for each client you'll facilitate for.
-3. Open `adrian-facilitator-v15.html` in Chrome or Edge (required for Web Speech API) — this is what the facilitator runs.
-4. Open `adrian-audience-v14.html` in a second window/tab, cast or project it for the room.
-5. Enter a Claude API key in the facilitator console before starting a session — it's not saved anywhere, so you'll re-enter it each time you reload the page.
+3. Double-click `start-adrian.bat` (see below) rather than opening the HTML files directly — it launches the facilitator console in your browser via `http://localhost`. Requires nothing beyond what Windows already has.
+4. Open `adrian-audience-v14.html` from that same `http://localhost:...` address in a second window/tab, cast or project it for the room — not by opening the file directly.
+5. Enter a Claude API key in the facilitator console before starting a session — it's not saved anywhere, so you'll re-enter it each time you reload the page. Without a key entered, Adrian will not classify anything or suggest captures — this is expected, not a bug.
+
+### Why `start-adrian.bat` instead of just opening the HTML files
+
+Opening either HTML file directly (`file://...`) mostly works, but the live-mic path doesn't: Chrome's continuous speech recognition auto-restarts roughly every 60 seconds, and on a `file://` origin Chrome doesn't reliably remember the microphone permission across those restarts — so it re-prompts for mic access repeatedly through a session, which is disruptive mid-facilitation.
+
+`start-adrian.bat` runs `serve-adrian.ps1`, a small local static file server built entirely from what ships with Windows (PowerShell's `HttpListener` — no Node, Python, or any install required), and opens the facilitator console at a real `http://localhost` address instead. Chrome treats `localhost` as a secure origin and keeps the mic permission properly, so the repeated prompt goes away. Close the console window it opens to stop serving. This matters most when the app is being run from a synced/downloaded local copy (e.g. from SharePoint) on a machine that isn't a dev environment — the same `config.js`/`clients.js`/`cef-logo.js` files described above still need to be sitting alongside the HTML files either way, since they're gitignored and won't come from a plain `git clone` or a copy of just the tracked repo files.
