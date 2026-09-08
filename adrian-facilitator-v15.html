@@ -2507,8 +2507,7 @@ function handleAIResult(parsed){
   const autoShow=document.getElementById('auto-show-toggle').checked;
   if(parsed.insight){
     const thought={id:Date.now(),headline:parsed.headline||'INSIGHT',text:parsed.insight,tags:parsed.tags||[],time:new Date().toLocaleTimeString()};
-    thoughts.unshift(thought);
-    renderThoughts();
+    pushThought(thought);
     if(autoShow)showBubble(thought);
     else setOrbState(isListening?'listening':'standby');
   }
@@ -2596,8 +2595,7 @@ async function runRollingSummary(){
   if(summary){
     await dbInsertSummary('rolling_5min',summary,segDbId);
     const thought={id:Date.now(),headline:'5-MIN SUMMARY',text:summary,tags:[],time:new Date().toLocaleTimeString()};
-    thoughts.unshift(thought);
-    renderThoughts();
+    pushThought(thought);
     showToastPlain('✦ 5-minute summary captured');
   }
 
@@ -2620,6 +2618,15 @@ function showBubble(thought){
 }
 
 bbClose.addEventListener('click',()=>{boardBubble.classList.remove('visible');if(isListening)setOrbState('listening');else setOrbState('standby');});
+
+/* Every new thought (live insight, rolling summary, discussion ideas, recent-
+   audio recap) goes through here so the audience view stays in sync — it was
+   previously a purely local, facilitator-only concept. */
+function pushThought(thought){
+  thoughts.unshift(thought);
+  renderThoughts();
+  syncSupabase();
+}
 
 function renderThoughts(){
   const empty=document.getElementById('thoughts-empty');
@@ -2690,6 +2697,7 @@ async function syncSupabase(){
         activeSegmentIndex,
         speakerTalk:talkTimeSnapshot(),
         sentiment:currentSentiment,
+        thought:thoughts[0]||null,
         at:Date.now()
       },
       updated_at:new Date().toISOString()
@@ -3405,8 +3413,7 @@ async function suggestDiscussionTopics(){
     catch(e){const m=raw.match(/\[[\s\S]*\]/);if(m)ideas=JSON.parse(m[0]);else throw new Error('parse failed');}
     if(!Array.isArray(ideas)||!ideas.length){showError('No discussion ideas came back — try again once more is captured.');setOrbState(isListening?'listening':'standby');return;}
     const thought={id:Date.now(),headline:'DISCUSSION IDEAS',text:ideas.map((t,i)=>`${i+1}. ${t}`).join(' '),tags:[],time:new Date().toLocaleTimeString()};
-    thoughts.unshift(thought);
-    renderThoughts();
+    pushThought(thought);
     if(document.getElementById('auto-show-toggle').checked)showBubble(thought);
     else setOrbState(isListening?'listening':'standby');
   }catch(e){showError('Could not generate discussion ideas — check the API key or try again.');setOrbState(isListening?'listening':'standby');}
@@ -3494,8 +3501,7 @@ askRecentAudio.addEventListener('click',async()=>{
   const summary=await summarizeText(segText,label);
   if(!summary){showError('Could not generate a summary — check the API key or try again.');setOrbState(isListening?'listening':'standby');return;}
   const thought={id:Date.now(),headline:'RIGHT NOW',text:summary,tags:[],time:new Date().toLocaleTimeString()};
-  thoughts.unshift(thought);
-  renderThoughts();
+  pushThought(thought);
   if(document.getElementById('auto-show-toggle').checked)showBubble(thought);
   else setOrbState(isListening?'listening':'standby');
 });

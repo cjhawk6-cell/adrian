@@ -50,7 +50,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
 /* ── ADRIAN FACE (standby / no-board mode) ── */
 #face-stage{display:flex;flex-direction:column;align-items:center;position:relative;z-index:10;transition:opacity .6s;}
 #face-stage.hidden{opacity:0;pointer-events:none;}
-#thought-bubble-wrap{position:relative;min-height:180px;width:clamp(300px,32vw,520px);display:flex;align-items:flex-end;justify-content:center;margin-bottom:0;}
+/* Fixed overlay (not a face-stage child) so it floats over the board too, not just the idle face. */
+#thought-bubble-wrap{position:fixed;left:50%;bottom:36px;transform:translateX(-50%);width:clamp(300px,32vw,520px);z-index:40;pointer-events:none;}
 #thought-bubble{background:rgba(255,255,255,.97);border-radius:20px;padding:18px 22px;width:100%;position:relative;opacity:0;transform:translateY(10px) scale(.97);transition:opacity .5s,transform .5s;pointer-events:none;}
 #thought-bubble.visible{opacity:1;transform:translateY(0) scale(1);}
 #thought-bubble::after{content:'';position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.7);box-shadow:0 14px 0 rgba(255,255,255,.4),0 24px 0 rgba(255,255,255,.2);}
@@ -254,13 +255,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
 
   <!-- Adrian face (shown when no board categories are active) -->
   <div id="face-stage">
-    <div id="thought-bubble-wrap">
-      <div id="thought-bubble">
-        <div id="bubble-headline">INSIGHT</div>
-        <div id="bubble-text"></div>
-        <div id="bubble-tags"></div>
-      </div>
-    </div>
     <div id="face-wrap" class="standby">
       <div id="face-glow"></div>
       <!-- Client hat overlay -->
@@ -328,6 +322,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
     <div id="face-caption">Adrian Ingram · Live Session</div>
   </div>
 
+  <!-- Adrian's latest thought — floats over whichever scene (face or board) is
+       currently showing, same as the facilitator's own board-bubble overlay. -->
+  <div id="thought-bubble-wrap">
+    <div id="thought-bubble">
+      <div id="bubble-headline">INSIGHT</div>
+      <div id="bubble-text"></div>
+      <div id="bubble-tags"></div>
+    </div>
+  </div>
+
   <!-- Board view: multi-column -->
   <div id="board-view">
     <div id="board-columns"></div>
@@ -374,6 +378,8 @@ let lastAt=0;
 let elapsedSec=0;
 let timerInterval=null;
 let sessionLive=false;
+let lastThoughtId=null;
+let thoughtBubbleTimeout=null;
 
 const CFG=window.ADRIAN_CONFIG||{};
 const SUPABASE_URL=CFG.SUPABASE_URL||'';
@@ -602,6 +608,21 @@ function handleListState(trigger){
   renderSentimentPanel(trigger.speakerTalk||{},trigger.sentiment||null);
   if(!sessionLive){sessionLive=true;sessionDot.classList.add('live');startTimer();}
   if(hasNew)flashCapture();
+  if(trigger.thought&&trigger.thought.id!==lastThoughtId){
+    lastThoughtId=trigger.thought.id;
+    showAudienceThought(trigger.thought);
+  }
+}
+
+/* Adrian's latest insight/summary — mirrors the facilitator's own board-bubble
+   popup (same 12s auto-hide), floating over whichever scene is on screen. */
+function showAudienceThought(thought){
+  bubbleHeadline.textContent=thought.headline||'INSIGHT';
+  bubbleText.textContent=thought.text||'';
+  bubbleTags.innerHTML=(thought.tags||[]).map(t=>`<span class="b-tag ${bbTagClassMap[t]||'b-tag-ai'}">${escHtml(t)}</span>`).join('');
+  thoughtBubble.classList.add('visible');
+  if(thoughtBubbleTimeout)clearTimeout(thoughtBubbleTimeout);
+  thoughtBubbleTimeout=setTimeout(()=>{thoughtBubble.classList.remove('visible');},12000);
 }
 
 /* ── PACING (talk-time + sentiment, Phase 9, facilitator-toggled via the same
