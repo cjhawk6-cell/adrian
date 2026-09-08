@@ -85,6 +85,9 @@ create table if not exists items (
   resolved_at timestamptz
 );
 alter table items add column if not exists speaker text;
+-- Owner/accountability name — rocks, roadblocks, and to-dos only (the app
+-- gates which categories show the picker); nullable, free text.
+alter table items add column if not exists assignee text;
 -- Hierarchy (rock -> boulder, pebble -> rock). Self-referencing, nullable —
 -- most items have no parent, and both AI-suggested and manual tagging leave
 -- it null rather than guess. "set null" on delete so removing a boulder

@@ -484,6 +484,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .bb-tag-action{background:#fffce0;color:#7a7200;}
 .bb-tag-risk{background:#fde8e8;color:#a00;}
 .bb-tag-opportunity{background:#f0e8fd;color:#6a1ab5;}
+.bb-tag-quip{background:#fff4e0;color:#a35b00;}
 #bb-close{position:absolute;top:8px;right:10px;border:none;background:none;cursor:pointer;font-size:16px;color:rgba(0,0,0,.3);line-height:1;}
 #bb-close:hover{color:rgba(0,0,0,.6);}
 
@@ -514,6 +515,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);}
 .board-item-parent-label{font-size:9px;color:rgba(255,255,255,.3);white-space:nowrap;}
 .board-item-parent-select{flex:1;font-size:10px;padding:2px 5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:rgba(255,255,255,.7);font-family:var(--font);min-width:0;}
 .board-item-parent-select option{background:#1a2a20;color:white;}
+.board-item-assignee-row{display:flex;align-items:center;gap:5px;padding:2px 0 0 24px;}
+.board-item-assignee-icon{font-size:10px;opacity:.5;}
+.board-item-assignee-input{flex:1;font-size:10px;padding:2px 5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:rgba(255,255,255,.7);font-family:var(--font);min-width:0;}
+.board-item-assignee-input::placeholder{color:rgba(255,255,255,.25);}
 .board-col-empty{font-size:10px;color:rgba(255,255,255,.15);padding:8px 4px;font-style:italic;text-align:center;}
 
 /* board quick-add inline */
@@ -1093,6 +1098,8 @@ let savedItems=[];
 let keywords=[];
 let lastAiCallTime=0;
 const AI_INTERVAL_MS=35000; // min gap between live classification calls. Raised from 18s to 35s: ~half the classification calls (and cost), and a fuller thought per call, for slightly slower board updates. Tunable: lower = more responsive/pricier, higher = cheaper/laggier.
+let lastLiveThoughtAt=0;
+const MIN_LIVE_THOUGHT_GAP_MS=120000; // pacing floor for passive-segment insight/quip popups only — a facilitator-asked question is never throttled. Claude is told to leave insight null most cycles too; this is a hard backstop regardless of what it returns. Tunable.
 
 /* ── PHASE 3: SUMMARIZATION ENGINE ── */
 let summaryBuffer=''; // accumulates finalized transcript continuously; drained (and reset) every 5min — independent of transcriptBuffer, which drains every ~18s for live classification
@@ -1139,7 +1146,7 @@ const SUPABASE_TABLE=CFG.SUPABASE_TABLE||'ai_sessions';
 const SESSION_ID=CFG.SESSION_ID||'main-session';
 if(!SUPABASE_URL||!SUPABASE_KEY){console.error('Adrian: config.js not found or incomplete. Copy config.example.js to config.js and add your Supabase URL/key.');}
 const tagMap={AI:'tc-tag-ai',Strategy:'tc-tag-strategy',Action:'tc-tag-action',Risk:'tc-tag-risk',Opportunity:'tc-tag-opportunity',Automation:'tc-tag-ai',People:'tc-tag-strategy',Process:'tc-tag-action',Technology:'tc-tag-ai',Data:'tc-tag-ai',Quip:'tc-tag-quip',Finance:'tc-tag-action',Operations:'tc-tag-strategy',Culture:'tc-tag-opportunity',Sales:'tc-tag-opportunity'};
-const bbTagMap={AI:'bb-tag-ai',Strategy:'bb-tag-strategy',Action:'bb-tag-action',Risk:'bb-tag-risk',Opportunity:'bb-tag-opportunity',Automation:'bb-tag-ai',People:'bb-tag-strategy',Process:'bb-tag-action',Technology:'bb-tag-ai',Data:'bb-tag-ai',Finance:'bb-tag-action',Operations:'bb-tag-strategy',Culture:'bb-tag-opportunity',Sales:'bb-tag-opportunity'};
+const bbTagMap={AI:'bb-tag-ai',Strategy:'bb-tag-strategy',Action:'bb-tag-action',Risk:'bb-tag-risk',Opportunity:'bb-tag-opportunity',Automation:'bb-tag-ai',People:'bb-tag-strategy',Process:'bb-tag-action',Technology:'bb-tag-ai',Data:'bb-tag-ai',Finance:'bb-tag-action',Operations:'bb-tag-strategy',Culture:'bb-tag-opportunity',Sales:'bb-tag-opportunity',Quip:'bb-tag-quip'};
 
 /* ── DOM REFS ── */
 const cbStart=document.getElementById('cb-start');
@@ -1459,6 +1466,14 @@ function setItemParent(key,idx,parentNum){
   }
 }
 
+function setItemAssignee(key,idx,assignee){
+  const item=items[key][idx];
+  if(!item)return;
+  item.assignee=assignee;
+  syncSupabase();
+  if(item.dbId)dbUpdateItemAssignee(item.dbId,assignee);
+}
+
 function logItemMention(key,num,text){
   const item=items[key].find(it=>it.num===num);
   if(!item){addItem(key,text,true);return;} // referenced item not found — fall back to adding fresh rather than losing it
@@ -1487,6 +1502,17 @@ function parentPickerHtml(key,idx,it,parentCat){
       <option value="">None</option>
       ${options}
     </select>
+  </div>`;
+}
+
+/* Owner/assignee — rocks, roadblocks, and to-dos only, per request. Reuses the
+   same attendee datalist as Speaker Calibration so a facilitator can pick a
+   known name or just type a new one. */
+const ASSIGNABLE_CATS=['rock','roadblock','todo'];
+function assigneePickerHtml(key,idx,it){
+  return `<div class="board-item-assignee-row">
+    <span class="board-item-assignee-icon" title="Owner">👤</span>
+    <input class="board-item-assignee-input" list="speaker-attendee-list" data-key="${key}" data-idx="${idx}" placeholder="Assign owner…" value="${it.assignee?escHtml(it.assignee):''}"/>
   </div>`;
 }
 
@@ -1520,6 +1546,7 @@ function boardItemCardHtml(key,idx,it){
         <button class="board-item-del" data-key="${key}" data-idx="${idx}">✕</button>
       </div>
       ${parentCat?parentPickerHtml(key,idx,it,parentCat):''}
+      ${ASSIGNABLE_CATS.includes(key)?assigneePickerHtml(key,idx,it):''}
     </div>`;
 }
 
@@ -1563,8 +1590,15 @@ function wireItemCardEvents(container){
   // ignore clicks on the delete button or the parent-tie dropdown.
   container.querySelectorAll('.board-item[data-key="rock"]').forEach(card=>{
     card.addEventListener('click',e=>{
-      if(e.target.closest('.board-item-del,.board-item-parent-select,.board-item-status-btn'))return;
+      if(e.target.closest('.board-item-del,.board-item-parent-select,.board-item-status-btn,.board-item-assignee-input'))return;
       openPebbleOverlay(parseInt(card.dataset.num));
+    });
+  });
+  container.querySelectorAll('.board-item-assignee-input').forEach(inp=>{
+    inp.addEventListener('click',e=>e.stopPropagation());
+    inp.addEventListener('change',()=>{
+      const k=inp.dataset.key;const i=parseInt(inp.dataset.idx);
+      setItemAssignee(k,i,inp.value.trim()||null);
     });
   });
 }
@@ -2436,8 +2470,8 @@ Category definitions:
 - parking: Good ideas that aren't relevant this quarter — long-term consideration
 Required JSON format:
 {
-  "headline": "2-5 word insight title",
-  "insight": "1-3 sentence observation or synthesis${client?` — tailor language and analogies to ${client.name}'s context and industry`:''}",
+  "headline": "2-5 word title for the insight/quip, or null if insight is null",
+  "insight": "1-3 sentence observation or synthesis, or null — see the insight/quip rules below${client?` (when non-null and not a quip, tailor language and analogies to ${client.name}'s context and industry)`:''}",
   "tags": ["tag1","tag2"],
   "captures": [
     {"type": "rock|roadblock|boulder|todo|pebble|parking", "text": "item text, concise and actionable", "matches_item_num": null, "parent_num": null}
@@ -2449,7 +2483,9 @@ Rules:
 - captures array may be empty if nothing clear was identified
 - Only capture items clearly stated or strongly implied — do NOT hallucinate
 - tags choose from: AI, Strategy, Action, Risk, Opportunity, People, Process, Technology, Finance, Operations, Culture, Sales, Quip
-- insight should be a genuine synthesis, not a summary${client?`\n- Use client-specific terminology naturally when relevant (${client.terminology})`:''}
+- insight should be a genuine synthesis, not a summary, when it's non-null${client?`\n- Use client-specific terminology naturally when relevant (${client.terminology})`:''}
+- insight: for a passive transcript segment (no "Facilitator question" present in the user message), leave insight (and headline) null far more often than not — only return one when the segment adds a real, non-redundant observation worth surfacing. Do not manufacture one just to have something to say; restating an existing synthesis in different words does not count as new. If a "Facilitator question" IS present in the user message, always answer it directly and substantively here instead — never null in that case.
+- quip (rare, optional): only relevant when insight would otherwise be null on a passive segment because there's nothing substantive in it (small talk, logistics, silence-filler, a tangent) — occasionally, well under half the time this happens, you may instead set insight to a short, dry, subtle, tasteful joke or observation about the moment, with headline "Just Saying" and "Quip" included in tags. Never make it about a specific person, never at anyone's expense, never touching anything sensitive or personal that was actually said. Most empty passive segments should simply stay null with no joke at all — this is a rare, light touch, not a running bit.
 - captures text should be concise (max 10 words)
 - matches_item_num: if this transcript segment is restating or echoing an item already captured this session (same underlying point, even if worded differently or said by someone else), set this to that item's number within its category instead of treating it as new. Leave it null if the point is genuinely new. This matters even if it sounds like a different person saying it — same underlying issue/rock/etc still counts as a match.
 - parent_num: rocks typically break down from a boulder, and pebbles typically break down from a rock. If a "rock" capture's parent boulder, or a "pebble" capture's parent rock, is unambiguous from what was actually said (e.g. "that's part of our boulder to expand into the Southeast" / "that pebble is part of the hiring rock"), set this to that parent item's number within its category. Leave it null otherwise — do NOT guess a link that the transcript doesn't state. This field is meaningless for other capture types.
@@ -2482,12 +2518,12 @@ Rules:
     let parsed;
     try{parsed=JSON.parse(raw);}
     catch(e){const m=raw.match(/\{[\s\S]*\}/);if(m)parsed=JSON.parse(m[0]);else throw new Error('JSON parse failed');}
-    handleAIResult(parsed);
+    handleAIResult(parsed,isFreeform);
   }catch(e){showError('AI error: '+e.message);}
   finally{aiActive=false;if(isListening)setOrbState('listening');else setOrbState('standby');}
 }
 
-function handleAIResult(parsed){
+function handleAIResult(parsed,isFreeform){
   // Add captures (or log a mention if this echoes an existing item)
   if(parsed.captures&&parsed.captures.length){
     parsed.captures.forEach(cap=>{
@@ -2506,7 +2542,17 @@ function handleAIResult(parsed){
   // Show thought
   const autoShow=document.getElementById('auto-show-toggle').checked;
   if(parsed.insight){
-    const thought={id:Date.now(),headline:parsed.headline||'INSIGHT',text:parsed.insight,tags:parsed.tags||[],time:new Date().toLocaleTimeString()};
+    const isQuip=(parsed.tags||[]).includes('Quip');
+    const now=Date.now();
+    if(!isFreeform&&now-lastLiveThoughtAt<MIN_LIVE_THOUGHT_GAP_MS){
+      // Passive-segment insight/quip arrived within the pacing floor — skip the
+      // popup this time. A facilitator-asked question (isFreeform) is never
+      // throttled; they're waiting on a direct answer.
+      if(isListening)setOrbState('listening');else setOrbState('standby');
+      return;
+    }
+    if(!isFreeform)lastLiveThoughtAt=now;
+    const thought={id:Date.now(),headline:parsed.headline||(isQuip?'Just Saying':'INSIGHT'),text:parsed.insight,tags:parsed.tags||[],time:new Date().toLocaleTimeString()};
     pushThought(thought);
     if(autoShow)showBubble(thought);
     else setOrbState(isListening?'listening':'standby');
@@ -2822,6 +2868,17 @@ async function dbUpdateItemParent(itemDbId,parentDbId){
       method:'PATCH',
       headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
       body:JSON.stringify({parent_item_id:parentDbId})
+    });
+  }catch(e){}
+}
+
+async function dbUpdateItemAssignee(itemDbId,assignee){
+  if(!itemDbId)return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/items?id=eq.${itemDbId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({assignee})
     });
   }catch(e){}
 }
@@ -3546,7 +3603,7 @@ function exportSession(){
     lines.push('== BOARD ITEMS ==');
     selectedCats.forEach(c=>{
       lines.push(`-- ${c.label.toUpperCase()} --`);
-      items[c.key].forEach(i=>lines.push(`${i.num}. ${i.text}`));
+      items[c.key].forEach(i=>lines.push(`${i.num}. ${i.text}${i.assignee?` (Owner: ${i.assignee})`:''}`));
       if(!items[c.key].length)lines.push('(none)');
     });
     lines.push('');

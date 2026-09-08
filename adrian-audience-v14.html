@@ -64,6 +64,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
 .b-tag-action{background:#fffce0;color:#7a7200;}
 .b-tag-risk{background:#fde8e8;color:#a00;}
 .b-tag-opportunity{background:#f0e8fd;color:#6a1ab5;}
+.b-tag-quip{background:#fff4e0;color:#a35b00;}
 
 #face-wrap{position:relative;width:clamp(120px,12vw,200px);height:clamp(120px,12vw,200px);flex-shrink:0;}
 #face-glow{position:absolute;inset:-10px;border-radius:50%;border:3px solid transparent;pointer-events:none;transition:border-color .4s;}
@@ -102,6 +103,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--d
 @keyframes item-pop{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
 .aud-item-num{font-size:clamp(11px,1.2vw,16px);font-weight:700;min-width:24px;flex-shrink:0;padding-top:2px;}
 .aud-item-text{font-size:clamp(13px,1.4vw,20px);line-height:1.4;color:rgba(255,255,255,.9);font-weight:500;}
+.aud-item-assignee{display:inline-block;margin-left:8px;font-size:0.68em;font-weight:400;color:rgba(255,255,255,.4);white-space:nowrap;}
 .aud-col-empty{font-size:clamp(11px,1vw,14px);color:rgba(255,255,255,.15);padding:8px;font-style:italic;text-align:center;}
 
 /* Strategic Plan zone (Boulders with tied Rocks nested) — mirrors the
@@ -369,7 +371,8 @@ const CATS=[
   {key:'pebble',   label:'Pebbles',       icon:'🔸',color:'#fdba74',badgeBg:'rgba(253,186,116,.15)'},
   {key:'parking',  label:'Long Term',     icon:'🅿️',color:'#94a3b8',badgeBg:'rgba(148,163,184,.15)'},
 ];
-const bbTagClassMap={AI:'b-tag-ai',Strategy:'b-tag-strategy',Action:'b-tag-action',Risk:'b-tag-risk',Opportunity:'b-tag-opportunity'};
+const bbTagClassMap={AI:'b-tag-ai',Strategy:'b-tag-strategy',Action:'b-tag-action',Risk:'b-tag-risk',Opportunity:'b-tag-opportunity',Quip:'b-tag-quip'};
+const ASSIGNABLE_CATS=['rock','roadblock','todo']; // must match the facilitator — rocks, roadblocks, and to-dos only
 
 /* ── STATE ── */
 let currentItems={rock:[],roadblock:[],boulder:[],todo:[],pebble:[],parking:[]};
@@ -512,7 +515,7 @@ function renderHierZone(col){
   if(badge)badge.textContent=boulders.length;
 
   // Skip re-render if nothing actually changed, to avoid animation flicker on every poll.
-  const sig=JSON.stringify({b:boulders.map(b=>[b.num,b.text]),r:rocks.map(r=>[r.num,r.text,r.parentNum])});
+  const sig=JSON.stringify({b:boulders.map(b=>[b.num,b.text]),r:rocks.map(r=>[r.num,r.text,r.parentNum,r.assignee||''])});
   if(col.dataset.sig===sig)return;
   col.dataset.sig=sig;
 
@@ -520,7 +523,7 @@ function renderHierZone(col){
   const rockItemHtml=r=>`
     <div class="aud-item aud-hier-rock">
       <span class="aud-item-num" style="color:#64ffb4">#${r.num}</span>
-      <span class="aud-item-text">${escHtml(r.text)}</span>
+      <span class="aud-item-text">${escHtml(r.text)}${r.assignee?`<span class="aud-item-assignee">👤 ${escHtml(r.assignee)}</span>`:''}</span>
     </div>`;
 
   const boulderGroupsHtml=boulders.map(b=>{
@@ -551,17 +554,20 @@ function renderColItems(col,cat,arr){
   if(badge)badge.textContent=arr.length;
   if(!arr.length){
     container.innerHTML=`<div class="aud-col-empty">No ${cat.label.toLowerCase()} yet</div>`;
+    col.dataset.sig='';
     return;
   }
-  // Only re-render if count changed (avoids animation flicker)
-  const current=container.querySelectorAll('.aud-item').length;
-  if(current!==arr.length){
-    container.innerHTML=arr.map(it=>`
-      <div class="aud-item">
-        <span class="aud-item-num" style="color:${cat.color}">#${it.num}</span>
-        <span class="aud-item-text">${escHtml(it.text)}</span>
-      </div>`).join('');
-  }
+  const showAssignee=ASSIGNABLE_CATS.includes(cat.key);
+  // Signature-based diff (not just count) so an in-place assignee edit still
+  // re-renders, not only an add/remove.
+  const sig=JSON.stringify(arr.map(it=>[it.num,it.text,showAssignee?(it.assignee||''):'']));
+  if(col.dataset.sig===sig)return;
+  col.dataset.sig=sig;
+  container.innerHTML=arr.map(it=>`
+    <div class="aud-item">
+      <span class="aud-item-num" style="color:${cat.color}">#${it.num}</span>
+      <span class="aud-item-text">${escHtml(it.text)}${showAssignee&&it.assignee?`<span class="aud-item-assignee">👤 ${escHtml(it.assignee)}</span>`:''}</span>
+    </div>`).join('');
 }
 
 /* ── SUPABASE POLL ── */
